@@ -1,7 +1,7 @@
 # feedback-backend
 The backend of the application for feedback analysis.
 
-Files:
+Files:  
     'src/' - folder is for the java project files and packages.
     
     .gitignore - defines files and file types to be ignored.
@@ -15,15 +15,15 @@ Files:
 
     system.properties - used by heroku to specify the version of java we are using.
 
-Useful Commands:
-    To use Maven to build the project, (which at the moment contains the bare minimum):
+Useful Commands:  
+    To use Maven to build the project, (which at the moment contains the bare minimum):  
         `$ mvn clean install`
-    This should build the file, install any dependencies etc, there are also other ways of doing this I think, such as:
+    This should build the file, install any dependencies etc, there are also other ways of doing this I think, such as:  
         `$ mvn test`
     also does the same I think.
 
-    Both will find the MainTest.java JUnit test because:
-        1. the name ends (or starts) with Test
-        2. and it is in the 'test/java/' directory
-    After it is found mvn will run the test automatically (This will also happen on the travis-ci pipeline too :D ).
-        Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.
+    Both will find the MainTest.java JUnit test because:  
+        1. the name ends (or starts) with Test  
+        2. and it is in the 'test/java/' directory  
+    After it is found mvn will run the test automatically (This will also happen on the travis-ci pipeline too :D ).  
+        Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.  
