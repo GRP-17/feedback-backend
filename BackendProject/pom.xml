@@ -71,7 +71,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<finalName>NAME_OF_YOUR_JAR.jar</finalName>
+					<finalName>feedback-backend-reduced-dependencies</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -79,7 +79,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.5</version>
 				<configuration>
-					<finalName>NAME_OF_YOUR_JAR.jar</finalName>
+					<finalName>feedback-backend-with-dependencies</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
