@@ -51,8 +51,8 @@ Useful Commands:
 
  where the -B flag just removes the coloured output.. I think  
 
-![travis-log-example1](https://github.com/GRP-17/feedback-backend/images/travis-log-example1.png)  
-![travis-log-example2](https://github.com/GRP-17/feedback-backend/images/travis-log-example2.png)
+![travis-log-example1](https://github.com/GRP-17/feedback-backend/blob/master/images/travis-log-example1.PNG)  
+![travis-log-example2](https://github.com/GRP-17/feedback-backend/blob/master/images/travis-log-example2.PNG)
 
 p.s the pictures was a experiment with the .md syntax / markdown syntax.
 
