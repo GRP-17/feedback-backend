@@ -1,5 +1,5 @@
 language: java
 
 script: 
-  - ./mvnw install -B
-  - ./mvnw test -B
+  - mvn install -B
+  - mvn test -B
