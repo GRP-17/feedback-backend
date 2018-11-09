@@ -17,14 +17,42 @@ Files:
     system.properties - used by heroku to specify the version of java we are using.  
 
 Useful Commands:  
+
  To use Maven to build the project, (which at the moment contains the bare minimum):  
-    `$ mvn clean install`  
- This should build the file, install any dependencies etc, there are also other ways of doing this I think, such as:  
-    `$ mvn test`  
+
+    $ mvn clean install 
+
+ This should build the file, install any dependencies etc, there are also other ways of doing this I think, such as:
+
+    $ mvn test 
+
  also does the same I think.
 
  Both will find the MainTest.java JUnit test because:  
-    1. the name ends (or starts) with Test  
-    2. and it is in the 'test/java/' directory  
- After it is found mvn will run the test automatically (This will also happen on the travis-ci pipeline too :D ).  
+
+   1.  the name ends (or starts) with Test  
+   1.  and it is in the 'test/java/' directory  
+
+ After it is found mvn will run the test automatically.  
     Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.  
+
+ This will also happen on the travis-ci pipeline too :D  
+ by default travis will run two commands for Maven:  
+
+ First:    
+
+    $ mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V  
+
+ Note: tests are skipped here and run in the other command (below), also it skips building the javadocs  
+
+ Second:     
+
+    $ mvn test -B  
+
+ where the -B flag just removes the coloured output.. I think  
+
+![travis-log-example1](/images/travis-log-example1.png)
+![travis-log-example1](/images/travis-log-example2.png)
+
+p.s the pictures was a experiment with the .md syntax / markdown syntax.
+
