@@ -1,5 +1,5 @@
 language: java
 
 script: 
-  - mvn clean install -f BackendProject/pom.xml -B
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -f BackendProject/pom.xml -B -V
   - mvn test -f BackendProject/pom.xml -B

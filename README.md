@@ -3,7 +3,7 @@ The backend of the application for feedback analysis.
 
 Files:  
     
-    'src/' - folder is for the java project files and packages.  
+    'BackendProject/' - folder is for the java project files and packages - should be able to import it into Eclipse as a Java project.  
 
     .gitignore - defines files and file types to be ignored.  
 
@@ -27,6 +27,12 @@ Useful Commands:
     $ mvn test 
 
  also does the same I think.
+
+ note that
+
+    $ mvn test (or install) -f <pom.xml filepath>
+ 
+ will allow you to specify where the pom.xml file is that you want to build. If you run the command from outside the directory (as in the travis file)
 
  Both will find the MainTest.java JUnit test because:  
 

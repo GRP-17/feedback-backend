@@ -25,10 +25,10 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# target folder - used in maven build - I think
+# target folder - used in maven build
 target
 
-# used by heroku to define enviroment variables locally - for use in testing locally - I think
+# used by heroku to define enviroment variables locally - for use in testing locally
 .env
 
 # not sure but were included in the heroku deployment example
