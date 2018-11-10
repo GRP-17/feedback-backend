@@ -1,6 +1,6 @@
 language: java
 
-before_deploy: 
+script: 
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -f BackendProject/pom.xml -B -V
   - mvn test -f BackendProject/pom.xml -B
 
