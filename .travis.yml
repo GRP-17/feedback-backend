@@ -1,3 +1,9 @@
 language: java
-
 jdk: oraclejdk11
+deploy:
+  provider: heroku
+  api_key:
+    secure: cK4IV27MaWeXtZQ29rxRJsmG0OGVTdiMbkadPJml1op35BKsfwTSISrttOXmxAcRqjJT81YhZ+Qoi8JTqpxEQgH+tpA/EjUZwgA8qpJVwdIk+CZGKRonX6JykXcTEYwxb/rYIV62PNNxhMt0oTtFuw07LUZGK3WGKOmCjpyIN++0EWtPzzIM5bXLi1/YDRIyWTwJKxpUK7TGDvEp1H7zK+aVNKeQ6tklpBapk3KQoAvEriv/fAW4l60nUjACaShzaxw1FB++aMf8MrCoA3sZsR7nQZUcl7Aid5WqXmM5h4jiZFEP2I+cLsPWC4eC3VWNhh0gpSE3/MCM7sTJmXb9J8ZcgRVDG1zMAMZLpVHLLmaZphPQjPIUYBlfDlX9f8ZUWSaTBfoQiOqm+PhES7kP9GOfvj9jWGChbjMShlpkErCt1b2IE2Vu++9+XIngYjpHY3IFiwXfjTyPjBDo73qmQim4zMAWi7kIRQ5jFhgw6FJprRDL2UCXIjsV/43wO926gDcL7WHchUFm2S7Shz64IfNxr6GRimlV5wLJjuvRS24Ba/19atiY5QyalUz39HdYlWZT4aQsXr62/lOmV3/ngaa3uPLP8Inj78Anx0+PeQ+5h7VAbj55j1Qp57bLhNgRqMfDPqUMD64mML8VnUSs+wcRcDt1PyVmAq0d6a3gDUs=
+  app:
+    master: feedback-analysis-app
+    calculator: feedback-analysis-calculator
