@@ -1,7 +1,7 @@
 language: java
 
 before_script:
-  - cd BackendProjects
+  - cd BackendProject
 
 script: 
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
