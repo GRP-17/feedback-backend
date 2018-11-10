@@ -1,1 +1,1 @@
-web: java -jar target/feedback-backend-1.0.jar
+web: java -jar BackendProject/target/feedback-backend-1.0.jar
