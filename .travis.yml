@@ -1,8 +1,11 @@
 language: java
 
+before_script:
+  - cd BackendProjects
+
 script: 
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -f BackendProject/pom.xml -B -V
-  - mvn test -f BackendProject/pom.xml -B
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn test -B
 
 deploy:
   provider: heroku
