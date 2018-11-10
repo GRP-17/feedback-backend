@@ -1,9 +1,10 @@
 language: java
 
-script: 
+before_deploy: 
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -f BackendProject/pom.xml -B -V
   - mvn test -f BackendProject/pom.xml -B
 
 deploy:
   provider: heroku
   api_key: 6b2f6e8e-142f-4347-b715-ebb6e6d1aa44 # need to encrypt the api key 
+  app: feedback-analysis-app
