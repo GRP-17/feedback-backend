@@ -1,0 +1,1 @@
+web: java -jar target/feedback-backend-1.0.jar -p 7000

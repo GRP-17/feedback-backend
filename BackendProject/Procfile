@@ -1,1 +1,1 @@
-web: java -jar -Dserver.port=$PORT target/feedback-backend-1.0.jar
+web: java -Dserver.port=$PORT -jar target/feedback-backend-1.0.jar
