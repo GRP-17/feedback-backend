@@ -57,8 +57,10 @@ Useful Commands:
 
  where the -B flag just removes the coloured output.. I think  
 
-![travis-log-example1](https://github.com/GRP-17/feedback-backend/blob/master/images/travis-log-example1.PNG)  
-![travis-log-example2](https://github.com/GRP-17/feedback-backend/blob/master/images/travis-log-example2.PNG)
-
 p.s the pictures was a experiment with the .md syntax / markdown syntax.
+
+
+Command for testing the heroku deployment of the master branch, with the test.JSON file... (need to have the terminal open in the folder with the test.JSON file :D)
+
+    curl -X POST  https://feedback-analysis-grp-app.herokuapp.com/feedback -d "@test.JSON" -H "Content-Type:application/json"
 
