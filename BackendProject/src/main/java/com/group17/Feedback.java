@@ -1,7 +1,6 @@
 package com.group17;
 
 public class Feedback {
-
     private Integer rating;
     private String text;
 
