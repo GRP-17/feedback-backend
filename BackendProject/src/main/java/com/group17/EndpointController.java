@@ -1,8 +1,12 @@
 package com.group17;
 
-import org.springframework.web.bind.annotation.*;
+import java.util.UUID;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class EndpointController {
@@ -25,6 +29,10 @@ public class EndpointController {
         } else if(feedback.getRating() < 1 || feedback.getRating() > 10) {
             return new ResponseEntity("rating cannot be less than 1 star or more than 10 stars\n", HttpStatus.BAD_REQUEST);
         } else {
+        	
+        	// TODO - Use this in database storage
+        	UUID uniqueId = UUID.randomUUID();
+        	
             return new ResponseEntity(String.format(response_template, feedback.getStars(), feedback.getText()), HttpStatus.OK);
         }
     }
