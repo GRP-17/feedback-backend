@@ -24,16 +24,21 @@ public class EndpointController {
 
     @PostMapping("/feedback")
     public ResponseEntity<String> receiveFeedback(@RequestBody Feedback feedback) {
+    	Application.getLogger().info("Endpoint called: [Rating:" + feedback.getRating() 
+    									+ ", Text:" + feedback.getText() + "]");
         if(feedback.getRating() == null) {
-            return new ResponseEntity("no rating provided\n", HttpStatus.BAD_REQUEST);
+        	Application.getLogger().error("Didn't provide rating");
+            return new ResponseEntity("No rating provided\n", HttpStatus.BAD_REQUEST);
         } else if(feedback.getRating() < 1 || feedback.getRating() > 10) {
-            return new ResponseEntity("rating cannot be less than 1 star or more than 10 stars\n", HttpStatus.BAD_REQUEST);
+        	Application.getLogger().error("Rating wasn't between 1 and 10");
+            return new ResponseEntity("Rating must be between 1 and 10\n", HttpStatus.BAD_REQUEST);
         } else {
-        	
-        	// TODO - Use this in database storage
+        	String toReturn = String.format(response_template, feedback.getStars(), feedback.getText());
+        	// TODO - Use this in database storage and also log the data storage
         	UUID uniqueId = UUID.randomUUID();
-        	
-            return new ResponseEntity(String.format(response_template, feedback.getStars(), feedback.getText()), HttpStatus.OK);
+
+        	Application.getLogger().info("Successfully returned " + toReturn + " for " + uniqueId);
+            return new ResponseEntity(toReturn, HttpStatus.OK);
         }
     }
 	

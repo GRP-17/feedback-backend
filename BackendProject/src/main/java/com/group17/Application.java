@@ -9,7 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class Application implements ApplicationRunner {
-	private static final Logger logger = LogManager.getLogger(Application.class);
+	private static final Logger logger;
+	
+	static {
+		logger = LogManager.getLogger(Application.class);
+	}
 
 	// executes the Spring run() function which will start the server
 	public static void main(String[] args) throws Exception {
@@ -23,6 +27,10 @@ public class Application implements ApplicationRunner {
 		logger.warn("Warning");
 		logger.error("Error");
 		logger.fatal("Fatal");
+	}
+	
+	public static Logger getLogger() {
+		return logger;
 	}
 
 }
