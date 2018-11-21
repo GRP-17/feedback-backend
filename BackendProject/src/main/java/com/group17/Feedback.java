@@ -1,23 +1,20 @@
 package com.group17;
 
 public class Feedback {
-    private Integer rating;
-    private String text;
+    private final Integer rating;
+    private final String text;
 
-    public Integer getRating() {
+    public Feedback(Integer rating, String text) {
+		this.rating = rating;
+		this.text = text;
+	}
+
+	public Integer getRating() {
         return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
     }
 
     public String getText() {
         return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getStars() {
