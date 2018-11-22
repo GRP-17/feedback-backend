@@ -5,18 +5,18 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
-import com.group17.EndpointController;;
+import com.group17.EndpointController;
 
 public class EndpointControllerTest {
 	private EndpointController sut = new EndpointController();
 	
 	@Test
-	public void shouldReturnErrorForEmptyText() {
+	public void shouldReturnOkForEmptyText() {
 		assertEquals(HttpStatus.OK, sut.getResponse(new Feedback(5, "")).getV());
 	}
 	
 	@Test
-	public void shouldReturnErrorForRatingValid() {
+	public void shouldReturnOkForRatingValid() {
 		assertEquals(HttpStatus.OK, sut.getResponse(new Feedback(9, "Text")).getV());
 	}
 	
