@@ -1,34 +1,56 @@
 package com.group17;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.group17.util.Tuple;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Null;
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 public class EndpointController {
-    private static final String response_template = "Received:\n-Rating: %s\n-Text: %s\n";
+    private final String response_template = "Feedback:\n-Rating: %s\n-Text: %s\n";
+    private final String full_response_template = "%s -Link: %s\n";
 
-    @PostMapping("/feedback")
-    public ResponseEntity<String> receiveFeedback(@RequestBody Feedback feedback) {
+    @Autowired
+    private FeedbackRepository feedbackDb;
+
+    @PostMapping(
+            value = "/feedback/save",
+            headers = "Accept=application/json"
+    )
+    public ResponseEntity<String> receiveFeedback(HttpServletRequest request, @RequestBody FeedbackEntity feedback) {
     	Application.getLogger().info("Endpoint called: [Rating:" + feedback.getRating() 
     									+ ", Text:" + feedback.getText() + "]");
+
+        Tuple<String, HttpStatus> responseTuple = checkFeedback(feedback);
     	
-    	Tuple<String, HttpStatus> responseTuple = getResponse(feedback);
-    	
-//    	if(responseTuple.getV().equals(HttpStatus.OK))
-//    	{
-//        	TODO - Use this in database storage and also log the data storage
-//        	UUID uniqueId = UUID.randomUUID();
-//    	}
-    	
-        return new ResponseEntity<String>(responseTuple.getK(), responseTuple.getV());
+    	if(!responseTuple.getV().equals(HttpStatus.OK))
+    	{
+            return new ResponseEntity<String>(responseTuple.getK(), responseTuple.getV());
+        }
+
+        //TODO - Use this in database storage and also log the data storage
+        UUID uniqueId = UUID.randomUUID();
+        feedback.setId(uniqueId.toString());
+        feedbackDb.save(feedback);
+        String linkUrl = String.format(
+                "%s://%s:%d/feedback/get/%s", request.getScheme(), request.getServerName(),
+                request.getServerPort(), uniqueId.toString()
+        );
+        Tuple<String, HttpStatus> fullOkResponseTuple = new Tuple<String, HttpStatus>(
+                String.format(full_response_template, responseTuple.getK(), linkUrl),
+                responseTuple.getV()
+        );
+        return new ResponseEntity<String>(fullOkResponseTuple.getK(), fullOkResponseTuple.getV());
     }
     
-    protected Tuple<String, HttpStatus> getResponse(Feedback feedback) {
+    protected Tuple<String, HttpStatus> checkFeedback(FeedbackEntity feedback) {
         if(feedback.getRating() == null) {
         	Application.getLogger().error("Didn't provide rating");
         	return new Tuple<String, HttpStatus>("No rating provided\n", HttpStatus.BAD_REQUEST);
@@ -39,6 +61,26 @@ public class EndpointController {
         	String toReturn = String.format(response_template, feedback.getStars(), feedback.getText());
         	Application.getLogger().info("Successfully returned " + toReturn);
             return new Tuple<String, HttpStatus>(toReturn, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(
+            value = "/feedback/get/{id}"
+    )
+    public ResponseEntity<String> sendFeedback(@PathVariable("id") String id) {
+        Tuple<String, HttpStatus> responseTuple = idDbReturn(id);
+        return new ResponseEntity<String>(responseTuple.getK(),responseTuple.getV());
+    }
+
+    protected Tuple<String, HttpStatus> idDbReturn(String id) {
+        List<FeedbackEntity> dbResponse = feedbackDb.findById(id);
+        if(dbResponse.isEmpty()) {
+            Application.getLogger().info("There was no feedback with that id");
+            return new Tuple<String, HttpStatus>("No entry with that id\n", HttpStatus.NOT_FOUND);
+        } else {
+            FeedbackEntity response =  dbResponse.get(0);
+            Application.getLogger().info("Entry being returned : " + response.toString());
+            return new Tuple<String, HttpStatus>(response.toString(), HttpStatus.OK);
         }
     }
 	

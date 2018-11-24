@@ -12,22 +12,22 @@ public class EndpointControllerTest {
 	
 	@Test
 	public void shouldReturnOkForEmptyText() {
-		assertEquals(HttpStatus.OK, sut.getResponse(new Feedback(5, "")).getV());
+		assertEquals(HttpStatus.OK, sut.checkFeedback(new FeedbackEntity(5, "")).getV());
 	}
 	
 	@Test
 	public void shouldReturnOkForRatingValid() {
-		assertEquals(HttpStatus.OK, sut.getResponse(new Feedback(9, "Text")).getV());
+		assertEquals(HttpStatus.OK, sut.checkFeedback(new FeedbackEntity(9, "Text")).getV());
 	}
 	
 	@Test
 	public void shouldReturnErrorForRatingBelow() {
-		assertEquals(HttpStatus.BAD_REQUEST, sut.getResponse(new Feedback(0, "Text")).getV());
+		assertEquals(HttpStatus.BAD_REQUEST, sut.checkFeedback(new FeedbackEntity(0, "Text")).getV());
 	}
 	
 	@Test
 	public void shouldReturnErrorForRatingAbove() {
-		assertEquals(HttpStatus.BAD_REQUEST, sut.getResponse(new Feedback(11, "Text")).getV());
+		assertEquals(HttpStatus.BAD_REQUEST, sut.checkFeedback(new FeedbackEntity(11, "Text")).getV());
 	}
 	
 	
