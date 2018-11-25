@@ -4,6 +4,10 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.Range;
+
 @Entity
 @Table(name = "feedback", schema = "hy1xosk6o5taszzw")
 public class Feedback {
@@ -13,7 +17,14 @@ public class Feedback {
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
     private String id;
+
+    @NotNull(message = "Rating is required.")
+    @Range(min = 1, max = 10, message = "The range of rating is {min} ~ {max}.")
+    @Column(name = "rating", columnDefinition = "INT(11)")
     private Integer rating;
+
+    @Size(min = 1, max = 65535)
+    @Column(name = "text", columnDefinition = "INT(11)")
     private String text;
 
     public Feedback() {}
@@ -23,27 +34,22 @@ public class Feedback {
 		this.text = text;
 	}
 
-	@Column(name = "id")
     public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-    @Column(name = "rating")
 	public Integer getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) { this.rating = rating; }
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
 
     public String getText() {
         return text;
     }
 
-    @Column(name = "text")
     public void setText(String text) {
         this.text = text;
     }
