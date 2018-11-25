@@ -34,7 +34,7 @@ public class FeedbackControllerTest {
     @Autowired
     private FeedbackRepository repository;
 
-    private String testFeedBackId;
+    static private String testFeedBackId;
 
     @Test
     public void testAFindAllShouldReturnFeedbackList() throws Exception {
@@ -66,7 +66,7 @@ public class FeedbackControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        testFeedBackId = JsonPath.parse(result).read("$.id").toString();
+        testFeedBackId = JsonPath.parse(result).read("$.id");
     }
 
     @Test
