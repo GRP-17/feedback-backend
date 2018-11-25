@@ -1,11 +1,7 @@
 package com.group17;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import org.springframework.data.repository.CrudRepository;
+interface FeedbackRepository extends JpaRepository<Feedback, String> {
 
-public interface FeedbackRepository extends CrudRepository<FeedbackEntity, Long> {
-
-    List<FeedbackEntity> findByRating(Integer rating);
-    List<FeedbackEntity> findById(String id);
 }
