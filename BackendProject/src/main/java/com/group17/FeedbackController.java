@@ -90,8 +90,11 @@ public class FeedbackController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable String id) {
-
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (Exception e) {
+            throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
+        }
 
         return ResponseEntity.noContent().build();
     }
