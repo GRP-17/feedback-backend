@@ -18,11 +18,12 @@ public class Application implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments applicationArguments) throws Exception {
-		logger.debug("Debugging log");
-		logger.info("Info log");
-		logger.warn("Warning");
-		logger.error("Error");
-		logger.fatal("Fatal"); 
+//		logger.debug("Debugging log");
+//		logger.info("Info log");
+//		logger.warn("Warning");
+//		logger.error("Error");
+//		logger.fatal("Fatal");
+		logger.info("Application started");
 	}
 	
 	public static Logger getLogger() {

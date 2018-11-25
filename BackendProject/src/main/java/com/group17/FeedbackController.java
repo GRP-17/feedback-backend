@@ -1,6 +1,9 @@
 package com.group17;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
+
+import com.group17.utils.CommonException;
+import com.group17.utils.ErrorResponse;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 
@@ -10,11 +13,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.transaction.TransactionSystemException;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ConstraintViolation;
 
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
+
     private final FeedbackRepository repository;
 
     private final FeedbackResourceAssembler assembler;
@@ -37,7 +46,7 @@ public class FeedbackController {
     }
 
     @PostMapping(headers = "Accept=application/json")
-    ResponseEntity<?> create(@RequestBody Feedback newFeedback) throws URISyntaxException {
+    ResponseEntity<?> create(@RequestBody Feedback newFeedback) throws URISyntaxException, TransactionSystemException {
 
         Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
 
@@ -47,16 +56,16 @@ public class FeedbackController {
     }
 
     @GetMapping("/{id}")
-    Resource<Feedback> findOne(@PathVariable String id) {
+    Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
 
         Feedback feedback = repository.findById(id)
-                .orElseThrow(() -> new FeedbackNotFoundException(id));
+                .orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
         return assembler.toResource(feedback);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id) throws URISyntaxException {
+    ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id) throws URISyntaxException, TransactionSystemException {
 
         Feedback updatedFeedback = repository.findById(id)
                 .map(feedback -> {
@@ -70,7 +79,7 @@ public class FeedbackController {
                     }
                     return repository.save(feedback);
                 })
-                .orElseThrow(() -> new FeedbackNotFoundException(id));
+                .orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
         Resource<Feedback> resource = assembler.toResource(updatedFeedback);
 
@@ -85,5 +94,38 @@ public class FeedbackController {
         repository.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /* Error Handlers */
+    // TODO: could be extended from a common controller class
+    @ExceptionHandler(CommonException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(CommonException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+        error.setErrorCode(ex.getErrorCode());
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<ErrorResponse> constraintViolationExceptionHandler(TransactionSystemException ex) {
+
+        // loop until find the ConstraintViolationException
+        Throwable t = ex;
+        while ((t != null) && !(t instanceof ConstraintViolationException)) {
+            t = t.getCause();
+        }
+
+        // loop the list to get results
+        StringBuilder msgList = new StringBuilder();
+        for (ConstraintViolation<?> constraintViolation : ((ConstraintViolationException) t).getConstraintViolations()) {
+            msgList.append(constraintViolation.getMessage());
+        }
+        ErrorResponse error = new ErrorResponse();
+        error.setErrorCode(HttpStatus.PRECONDITION_FAILED.value());
+        error.setMessage(msgList.toString());
+
+        return new ResponseEntity<>(error, HttpStatus.OK);
     }
 }
