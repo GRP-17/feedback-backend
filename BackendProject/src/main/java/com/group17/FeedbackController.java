@@ -41,6 +41,8 @@ public class FeedbackController {
                 .map(assembler::toResource)
                 .collect(Collectors.toList());
 
+        Application.getLogger().info("[feedback/browse] Found. Object list size: " + feedback.size());
+
         return new Resources<>(feedback,
                 linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel());
     }
@@ -49,6 +51,8 @@ public class FeedbackController {
     ResponseEntity<?> create(@RequestBody Feedback newFeedback) throws URISyntaxException, TransactionSystemException {
 
         Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
+
+        Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId() + ". Object: " + newFeedback.toString());
 
         return ResponseEntity
                 .created(new URI(resource.getId().expand().getHref()))
@@ -60,6 +64,8 @@ public class FeedbackController {
 
         Feedback feedback = repository.findById(id)
                 .orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
+
+        Application.getLogger().info("[feedback/retrieve] Retrieved: " + id + ". Object: " + feedback.toString());
 
         return assembler.toResource(feedback);
     }
@@ -81,6 +87,8 @@ public class FeedbackController {
                 })
                 .orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
+        Application.getLogger().info("[feedback/update] Updated: " + id + ". Object: " + newFeedback.toString());
+
         Resource<Feedback> resource = assembler.toResource(updatedFeedback);
 
         return ResponseEntity
@@ -90,8 +98,10 @@ public class FeedbackController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable String id) {
+
         try {
             repository.deleteById(id);
+            Application.getLogger().info("[feedback/delete] Deleted: " + id);
         } catch (Exception e) {
             throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
         }
@@ -103,6 +113,7 @@ public class FeedbackController {
     // TODO: could be extended from a common controller class
     @ExceptionHandler(CommonException.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(CommonException ex) {
+        Application.getLogger().info("[exception] " + ex.getMessage());
 
         ErrorResponse error = new ErrorResponse();
         error.setErrorCode(ex.getErrorCode());
