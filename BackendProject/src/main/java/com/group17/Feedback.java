@@ -2,19 +2,23 @@ package com.group17;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
 @Table(name = "feedback", schema = "hy1xosk6o5taszzw")
-public class FeedbackEntity {
+public class Feedback {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", columnDefinition = "VARCHAR(36)")
     private String id;
     private Integer rating;
     private String text;
 
-    public FeedbackEntity() {
-    }
+    public Feedback() {}
 
-    public FeedbackEntity(Integer rating, String text) {
+    public Feedback(Integer rating, String text) {
 		this.rating = rating;
 		this.text = text;
 	}
@@ -23,7 +27,6 @@ public class FeedbackEntity {
     public String getId() {
 		return id;
 	}
-
 
 	public void setId(String id) {
 		this.id = id;
