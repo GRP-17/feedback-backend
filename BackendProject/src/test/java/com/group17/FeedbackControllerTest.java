@@ -24,50 +24,51 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTest {
 
-  private static String testFeedBackId;
-  @Autowired private MockMvc mockMvc;
-  @Autowired private FeedbackRepository repository;
+	private static String testFeedBackId;
+	@Autowired private MockMvc mockMvc;
+	@Autowired private FeedbackRepository repository;
 
-  @Test
-  public void testAFindAllShouldReturnFeedbackList() throws Exception {
-    List<Feedback> feedbackList = repository.findAll();
+	@Test
+	public void testAFindAllShouldReturnFeedbackList() throws Exception {
+		List<Feedback> feedbackList = repository.findAll();
 
-    this.mockMvc
-        .perform(get("/feedback"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$._embedded.feedbackList").isArray())
-        .andExpect(jsonPath("$._embedded.feedbackList.length()").value(feedbackList.size()));
-  }
+		this.mockMvc
+			.perform(get("/feedback"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$._embedded.feedbackList").isArray())
+			.andExpect(jsonPath("$._embedded.feedbackList.length()").value(feedbackList.size()));
+	}
 
-  @Test
-  public void testBFindAllShouldReturnLinks() throws Exception {
-    this.mockMvc
-        .perform(get("/feedback"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$._links").isMap());
-  }
+	@Test
+	public void testBFindAllShouldReturnLinks() throws Exception {
+		this.mockMvc
+			.perform(get("/feedback"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$._links").isMap());
+	}
 
-  @Test
-  public void testCCreateShouldReturnResults() throws Exception {
+	@Test
+	public void testCCreateShouldReturnResults() throws Exception {
 
-    String result =
-        this.mockMvc
-            .perform(
-                post("/feedback")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new String("{\"rating\":7, \"text\": \"this is a test\"}")))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.rating").value(7))
-            .andExpect(jsonPath("$.text").value("this is a test"))
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+		String result =
+				this.mockMvc
+				.perform(
+						post("/feedback")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(new String("{\"rating\":7, \"text\": \"this is a test\"}")))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.rating").value(7))
+				.andExpect(jsonPath("$.text").value("this is a test"))
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
-    testFeedBackId = JsonPath.parse(result).read("$.id");
-  }
+		testFeedBackId = JsonPath.parse(result).read("$.id");
+	}
 
-  @Test
-  public void testDDeleteShouldReturnResults() throws Exception {
-    this.mockMvc.perform(delete("/feedback/" + testFeedBackId)).andExpect(status().isNoContent());
-  }
+	@Test
+	public void testDDeleteShouldReturnResults() throws Exception {
+		this.mockMvc.perform(delete("/feedback/" + testFeedBackId)).andExpect(status().isNoContent());
+	}
+	
 }

@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.group17.util.CommonException;
 import com.group17.util.ErrorResponse;
+import com.ibm.watson.developer_cloud.service.security.IamOptions;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneOptions;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -23,6 +27,16 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
+	private static final String IBM_API_KEY = "t6ayyh6UX9UiRiM-SFCkjSOXHdasKGJbiguzWEvu8yUV";
+	private static final String IBM_VERSION = "2018-11-27";
+	private static final String IBM_URL = "https://gateway-wdc.watsonplatform.net/tone-analyzer/api";
+	
+	/**
+	 * The ToneAnalyzer singleton that stores the above IBM constants and provides
+	 * endpoint calls.
+	 */
+	private static ToneAnalyzer toneAnalyzer;
+	
 	private final FeedbackRepository repository;
 	private final FeedbackResourceAssembler assembler;
 
@@ -48,11 +62,26 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 
 		Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
-
 		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
+		
+		analyze(newFeedback.getText());
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
+	}
+	
+	private void analyze(String text)
+	{
+		if(toneAnalyzer == null)
+		{
+			IamOptions options = new IamOptions.Builder().apiKey(IBM_API_KEY).build();
+			toneAnalyzer = new ToneAnalyzer(IBM_VERSION, options);
+			toneAnalyzer.setEndPoint(IBM_URL);
+		}
+
+		ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
+		ToneAnalysis toneAnalysis = toneAnalyzer.tone(toneOptions).execute();
+		Application.getLogger().info(toneAnalysis);
 	}
 
 	@GetMapping("/{id}")
