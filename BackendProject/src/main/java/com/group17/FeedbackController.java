@@ -24,7 +24,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
 	private final FeedbackRepository repository;
-
 	private final FeedbackResourceAssembler assembler;
 
 	public FeedbackController(FeedbackRepository repository, FeedbackResourceAssembler assembler) {
@@ -50,12 +49,8 @@ public class FeedbackController {
 
 		Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
 
-		Application.getLogger()
-		.info(
-				"[feedback/create] Created: "
-						+ newFeedback.getId()
-						+ ". Object: "
-						+ newFeedback.toString());
+		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
+										+ ". Object: " + newFeedback.toString());
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
@@ -71,8 +66,8 @@ public class FeedbackController {
 						new CommonException(
 								"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
-		Application.getLogger()
-		.info("[feedback/retrieve] Retrieved: " + id + ". Object: " + feedback.toString());
+		Application.getLogger().info("[feedback/retrieve] Retrieved: " + id 
+										+ ". Object: " + feedback.toString());
 
 		return assembler.toResource(feedback);
 	}
@@ -80,29 +75,27 @@ public class FeedbackController {
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id)
 			throws URISyntaxException, TransactionSystemException {
-
 		Feedback updatedFeedback =
 				repository
 				.findById(id)
-				.map(
-						feedback -> {
-							Integer newRating = newFeedback.getRating();
-							String newText = newFeedback.getText();
-							if (newRating != null) {
-								feedback.setRating(newRating);
-							}
-							if (newText != null) {
-								feedback.setText(newText);
-							}
-							return repository.save(feedback);
-						})
+				.map(feedback -> {
+						Integer newRating = newFeedback.getRating();
+						String newText = newFeedback.getText();
+						if (newRating != null) {
+							feedback.setRating(newRating);
+						}
+						if (newText != null) {
+							feedback.setText(newText);
+						}
+						return repository.save(feedback);
+					 })
 				.orElseThrow(
 						() ->
 						new CommonException(
 								"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
-		Application.getLogger()
-		.info("[feedback/update] Updated: " + id + ". Object: " + newFeedback.toString());
+		Application.getLogger().info("[feedback/update] Updated: " + id 
+										+ ". Object: " + newFeedback.toString());
 
 		Resource<Feedback> resource = assembler.toResource(updatedFeedback);
 
@@ -126,7 +119,7 @@ public class FeedbackController {
 	// TODO: could be extended from a common controller class
 	@ExceptionHandler(CommonException.class)
 	public ResponseEntity<ErrorResponse> exceptionHandler(CommonException ex) {
-		Application.getLogger().info("[exception] " + ex.getMessage());
+		Application.getLogger().warn("[exception] " + ex.getMessage());
 
 		ErrorResponse error = new ErrorResponse();
 		error.setErrorCode(ex.getErrorCode());
