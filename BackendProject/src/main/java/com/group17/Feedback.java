@@ -22,7 +22,7 @@ public class Feedback {
 	private Integer rating;
 
 	@Size(min = 1, max = 65535)
-	@Column(name = "text", columnDefinition = "INT(11)")
+	@Column(name = "text", columnDefinition = "text")
 	private String text;
 
 	public Feedback() {}
