@@ -8,12 +8,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-class RootController {
+public class RootController {
 
-  @GetMapping
-  ResourceSupport index() {
-    ResourceSupport rootResource = new ResourceSupport();
-    rootResource.add(linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
-    return rootResource;
-  }
+	@GetMapping
+	public ResourceSupport index() {
+		ResourceSupport rootResource = new ResourceSupport();
+		rootResource.add(linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
+		return rootResource;
+	}
+	
 }
