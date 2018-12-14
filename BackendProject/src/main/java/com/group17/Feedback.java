@@ -17,15 +17,17 @@ public class Feedback {
 	private String id;
 
 	@NotNull(message = "Rating is required.")
-	@Range(min = 1, max = 10, message = "The range of rating is {min} ~ {max}.")
+	@Range(min = 1, max = 5, message = "The range of rating is {min} ~ {max}.")
 	@Column(name = "rating", columnDefinition = "INT(11)")
 	private Integer rating;
 
-	@Size(min = 1, max = 65535)
+	@Size(max = 65535)
 	@Column(name = "text", columnDefinition = "text")
 	private String text;
 
-	public Feedback() {}
+	public Feedback() {
+		this.text = "";
+	}
 
 	public Feedback(Integer rating, String text) {
 		this.rating = rating;

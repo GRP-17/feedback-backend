@@ -64,8 +64,9 @@ public class FeedbackController {
 		Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
 		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
-		
-		analyze(newFeedback.getText());
+		if(newFeedback.getText().length() != 0) {
+			analyze(newFeedback.getText());
+		}
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
