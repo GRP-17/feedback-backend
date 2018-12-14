@@ -27,22 +27,19 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
-	private static final String IBM_API_KEY = "t6ayyh6UX9UiRiM-SFCkjSOXHdasKGJbiguzWEvu8yUV";
-	private static final String IBM_VERSION = "2018-11-27";
-	private static final String IBM_URL = "https://gateway-wdc.watsonplatform.net/tone-analyzer/api";
-	
-	/**
-	 * The ToneAnalyzer singleton that stores the above IBM constants and provides
-	 * endpoint calls.
-	 */
-	private static ToneAnalyzer toneAnalyzer;
-	
+
 	private final FeedbackRepository repository;
 	private final FeedbackResourceAssembler assembler;
+	private final AnalysisService analysisService;
 
 	public FeedbackController(FeedbackRepository repository, FeedbackResourceAssembler assembler) {
 		this.repository = repository;
 		this.assembler = assembler;
+		this.analysisService = new AnalysisService(
+				"t6ayyh6UX9UiRiM-SFCkjSOXHdasKGJbiguzWEvu8yUV",
+				"2018-11-27",
+				"https://gateway-wdc.watsonplatform.net/tone-analyzer/api"
+		);
 	}
 
 	@GetMapping()
@@ -65,24 +62,10 @@ public class FeedbackController {
 		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
 		if(newFeedback.getText().length() != 0) {
-			analyze(newFeedback.getText());
+			analysisService.analyze(newFeedback.getText());
 		}
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
-	}
-	
-	private void analyze(String text)
-	{
-		if(toneAnalyzer == null)
-		{
-			IamOptions options = new IamOptions.Builder().apiKey(IBM_API_KEY).build();
-			toneAnalyzer = new ToneAnalyzer(IBM_VERSION, options);
-			toneAnalyzer.setEndPoint(IBM_URL);
-		}
-
-		ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
-		ToneAnalysis toneAnalysis = toneAnalyzer.tone(toneOptions).execute();
-		Application.getLogger().info(toneAnalysis);
 	}
 
 	@GetMapping("/{id}")
