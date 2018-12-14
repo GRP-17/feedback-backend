@@ -23,10 +23,9 @@ public class Feedback {
 
 	@Size(max = 65535)
 	@Column(name = "text", columnDefinition = "text")
-	private String text;
+	private String text= "";
 
 	public Feedback() {
-		this.text = "";
 	}
 
 	public Feedback(Integer rating, String text) {
