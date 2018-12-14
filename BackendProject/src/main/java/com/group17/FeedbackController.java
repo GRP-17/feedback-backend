@@ -8,7 +8,6 @@ import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 
 import com.group17.util.CommonException;
-import com.group17.util.ErrorResponse;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
@@ -148,18 +147,13 @@ public class FeedbackController {
 	/* Error Handlers */
 	// TODO: could be extended from a common controller class
 	@ExceptionHandler(CommonException.class)
-	public ResponseEntity<ErrorResponse> exceptionHandler(CommonException ex) {
+	public ResponseEntity<String> exceptionHandler(CommonException ex) {
 		Application.getLogger().warn("[exception] " + ex.getMessage());
-
-		ErrorResponse error = new ErrorResponse();
-		error.setErrorCode(ex.getErrorCode());
-		error.setMessage(ex.getMessage());
-
-		return new ResponseEntity<>(error, HttpStatus.OK);
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.valueOf(ex.getErrorCode()));
 	}
 
 	@ExceptionHandler(TransactionSystemException.class)
-	public ResponseEntity<ErrorResponse> constraintViolationExceptionHandler(
+	public ResponseEntity<String> constraintViolationExceptionHandler(
 			TransactionSystemException ex) {
 
 		// loop until find the ConstraintViolationException
@@ -174,10 +168,7 @@ public class FeedbackController {
 			((ConstraintViolationException) t).getConstraintViolations()) {
 			msgList.append(constraintViolation.getMessage());
 		}
-		ErrorResponse error = new ErrorResponse();
-		error.setErrorCode(HttpStatus.PRECONDITION_FAILED.value());
-		error.setMessage(msgList.toString());
 
-		return new ResponseEntity<>(error, HttpStatus.OK);
+		return new ResponseEntity<>(msgList.toString(), HttpStatus.PRECONDITION_FAILED);
 	}
 }
