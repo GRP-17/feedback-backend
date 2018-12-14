@@ -55,7 +55,7 @@ public class FeedbackControllerTest {
 				.perform(
 						post("/feedback")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(new String("{\"rating\":7, \"text\": \"this is a test\"}")))
+						.content(new String("{\"rating\":5, \"text\": \"this is a test\"}")))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.rating").value(7))
 				.andExpect(jsonPath("$.text").value("this is a test"))
