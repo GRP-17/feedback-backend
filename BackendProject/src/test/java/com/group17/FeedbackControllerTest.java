@@ -70,5 +70,4 @@ public class FeedbackControllerTest {
 	public void testDDeleteShouldReturnResults() throws Exception {
 		this.mockMvc.perform(delete("/feedback/" + testFeedBackId)).andExpect(status().isNoContent());
 	}
-	
 }

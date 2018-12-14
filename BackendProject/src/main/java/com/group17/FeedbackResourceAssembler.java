@@ -7,12 +7,20 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
 
+/**
+ * Used as a factory for the Resources
+ */
 @Component
 public class FeedbackResourceAssembler implements ResourceAssembler<Feedback, Resource<Feedback>> {
 
+	/**
+	 * Generates a resource from the Feedback object supplied
+	 * @param feedback the object to make into a resource
+	 * @return a resource object wrapping up the feedback, has links to the feedback itself and the endpoint
+	 */
 	@Override
 	public Resource<Feedback> toResource(Feedback feedback) {
-		return new Resource<Feedback>(
+		return new Resource<>(
 				feedback,
 				linkTo(methodOn(FeedbackController.class).findOne(feedback.getId())).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
