@@ -71,11 +71,12 @@ public class FeedbackController {
 
 	/**
 	 * default mapping for a post request to the feedback endpoint
-	 * @param newFeedback the rody of the post request (should be in JSON format)
+	 * @param newFeedback the body of the post request (should be in JSON format)
 	 * @return a HTTP status of 201 'Created' and a link to the resource they just created (the endpoint to get that resource)
 	 * @throws URISyntaxException
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
 	 */
+	@CrossOrigin
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
