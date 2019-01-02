@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.util.CommonException;
+import com.group17.util.LoggerUtil;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -62,11 +64,25 @@ public class FeedbackController {
 	public Resources<Resource<Feedback>> findAll() {
 
 		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
+		LoggerUtil.logFeedbackFindAll(resources.size());
 
-		Application.getLogger().info("[feedback/browse] Found. Object list size: " + resources.size());
-
-		return new Resources<>(
+		return new Resources<Resource<Feedback>>(
 				resources, linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel());
+	}
+
+	/**
+	 * a sub-mapping for get requests
+	 * will return a resource for one piece of feedback from the database
+	 * @param id the id of the feedback to return
+	 * @return the resource for the id given, if one exist
+	 * @throws CommonException thrown if an entry in the database could not be found for that id
+	 */
+	@GetMapping("/{id}")
+	public Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
+
+		Resource<Feedback> resource = feedbackService.getFeedbackById(id);
+		LoggerUtil.logFeedbackFindOne(resource.getContent());
+		return resource;
 	}
 
 	/**
@@ -82,31 +98,14 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 
 		Resource<Feedback> resource = feedbackService.saveFeedback(newFeedback);
-		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
-										+ ". Object: " + newFeedback.toString());
+		LoggerUtil.logFeedbackCreate(newFeedback);
 		
-		if(newFeedback.getText().length() != 0)
-			feedbackService.analyze(newFeedback);
+		if(newFeedback.getText().length() != 0) {
+			ToneAnalysis analysis = feedbackService.analyze(newFeedback);
+			LoggerUtil.logAnalysis(newFeedback, analysis);
+		}
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
-	}
-
-	/**
-	 * a sub-mapping for get requests
-	 * will return a resource for one piece of feedback from the database
-	 * @param id the id of the feedback to return
-	 * @return the resource for the id given, if one exist
-	 * @throws CommonException thrown if an entry in the database could not be found for that id
-	 */
-	@GetMapping("/{id}")
-	public Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
-
-		Resource<Feedback> resource = feedbackService.getFeedbackById(id);
-
-		Application.getLogger().info("[feedback/retrieve] Retrieved: " + id 
-										+ ". Object: " + resource.getContent().toString());
-
-		return resource;
 	}
 
 	/**
@@ -122,8 +121,7 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
-		Application.getLogger().info("[feedback/update] Updated: " + id 
-										+ ". Object: " + newFeedback.toString());
+		LoggerUtil.logFeedbackUpdate(resource.getContent());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
@@ -137,7 +135,7 @@ public class FeedbackController {
 
 		try {
 			feedbackService.deleteFeedbackById(id);
-			Application.getLogger().info("[feedback/delete] Deleted: " + id);
+			LoggerUtil.logFeedbackDeleted(id);
 		} catch (Exception e) {
 			throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
 		}
@@ -151,10 +149,9 @@ public class FeedbackController {
 	 * @return a response entity with the message and HTTP status code
 	 */
 	/* Error Handlers */
-	// TODO: could be extended from a common controller class
 	@ExceptionHandler(CommonException.class)
 	public ResponseEntity<String> exceptionHandler(CommonException ex) {
-		Application.getLogger().warn("[exception] " + ex.getMessage());
+		LoggerUtil.logException(ex);
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.valueOf(ex.getErrorCode()));
 	}
 

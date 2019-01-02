@@ -118,16 +118,6 @@ public class FeedbackService {
     public void deleteFeedbackById(String id) throws Exception {
 		repository.deleteById(id);
     }
-
-    /**
-     * Analyze a {@link Feedback} and print it to console.
-     * 
-     * @param feedback what to analyze
-     */
-    public void analyze(Feedback feedback) {
-    	ToneAnalysis toneAnalysis = analyzeText(feedback.getText());
-		Application.getLogger().info(toneAnalysis);
-    }
     
     /**
      * Method that will analyze a given String, and produce
@@ -138,6 +128,15 @@ public class FeedbackService {
     private ToneAnalysis analyzeText(String text) {
         ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
         return toneAnalyzer.tone(toneOptions).execute();
+    }
+
+    /**
+     * Analyze a {@link Feedback} and print it to console.
+     * 
+     * @param feedback what to analyze
+     */
+    public ToneAnalysis analyze(Feedback feedback) {
+    	return analyzeText(feedback.getText());
     }
     
     
