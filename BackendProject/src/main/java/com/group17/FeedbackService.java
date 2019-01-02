@@ -25,7 +25,10 @@ public class FeedbackService {
     private final ToneAnalyzer toneAnalyzer;
 
     /**
-     * constructor
+     * Constructor.
+     * 
+     * @param repository the database representation
+     * @param assembler the resource factory
      * @param key the API key used to connect to the tone analyser
      * @param version the version of the tone analyser to use (a date in string form yyyy-mm-dd)
      * @param url the url to the tone analyser
@@ -41,10 +44,22 @@ public class FeedbackService {
         toneAnalyzer.setEndPoint(url);
     }
     
+    /**
+     * Get every {@link Resource} in the database.
+     * 
+     * @return all of the entries
+     */
     public List<Resource<Feedback>> getAllFeedback() {
     	return repository.findAll().stream().map(assembler::toResource).collect(Collectors.toList());
     }
     
+    /**
+     * Get a single {@link Resource} object.
+     * 
+     * @param id the identifier of the requested entry
+     * @return the entry
+     * @throws CommonException if the id isn't valid (no entry with that given id)
+     */
     public Resource<Feedback> getFeedbackById(String id) throws CommonException {		
     	Feedback feedback =
     		repository.findById(id)
@@ -55,6 +70,14 @@ public class FeedbackService {
     	return assembler.toResource(feedback);
     }
     
+    /**
+     * Update a {@link Feedback} entry in the database.
+     * 
+     * @param id the identifier of the entry to update
+     * @param newFeedback the object containing the data to overwrite with
+     * @return the newly saved resource
+     * @throws CommonException if the id isn't valid (no entry with that given id)
+     */
     public Resource<Feedback> updateFeedback(String id, Feedback newFeedback) throws CommonException {
 		Feedback updatedFeedback =
 				repository.findById(id)
@@ -76,11 +99,23 @@ public class FeedbackService {
     	return assembler.toResource(updatedFeedback);
     }
     
+    /**
+     * Save a {@link Feedback} entry to the database.
+     * 
+     * @param feedback what to save
+     * @return the newly saved resource
+     */
     public Resource<Feedback> saveFeedback(Feedback feedback) {
     	return assembler.toResource(repository.save(feedback));
     }
     
-    public void deleteResourceById(String id) {
+    /**
+     * Delete a {@link Feedback} entry in the database.
+     * 
+     * @param id the id of the {@link Feedback to delete}
+     * @throws Exception if the id isn't valid (no entry with that given id)
+     */
+    public void deleteFeedbackById(String id) throws Exception {
 		repository.deleteById(id);
     }
 

@@ -39,7 +39,8 @@ public class FeedbackController {
 	private final FeedbackService feedbackService;
 
 	/**
-	 * Constructor
+	 * Constructor.
+	 * 
 	 * The Spring server will automatically create an instance of this class using its constructor
 	 * @param repository instance created automatically by the Spring server and assigned to the member variable
 	 * @param assembler instance created automatically by the Spring server and assigned to the member variable
@@ -135,7 +136,7 @@ public class FeedbackController {
 	public ResponseEntity<?> delete(@PathVariable String id) {
 
 		try {
-			feedbackService.deleteResourceById(id);
+			feedbackService.deleteFeedbackById(id);
 			Application.getLogger().info("[feedback/delete] Deleted: " + id);
 		} catch (Exception e) {
 			throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
