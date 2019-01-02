@@ -1,27 +1,32 @@
 package com.group17;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.util.CommonException;
-import com.ibm.watson.developer_cloud.service.security.IamOptions;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneOptions;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -30,12 +35,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
 
-	/** holds the instance of the FeedbackRepository which represents the database */
-	private final FeedbackRepository repository;
-	/** holds the instance of the factory which will make the resources */
-	private final FeedbackResourceAssembler assembler;
 	/** holds the instance of the AnalysisService  */
-	private final AnalysisService analysisService;
+	private final FeedbackService feedbackService;
 
 	/**
 	 * Constructor
@@ -44,9 +45,8 @@ public class FeedbackController {
 	 * @param assembler instance created automatically by the Spring server and assigned to the member variable
 	 */
 	public FeedbackController(FeedbackRepository repository, FeedbackResourceAssembler assembler) {
-		this.repository = repository;
-		this.assembler = assembler;
-		this.analysisService = new AnalysisService(
+		this.feedbackService = new FeedbackService(
+				repository, assembler,
 				"t6ayyh6UX9UiRiM-SFCkjSOXHdasKGJbiguzWEvu8yUV",
 				"2018-11-27",
 				"https://gateway-wdc.watsonplatform.net/tone-analyzer/api"
@@ -60,13 +60,12 @@ public class FeedbackController {
 	@GetMapping()
 	public Resources<Resource<Feedback>> findAll() {
 
-		List<Resource<Feedback>> feedback =
-				repository.findAll().stream().map(assembler::toResource).collect(Collectors.toList());
+		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
 
-		Application.getLogger().info("[feedback/browse] Found. Object list size: " + feedback.size());
+		Application.getLogger().info("[feedback/browse] Found. Object list size: " + resources.size());
 
 		return new Resources<>(
-				feedback, linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel());
+				resources, linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel());
 	}
 
 	/**
@@ -81,13 +80,12 @@ public class FeedbackController {
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
 
-		Resource<Feedback> resource = assembler.toResource(repository.save(newFeedback));
+		Resource<Feedback> resource = feedbackService.saveFeedback(newFeedback);
 		Application.getLogger().info("[feedback/create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
-		if(newFeedback.getText().length() != 0) {
-			ToneAnalysis toneAnalysis = analysisService.analyze(newFeedback.getText());
-			Application.getLogger().info(toneAnalysis);
-		}
+		
+		if(newFeedback.getText().length() != 0)
+			feedbackService.analyze(newFeedback);
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
@@ -102,18 +100,12 @@ public class FeedbackController {
 	@GetMapping("/{id}")
 	public Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
 
-		Feedback feedback =
-				repository
-				.findById(id)
-				.orElseThrow(
-						() ->
-						new CommonException(
-								"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
+		Resource<Feedback> resource = feedbackService.getFeedbackById(id);
 
 		Application.getLogger().info("[feedback/retrieve] Retrieved: " + id 
-										+ ". Object: " + feedback.toString());
+										+ ". Object: " + resource.getContent().toString());
 
-		return assembler.toResource(feedback);
+		return resource;
 	}
 
 	/**
@@ -127,30 +119,10 @@ public class FeedbackController {
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id)
 			throws URISyntaxException, TransactionSystemException {
-		Feedback updatedFeedback =
-				repository
-				.findById(id)
-				.map(feedback -> {
-						Integer newRating = newFeedback.getRating();
-						String newText = newFeedback.getText();
-						if (newRating != null) {
-							feedback.setRating(newRating);
-						}
-						if (newText != null) {
-							feedback.setText(newText);
-						}
-						return repository.save(feedback);
-					 })
-				.orElseThrow(
-						() ->
-						new CommonException(
-								"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 
+		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
 		Application.getLogger().info("[feedback/update] Updated: " + id 
 										+ ". Object: " + newFeedback.toString());
-
-		Resource<Feedback> resource = assembler.toResource(updatedFeedback);
-
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
@@ -163,7 +135,7 @@ public class FeedbackController {
 	public ResponseEntity<?> delete(@PathVariable String id) {
 
 		try {
-			repository.deleteById(id);
+			feedbackService.deleteResourceById(id);
 			Application.getLogger().info("[feedback/delete] Deleted: " + id);
 		} catch (Exception e) {
 			throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
