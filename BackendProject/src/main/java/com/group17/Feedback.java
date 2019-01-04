@@ -1,12 +1,9 @@
 package com.group17;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,14 +27,6 @@ public class Feedback {
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
 	private String id;
-
-	/**
-	 * When this feedback was created.
-	 * <p>
-	 * This is set as soon as the controller creates the resource.
-	 */
-	@Column(name = "dateCreated", columnDefinition = "dateCreated")
-	private Date dateCreated;
 
 	/**
 	 * The rating of the feedback. Is required to be present in valid feedback.
@@ -88,11 +77,6 @@ public class Feedback {
 		this.text = text;
 	}
 	
-	@PrePersist
-	protected void onCreate() {
-		dateCreated = new Date();
-	}
-
 	public String getId() {
 		return id;
 	}
