@@ -1,11 +1,17 @@
 package com.group17;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.validator.constraints.Range;
+import java.sql.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * defines the schema, of the table we want to map to, as a Java object
@@ -55,6 +61,9 @@ public class Feedback {
 	@Column(name = "sentiment", columnDefinition = "sentiment")
 	private String sentiment;
 
+	@Column(name = "dateCreated", columnDefinition = "dateCreated")
+	private Date dateCreated;
+
 	/**
 	 * the default constructor
 	 * sets the text to a default value of nothing if it's not included in the request JSON body
@@ -103,6 +112,10 @@ public class Feedback {
 	
 	public void setSentiment(Sentiment sentiment) {
 		setSentiment(sentiment.toString());
+	}
+	
+	public void setDateCreated(Date date) {
+		this.dateCreated = date;
 	}
 
 	/**
