@@ -12,7 +12,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
  * Handles the root endpoint (just the app url, nothing after)
  * should return a list of all the high-level endpoints in the server / children of this endpoint
  */
-@CrossOrigin(origins = "https://feedback-analysis.herokuapp.com", maxAge = 3600)
+@CrossOrigin
 @RestController
 public class RootController {
 

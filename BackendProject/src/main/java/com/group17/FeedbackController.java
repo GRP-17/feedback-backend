@@ -32,7 +32,7 @@ import com.group17.util.LoggerUtil;
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
  */
-@CrossOrigin(origins = "https://feedback-analysis.herokuapp.com", maxAge = 3600)
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
