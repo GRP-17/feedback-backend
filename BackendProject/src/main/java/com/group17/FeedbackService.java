@@ -1,6 +1,5 @@
 package com.group17;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,7 +110,6 @@ public class FeedbackService {
      */
     public Resource<Feedback> createFeedback(Feedback feedback) {
     	deduceAndSetSentiment(feedback);
-    	feedback.setDateCreated(new Date(System.currentTimeMillis()));
     	return assembler.toResource(repository.save(feedback));
     }
     
