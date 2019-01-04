@@ -108,7 +108,8 @@ public class FeedbackService {
      * @param feedback what to save
      * @return the newly saved resource
      */
-    public Resource<Feedback> saveFeedback(Feedback feedback) {
+    public Resource<Feedback> createFeedback(Feedback feedback) {
+    	deduceAndSetSentiment(feedback);
     	return assembler.toResource(repository.save(feedback));
     }
     
@@ -133,7 +134,7 @@ public class FeedbackService {
         return toneAnalyzer.tone(toneOptions).execute();
     }
     
-    public void deduceAndSetSentiment(Feedback feedback) { 
+    private void deduceAndSetSentiment(Feedback feedback) { 
     	String text = feedback.getText();
 		// Calculate the sentiment
 		if(text.length() > 0) {
@@ -144,6 +145,5 @@ public class FeedbackService {
 			feedback.setSentiment(Sentiment.NEUTRAL);
 		}
     }
-
     
 }

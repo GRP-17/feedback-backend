@@ -96,8 +96,7 @@ public class FeedbackController {
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
 
-		feedbackService.deduceAndSetSentiment(newFeedback);
-		Resource<Feedback> resource = feedbackService.saveFeedback(newFeedback);
+		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 		LoggerUtil.logFeedbackCreate(newFeedback);
 		
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);

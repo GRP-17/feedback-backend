@@ -3,7 +3,6 @@ package com.group17;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.SentenceAnalysis;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneScore;
 
@@ -34,26 +33,25 @@ public enum Sentiment {
 	/** The relative weight of this Sentiment [-1 .. 1]. */
 	private int relativeWeight;	
 	
+	/**
+	 * Constructor.
+	 */
 	private Sentiment(int relativeWeight) {
 		this.relativeWeight = relativeWeight;
 	}
 	
+	/**
+	 * Use the analysis to find the relative weights of the tones in the text
+	 * and from there deduce the overall Sentiment of a given analysis object.
+	 * 
+	 * @param analysis what to find the Sentiment for
+	 * @return the Sentiment
+	 */
 	public static Sentiment getByToneAnalysis(ToneAnalysis analysis) {
-		if(analysis.getSentencesTone() == null) return NEUTRAL;
+		if(analysis.getDocumentTone() == null) return NEUTRAL;
 		
 		double weightSum = 0.0;
-		for(SentenceAnalysis sentence : analysis.getSentencesTone()) {
-			weightSum += getWeight(sentence);
-		}
-		
-		if(weightSum > 0.0) return POSITIVE;
-		else if(weightSum == 0.0) return NEUTRAL;
-		else return NEGATIVE;
-	}
-	
-	private static double getWeight(SentenceAnalysis sentence) {
-		double weight = 0.0;
-		for(ToneScore score : sentence.getTones()) {
+		for(ToneScore score : analysis.getDocumentTone().getTones()) {
 			String id = score.getToneId();
 			
 			// There can be language sentiments, so we'll skip those
@@ -61,9 +59,12 @@ public enum Sentiment {
 			if(!emotionalSentiments.containsKey(id)) continue;
 				
 			Sentiment sentiment = emotionalSentiments.get(id);
-			weight += sentiment.relativeWeight * score.getScore();
+			weightSum += sentiment.relativeWeight * score.getScore();
 		}
-		return weight;
+		
+		if(weightSum > 0.0) return POSITIVE;
+		else if(weightSum == 0.0) return NEUTRAL;
+		else return NEGATIVE;
 	}
-
+	
 }
