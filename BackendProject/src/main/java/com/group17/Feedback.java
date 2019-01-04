@@ -31,6 +31,14 @@ public class Feedback {
 	private String id;
 
 	/**
+	 * When this feedback was created.
+	 * <p>
+	 * This is set as soon as the controller creates the resource.
+	 */
+	@Column(name = "dateCreated", columnDefinition = "dateCreated")
+	private Date dateCreated;
+
+	/**
 	 * The rating of the feedback. Is required to be present in valid feedback.
 	 * should be 1 - 5 (as its representing the stars given).
 	 * maps onto the rating column.
@@ -61,9 +69,6 @@ public class Feedback {
 	@Column(name = "sentiment", columnDefinition = "sentiment")
 	private String sentiment;
 
-	@Column(name = "dateCreated", columnDefinition = "dateCreated")
-	private Date dateCreated;
-
 	/**
 	 * the default constructor
 	 * sets the text to a default value of nothing if it's not included in the request JSON body
@@ -84,6 +89,10 @@ public class Feedback {
 
 	public String getId() {
 		return id;
+	}
+	
+	public void setDateCreated(Date date) {
+		this.dateCreated = date;
 	}
 
 	public Integer getRating() {
@@ -112,10 +121,6 @@ public class Feedback {
 	
 	public void setSentiment(Sentiment sentiment) {
 		setSentiment(sentiment.toString());
-	}
-	
-	public void setDateCreated(Date date) {
-		this.dateCreated = date;
 	}
 
 	/**
