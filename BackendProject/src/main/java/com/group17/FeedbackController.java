@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -97,14 +96,10 @@ public class FeedbackController {
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
 
+		feedbackService.deduceAndSetSentiment(newFeedback);
 		Resource<Feedback> resource = feedbackService.saveFeedback(newFeedback);
 		LoggerUtil.logFeedbackCreate(newFeedback);
 		
-		if(newFeedback.getText().length() != 0) {
-			ToneAnalysis analysis = feedbackService.analyze(newFeedback);
-			LoggerUtil.logAnalysis(newFeedback, analysis);
-		}
-
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 

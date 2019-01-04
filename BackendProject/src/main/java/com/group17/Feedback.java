@@ -44,6 +44,18 @@ public class Feedback {
 	private String text;
 
 	/**
+	 * The sentiment of the {@link #text}. This will be set to the
+	 * value of {@link Sentiment#toString()}.
+	 * <p>
+	 * If there is no {@link #text}, then this will default to
+	 * {@link Sentiment#NEUTRAL}.
+	 * 
+	 */
+	@Size(max = 65535)
+	@Column(name = "sentiment", columnDefinition = "sentiment")
+	private String sentiment;
+
+	/**
 	 * the default constructor
 	 * sets the text to a default value of nothing if it's not included in the request JSON body
 	 */
@@ -80,6 +92,18 @@ public class Feedback {
 	public void setText(String text) {
 		this.text = text;
 	}
+	
+	public String getSentiment() {
+		return sentiment;
+	}
+	
+	public void setSentiment(String sentiment) {
+		this.sentiment = sentiment;
+	}
+	
+	public void setSentiment(Sentiment sentiment) {
+		setSentiment(sentiment.toString());
+	}
 
 	/**
 	 * @return the rating as a number of stars
@@ -95,6 +119,7 @@ public class Feedback {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Feedback [id=%s, rating=%s, text=%s]\n", id, rating, text);
+		return String.format("Feedback [id=%s, rating=%s, text=%s, sentiment=%s]\n", 
+							 id, rating, text, sentiment);
 	}
 }

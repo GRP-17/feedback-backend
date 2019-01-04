@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.group17.Application;
 import com.group17.Feedback;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 
 public class LoggerUtil {
 	/** the logger used to write the output logs : log4j library used */
@@ -36,9 +35,9 @@ public class LoggerUtil {
 		logger.info("[Feedback/Delete] Deleted: " + id);
 	}
 	
-	public static void logAnalysis(Feedback feedback, ToneAnalysis analysis) {
-		logger.info("[Analysis] Analysed " + feedback.getId() + ". Analysis:");
-		logger.info(analysis);
+	public static void logAnalysis(Feedback feedback) {
+		logger.info("[Analysis] Analysed " + feedback.getId() 
+							+ ". Sentiment: " + feedback.getSentiment());
 	}
 	
 	public static void logException(Exception exception) {

@@ -7,6 +7,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 
 import com.group17.util.CommonException;
+import com.group17.util.LoggerUtil;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
@@ -89,6 +90,8 @@ public class FeedbackService {
 							}
 							if (newText != null) {
 								feedback.setText(newText);
+								
+								deduceAndSetSentiment(feedback);
 							}
 							return repository.save(feedback);
 						 })
@@ -125,19 +128,22 @@ public class FeedbackService {
      * 
      * @param text the text to analyze. Note: limit of 1000 sentences
      */
-    private ToneAnalysis analyzeText(String text) {
+    private ToneAnalysis analyze(String text) {
         ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
         return toneAnalyzer.tone(toneOptions).execute();
     }
-
-    /**
-     * Analyze a {@link Feedback} and print it to console.
-     * 
-     * @param feedback what to analyze
-     */
-    public ToneAnalysis analyze(Feedback feedback) {
-    	return analyzeText(feedback.getText());
-    }
     
+    public void deduceAndSetSentiment(Feedback feedback) { 
+    	String text = feedback.getText();
+		// Calculate the sentiment
+		if(text.length() > 0) {
+			Sentiment sentiment = Sentiment.getByToneAnalysis(analyze(text));
+			feedback.setSentiment(sentiment);
+			LoggerUtil.logAnalysis(feedback);
+		} else {
+			feedback.setSentiment(Sentiment.NEUTRAL);
+		}
+    }
+
     
 }
