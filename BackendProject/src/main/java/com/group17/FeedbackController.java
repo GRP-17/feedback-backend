@@ -32,6 +32,7 @@ import com.group17.util.LoggerUtil;
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
  */
+@CrossOrigin(origins = "https://feedback-analysis.herokuapp.com", maxAge = 3600)
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
@@ -91,7 +92,6 @@ public class FeedbackController {
 	 * @throws URISyntaxException
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
 	 */
-	@CrossOrigin
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
