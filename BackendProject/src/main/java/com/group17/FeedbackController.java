@@ -10,6 +10,7 @@ import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -85,9 +86,10 @@ public class FeedbackController {
 		return resource;
 	}
 	
-	@GetMapping("/sentiment/{count}")
-	public ResponseEntity<?> sentimentCount(@PathVariable int count) {
-		return ResponseEntity.noContent().build();
+	@GetMapping("/sentiment/count/{sentiment}")
+	public String sentimentCount(String sentiment) {
+		LoggerUtil.getLogger().log(Level.INFO, "Attempted to GET count for " + sentiment);
+		return "Attempting to retrieve " + sentiment;
 	}
 
 	/**
