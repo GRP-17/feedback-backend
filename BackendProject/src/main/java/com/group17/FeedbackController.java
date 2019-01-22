@@ -84,6 +84,11 @@ public class FeedbackController {
 		LoggerUtil.logFeedbackFindOne(resource.getContent());
 		return resource;
 	}
+	
+	@GetMapping("/sentiment/{count}")
+	public ResponseEntity<?> sentimentCount(@PathVariable int count) {
+		return ResponseEntity.noContent().build();
+	}
 
 	/**
 	 * default mapping for a post request to the feedback endpoint
