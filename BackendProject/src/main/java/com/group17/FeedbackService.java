@@ -72,7 +72,7 @@ public class FeedbackService {
     }
     
     public long getCountBySentiment(String sentiment) {
-    	return repository.countBySentiment(sentiment.toUpperCase());
+    	return repository.countBySentiment(sentiment);
     }
     
     /**

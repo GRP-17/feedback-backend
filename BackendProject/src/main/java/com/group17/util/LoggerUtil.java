@@ -21,6 +21,11 @@ public class LoggerUtil {
 							+ ". Object: " + feedback.toString());
 	}
 	
+	public static void logFeedbackSentimentCount(String sentiment, long count) {
+		logger.info("[Feedback/Sentiment Retrieve] Retrieved count " + count 
+							+ " for " + sentiment);
+	}
+	
 	public static void logFeedbackCreate(Feedback feedback) {
 		logger.info("[Feedback/Create] Created: " + feedback.getId()
 							+ ". Object: " + feedback.toString());
