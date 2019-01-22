@@ -87,9 +87,9 @@ public class FeedbackController {
 	}
 	
 	@GetMapping("/sentiment/count/{sentiment}")
-	public String sentimentCount(String sentiment) {
+	public String sentimentCount(@PathVariable String sentiment) {
 		LoggerUtil.getLogger().log(Level.INFO, "Attempted to GET count for " + sentiment);
-		return "Attempting to retrieve " + sentiment;
+		return "Attempting to retrieve " + sentiment + ", result: " + feedbackService.getCountBySentiment(sentiment);
 	}
 
 	/**

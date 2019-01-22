@@ -71,6 +71,10 @@ public class FeedbackService {
     	return assembler.toResource(feedback);
     }
     
+    public long getCountBySentiment(String sentiment) {
+    	return repository.countBySentiment(sentiment.toUpperCase());
+    }
+    
     /**
      * Update a {@link Feedback} entry in the database.
      * 
