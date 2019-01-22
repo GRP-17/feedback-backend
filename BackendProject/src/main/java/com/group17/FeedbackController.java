@@ -5,12 +5,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.logging.log4j.Level;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 
@@ -93,11 +96,25 @@ public class FeedbackController {
 	 * @param sentiment the sentiment to look for
 	 * @return the count
 	 */
-	@GetMapping("/sentiment/count/{sentiment}")
-	public long sentimentCount(@PathVariable String sentiment) {
-		long count = feedbackService.getCountBySentiment(sentiment);
-		LoggerUtil.logFeedbackSentimentCount(sentiment, count);
-		return count;
+//	@GetMapping("/sentiment/count/{sentiment}")
+//	public long sentimentCount(@PathVariable String sentiment) {
+//		long count = feedbackService.getCountBySentiment(sentiment);
+//		LoggerUtil.logFeedbackSentimentCount(sentiment, count);
+//		return count;
+//	}
+	
+
+	@GetMapping("/sentiment/count")
+	public ResponseEntity<?> sentimentCount() throws CommonException { 
+		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
+		for(Sentiment sentiment : Sentiment.values()) {
+			counts.put(sentiment, feedbackService.getCountBySentiment(sentiment.toString()));
+		}
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(counts));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize sentiment map", HttpStatus.NO_CONTENT.value());
+		}
 	}
 
 	/**
