@@ -86,6 +86,13 @@ public class FeedbackController {
 		return resource;
 	}
 	
+	/**
+	 * A mapping to get the count of {@link Feedback}s in the database
+	 * with the specified sentiment.
+	 * 
+	 * @param sentiment the sentiment to look for
+	 * @return the count
+	 */
 	@GetMapping("/sentiment/count/{sentiment}")
 	public long sentimentCount(@PathVariable String sentiment) {
 		long count = feedbackService.getCountBySentiment(sentiment);

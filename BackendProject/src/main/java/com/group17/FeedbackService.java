@@ -71,6 +71,15 @@ public class FeedbackService {
     	return assembler.toResource(feedback);
     }
     
+    /**
+     * Get the total appearances of a given {@link Sentiment} in the
+     * JPA {@link Feedback} repository.
+     * <p>
+     * This is not case sensitive.
+     * 
+     * @param sentiment the sentiment search for
+     * @return the total appearances
+     */
     public long getCountBySentiment(String sentiment) {
     	return repository.countBySentiment(sentiment);
     }
