@@ -1,75 +1,51 @@
 package com.group17;
 
-public class FeedbackControllerTest {}
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+public class FeedbackControllerTest {
+	private static final Feedback MOCK_FEEDBACK = new MockFeedback();
+	private static final FeedbackResourceAssembler ASSEMBLER
+							= new FeedbackResourceAssembler();
+	
+	@Autowired @InjectMocks FeedbackService feedbackService;
+	
+	@Mock WatsonGateway watsonGateway;
+	@Mock FeedbackRepository feedbackRepository;
+//	
+//	@Before
+//	public void setup() {
+//		MockitoAnnotations.initMocks(this);
 //
-//import com.jayway.jsonpath.JsonPath;
-//import org.junit.FixMethodOrder;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.junit.runners.MethodSorters;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.context.junit4.SpringRunner;
-//import org.springframework.test.web.servlet.MockMvc;
-//
-//import java.util.List;
-//
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-//public class FeedbackControllerTest {
-//
-//	private static String testFeedBackId;
-//	@Autowired private MockMvc mockMvc;
-//	@Autowired private FeedbackRepository repository;
-//
-//	@Test
-//	public void testAFindAllShouldReturnFeedbackList() throws Exception {
-//		List<Feedback> feedbackList = repository.findAll();
-//
-//		this.mockMvc
-//			.perform(get("/feedback"))
-//			.andExpect(status().isOk())
-//			.andExpect(jsonPath("$._embedded.feedbackList").isArray())
-//			.andExpect(jsonPath("$._embedded.feedbackList.length()").value(feedbackList.size()));
+//		// Make any Watson Gateway Request for Sentiments return NEUTRAL
+//		when(watsonGateway.getSentimentByText(anyString())).thenReturn(Sentiment.NEUTRAL);
+//		// Cancel any Feedback saving & return MOCK_FEEDBACK
+//	    when(feedbackRepository.save(any(Feedback.class))).thenReturn(MOCK_FEEDBACK);
 //	}
-//
+//	
 //	@Test
-//	public void testBFindAllShouldReturnLinks() throws Exception {
-//		this.mockMvc
-//			.perform(get("/feedback"))
-//			.andExpect(status().isOk())
-//			.andExpect(jsonPath("$._links").isMap());
+//	public void testFeedbackCreation() {
+//	    
+//	    try {
+//			ResponseEntity<?> responseEntity 
+//						= feedbackController.create(new Feedback(5, "Test"));
+//			assertEquals(responseEntity.getStatusCode(), HttpStatus.CREATED);
+//	    } catch (Exception e) {
+//			e.printStackTrace();
+//			fail();
+//		}
 //	}
-//
-//	@Test
-//	public void testCCreateShouldReturnResults() throws Exception {
-//
-//		String result =
-//				this.mockMvc
-//				.perform(
-//						post("/feedback")
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.content(new String("{\"rating\":5, \"text\": \"this is a test\"}")))
-//				.andExpect(status().isCreated())
-//				.andExpect(jsonPath("$.rating").value(5))
-//				.andExpect(jsonPath("$.text").value("this is a test"))
-//				.andReturn()
-//				.getResponse()
-//				.getContentAsString();
-//
-//		testFeedBackId = JsonPath.parse(result).read("$.id");
-//	}
-//
-//	@Test
-//	public void testDDeleteShouldReturnResults() throws Exception {
-//		this.mockMvc.perform(delete("/feedback/" + testFeedBackId)).andExpect(status().isNoContent());
-//	}
-//}
+	
+}

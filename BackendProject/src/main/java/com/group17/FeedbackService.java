@@ -17,24 +17,11 @@ import com.group17.util.LoggerUtil;
 @Service
 public class FeedbackService {
 	/** holds the instance of the FeedbackRepository which represents the database */
-	private final FeedbackRepository repository;
+	@Autowired private FeedbackRepository repository;
 	/** holds the instance of the factory which will make the resources */
-	private final FeedbackResourceAssembler assembler;
-	
+	@Autowired private FeedbackResourceAssembler assembler;
 	@Autowired private WatsonGateway watsonGateway;
 
-    /**
-     * Constructor.
-     * 
-     * @param repository the database representation
-     * @param assembler the resource factory
-     */
-    public FeedbackService(FeedbackRepository repository, 
-    					   FeedbackResourceAssembler assembler) {
-    	this.repository = repository;
-    	this.assembler = assembler;
-    }
-    
     /**
      * Get every {@link Resource} in the database.
      * 

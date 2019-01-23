@@ -16,7 +16,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class RootController {
 
-
 	/**
 	 * Only have one endpoint, so it will one return the feedback endpoint
 	 * @return a resource containing just a link to the all the endpoints

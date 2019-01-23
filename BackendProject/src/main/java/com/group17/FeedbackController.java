@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -40,20 +41,8 @@ import com.group17.util.LoggerUtil;
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
-
-	/** holds the instance of the AnalysisService  */
-	private final FeedbackService feedbackService;
-
-	/**
-	 * Constructor.
-	 * 
-	 * The Spring server will automatically create an instance of this class using its constructor
-	 * @param repository instance created automatically by the Spring server and assigned to the member variable
-	 * @param assembler instance created automatically by the Spring server and assigned to the member variable
-	 */
-	public FeedbackController(FeedbackRepository repository, FeedbackResourceAssembler assembler) {
-		this.feedbackService = new FeedbackService(repository, assembler);
-	}
+	/** holds the instance of the FeedbackService  */
+	@Autowired private FeedbackService feedbackService;
 
 	/**
 	 * the default mapping for a get request to the feedback endpoint
@@ -83,21 +72,6 @@ public class FeedbackController {
 		LoggerUtil.logFeedbackFindOne(resource.getContent());
 		return resource;
 	}
-	
-	/**
-	 * A mapping to get the count of {@link Feedback}s in the database
-	 * with the specified sentiment.
-	 * 
-	 * @param sentiment the sentiment to look for
-	 * @return the count
-	 */
-//	@GetMapping("/sentiment/count/{sentiment}")
-//	public long sentimentCount(@PathVariable String sentiment) {
-//		long count = feedbackService.getCountBySentiment(sentiment);
-//		LoggerUtil.logFeedbackSentimentCount(sentiment, count);
-//		return count;
-//	}
-	
 
 	@GetMapping("/sentiment/count")
 	public ResponseEntity<?> sentimentCount() throws CommonException { 
