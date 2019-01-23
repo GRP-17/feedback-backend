@@ -7,28 +7,15 @@ The backend of the application for feedback analysis.
 
 Useful Commands:  
 
- To use Maven to build the project, (which at the moment contains the bare minimum):  
-
+ Do the following to make Maven build the project, install any dependencies, etc:
+    
     $ mvn clean install 
-
- This should build the file, install any dependencies etc, there are also other ways of doing this I think, such as:
-
-    $ mvn test 
-
- also does the same I think.
-
- note that
+    
+ Note that the following will allow you to specify where the pom.xml file is that you want to build. If you run the command from outside the directory (as in the travis file):
 
     $ mvn test (or install) -f <pom.xml filepath>
 
- will allow you to specify where the pom.xml file is that you want to build. If you run the command from outside the directory (as in the travis file)
-
- Both will find the MainTest.java JUnit test because:  
-
-   1.  the name ends (or starts) with Test  
-   1.  and it is in the 'test/java/' directory  
-
- After it is found mvn will run the test automatically.  
+ Maven will run the tests automatically.  
 ​    Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.  
 
  This will also happen on the travis-ci pipeline too :D  
@@ -44,7 +31,7 @@ Useful Commands:
 
     $ mvn test -B  
 
- where the -B flag just removes the coloured output.. I think  
+ where the -B flag just removes the coloured output.
 
 In order to test the backend without a frontend, open terminal and navigate inside the project folder where test.json is present. Then run the following command:
 
