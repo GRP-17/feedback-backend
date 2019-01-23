@@ -3,15 +3,12 @@ package com.group17;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
-import com.ibm.watson.developer_cloud.service.security.IamOptions;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
-import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneOptions;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -23,23 +20,18 @@ public class FeedbackService {
 	/** holds the instance of the factory which will make the resources */
 	private final FeedbackResourceAssembler assembler;
 	
-	private WatsonGateway watsonGateway;
+	@Autowired private WatsonGateway watsonGateway;
 
     /**
      * Constructor.
      * 
      * @param repository the database representation
      * @param assembler the resource factory
-     * @param key the API key used to connect to the tone analyser
-     * @param version the version of the tone analyser to use (a date in string form yyyy-mm-dd)
-     * @param url the url to the tone analyser
      */
     public FeedbackService(FeedbackRepository repository, 
-    					   FeedbackResourceAssembler assembler, 
-    					   String key, String version, String url) {
+    					   FeedbackResourceAssembler assembler) {
     	this.repository = repository;
     	this.assembler = assembler;
-    	this.watsonGateway = new WatsonGateway(key, version, url);
     }
     
     /**

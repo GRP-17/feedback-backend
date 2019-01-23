@@ -18,7 +18,6 @@ public class Application implements ApplicationRunner {
 	 * @param args any command line arguments
 	 * @throws Exception thrown when SpringApplication fails to run
 	 */
-	// executes the Spring run() function which will start the server
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);
 	}
