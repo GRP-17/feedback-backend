@@ -22,13 +22,15 @@ public class FeedbackTest {
 	public static final Feedback MOCK_FEEDBACK = new MockFeedback();
 	
 	@Autowired @InjectMocks FeedbackService feedbackService;
-	@Autowired FeedbackController feedbackController;
+	FeedbackController feedbackController;
 	
 	@Mock WatsonGateway watsonGateway;
 	@Mock FeedbackRepository feedbackRepository;
 	
 	@Before
 	public void setup() {
+		feedbackController = feedbackService.getController();
+		
 		MockitoAnnotations.initMocks(this);
 
 		// Make any Watson Gateway Request for Sentiments return NEUTRAL
