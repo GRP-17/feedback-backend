@@ -1,6 +1,5 @@
 package com.group17;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -30,8 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.jayway.jsonpath.JsonPath;
 
 @RunWith(SpringRunner.class)
-@AutoConfigureMockMvc
 //@RunWith(MockitoJUnitRunner.Silent.class)
+@AutoConfigureMockMvc
 @SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTest {
@@ -42,10 +41,13 @@ public class FeedbackControllerTest {
 	@Autowired @InjectMocks private FeedbackService feedbackService;
 	@Mock private WatsonGateway watsonGateway;
 	
+	/** Stores the last created feedbackId, so that the delete test 
+	 *  can use the same one */
 	private String testFeedBackId;
 	
 	@Before
 	public void setup() {
+		// Initialise all the mocks
 		MockitoAnnotations.initMocks(this);
 
 		// Make any Watson Gateway Request for Sentiments return NEUTRAL
@@ -54,12 +56,14 @@ public class FeedbackControllerTest {
 	
 	@Test
 	public void testMockWatsonGateway() {
+		// Ensure that the return value is always NEUTRAL for the Autowired gateway instance
+		// here, and also the gateway instance within the Autowired service.
 		assertEquals(Sentiment.NEUTRAL, watsonGateway.getSentimentByText("This is good"));
 		assertEquals(Sentiment.NEUTRAL, feedbackService.getSentimentByText("This is good"));
 	}
 
 	@Test
-	public void testAFindAllShouldReturnFeedbackList() throws Exception {
+	public void testFindAllShouldReturnFeedbackList() throws Exception {
 		List<Feedback> feedbackList = repository.findAll();
 
 		mockMvc
@@ -70,13 +74,22 @@ public class FeedbackControllerTest {
 	}
 
 	@Test
-	public void testBFindAllShouldReturnLinks() throws Exception {
+	public void testFindAllShouldReturnLinks() throws Exception {
 		mockMvc
 			.perform(get("/feedback"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$._links").isMap());
 	}
-
+	
+	@Test
+	public void testRootEndpoint() throws Exception {
+		// This should link to the '/feedback' endpoint, but this double checks it
+		mockMvc
+			.perform(get(""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$._links").isMap());
+	}
+	
 	@Test
 	public void testCreateShouldReturnResults() throws Exception {
 
@@ -97,7 +110,7 @@ public class FeedbackControllerTest {
 	}
 
 	@Test
-	public void testDDeleteShouldReturnResults() throws Exception {
+	public void testDeleteShouldReturnResults() throws Exception {
 		mockMvc.perform(delete("/feedback/" + testFeedBackId))
 					.andExpect(status().isNoContent());
 	}

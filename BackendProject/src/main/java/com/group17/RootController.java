@@ -10,14 +10,17 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Handles the root endpoint (just the app url, nothing after)
- * should return a list of all the high-level endpoints in the server / children of this endpoint
+ * <p>
+ * This should return a list of all the high-level endpoints in the 
+ * server / children of this endpoint.
  */
 @CrossOrigin
 @RestController
 public class RootController {
 
 	/**
-	 * Only have one endpoint, so it will one return the feedback endpoint
+	 * There's only one endpoint, so it will one return the feedback endpoint.
+	 * 
 	 * @return a resource containing just a link to the all the endpoints
 	 */
 	@GetMapping
