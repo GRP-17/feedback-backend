@@ -1,6 +1,7 @@
 package com.group17;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
@@ -10,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.TransactionSystemException;
@@ -23,12 +23,14 @@ public class FeedbackTest {
 	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		watsonGateway = mock(WatsonGateway.class);
 	}
 	
 	@Test
 	public void testSentiment() {
 		when(watsonGateway.getSentimentByText(anyString())).thenReturn(Sentiment.NEUTRAL);
+		
+		System.out.println("Gateway returned " + watsonGateway.getSentimentByText("This is a good review"));
 		
 		try {
 			feedbackController.create(new Feedback(Integer.valueOf(5), "This is a great review"));
