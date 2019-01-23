@@ -92,7 +92,6 @@ public class FeedbackControllerTest {
 	
 	@Test
 	public void testCreateShouldReturnResults() throws Exception {
-
 		String result =
 				mockMvc
 					.perform(
