@@ -132,7 +132,6 @@ public class FeedbackController {
 			feedbackService.deleteFeedbackById(id);
 			LoggerUtil.logFeedbackDeleted(id);
 		} catch (Exception e) {
-			throw new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value());
 		}
 
 		return ResponseEntity.noContent().build();
