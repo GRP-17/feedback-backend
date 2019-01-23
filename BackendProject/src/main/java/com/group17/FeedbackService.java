@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
@@ -13,6 +14,7 @@ import com.group17.util.LoggerUtil;
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
  */
+@Service
 public class FeedbackService {
 
 	/** holds the instance of the FeedbackRepository which represents the database */
