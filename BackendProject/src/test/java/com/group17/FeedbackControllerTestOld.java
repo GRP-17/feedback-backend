@@ -1,6 +1,9 @@
 package com.group17;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,16 +27,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.junit.Assert.assertEquals;
 import com.jayway.jsonpath.JsonPath;
-import static org.mockito.Mockito.when;
 
 //@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTestOld {
 	public static final Feedback MOCK_FEEDBACK = new MockFeedback();
