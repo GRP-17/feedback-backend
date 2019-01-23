@@ -1,8 +1,8 @@
 package com.group17;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,10 +12,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@RunWith(MockitoJUnitRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class FeedbackTest {
 	@Autowired @InjectMocks FeedbackService feedbackService;
 	@Mock WatsonGateway watsonGateway;
