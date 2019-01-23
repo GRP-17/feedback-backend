@@ -52,7 +52,7 @@ public class FeedbackController {
 	 * @param assembler instance created automatically by the Spring server and assigned to the member variable
 	 */
 	public FeedbackController(FeedbackRepository repository, FeedbackResourceAssembler assembler) {
-		this.feedbackService = new FeedbackService(this, repository, assembler);
+		this.feedbackService = new FeedbackService(repository, assembler);
 	}
 
 	/**

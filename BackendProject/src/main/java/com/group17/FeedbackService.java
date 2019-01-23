@@ -16,7 +16,6 @@ import com.group17.util.LoggerUtil;
  */
 @Service
 public class FeedbackService {
-	private final FeedbackController controller;
 	/** holds the instance of the FeedbackRepository which represents the database */
 	private final FeedbackRepository repository;
 	/** holds the instance of the factory which will make the resources */
@@ -30,10 +29,8 @@ public class FeedbackService {
      * @param repository the database representation
      * @param assembler the resource factory
      */
-    public FeedbackService(FeedbackController controller, 
-    					   FeedbackRepository repository, 
+    public FeedbackService(FeedbackRepository repository, 
     					   FeedbackResourceAssembler assembler) {
-    	this.controller = controller;
     	this.repository = repository;
     	this.assembler = assembler;
     }
@@ -139,10 +136,6 @@ public class FeedbackService {
 		} else {
 			feedback.setSentiment(Sentiment.NEUTRAL);
 		}
-    }
-    
-    public FeedbackController getController() {
-    	return controller;
     }
     
 }
