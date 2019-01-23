@@ -16,7 +16,6 @@ import com.group17.util.LoggerUtil;
  */
 @Service
 public class FeedbackService {
-
 	/** holds the instance of the FeedbackRepository which represents the database */
 	private final FeedbackRepository repository;
 	/** holds the instance of the factory which will make the resources */
