@@ -125,4 +125,8 @@ public class FeedbackService {
 		}
     }
     
+    public Sentiment getSentimentByText(String text) {
+    	return watsonGateway.getSentimentByText(text);
+    }
+    
 }
