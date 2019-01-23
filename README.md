@@ -4,20 +4,6 @@
 
 The backend of the application for feedback analysis.
 
-Files:      
-
-    'BackendProject/' - folder is for the java project files and packages - should be able to import it into Eclipse as a Java project.  
-    
-    .gitignore - defines files and file types to be ignored.  
-    
-    .travis.yml - used to manipulate the travis ci pipeline, doesn't need anything really.  
-    
-    pom.xml - the Maven build file, defines the build path i.e dependencies and plugins etc...  
-    
-    procfile - used by heroku to tell it what the 'dynos' should run (just what it should 'host'/ run,   
-                in our case it would be a compiled jar file which starts the spring server).  
-    
-    system.properties - used by heroku to specify the version of java we are using.  
 
 Useful Commands:  
 
@@ -60,10 +46,21 @@ Useful Commands:
 
  where the -B flag just removes the coloured output.. I think  
 
-p.s the pictures was a experiment with the .md syntax / markdown syntax.
-
-
-Command for testing the heroku deployment of the master branch, with the test.JSON file... (need to have the terminal open in the folder with the test.JSON file :D)
+In order to test the backend without a frontend, open terminal and navigate inside the project folder where test.json is present. Then run the following command:
 
     curl -X POST  https://feedback-analysis-grp-app.herokuapp.com/feedback -d "@test.JSON" -H "Content-Type:application/json"
 
+Files:      
+
+    'BackendProject/' - folder is for the java project files and packages - should be able to import it into Eclipse as a Java project.  
+    
+    .gitignore - defines files and file types to be ignored.  
+    
+    .travis.yml - used to manipulate the travis ci pipeline, doesn't need anything really.  
+    
+    pom.xml - the Maven build file, defines the build path i.e dependencies and plugins etc...  
+    
+    procfile - used by heroku to tell it what the 'dynos' should run (just what it should 'host'/ run,   
+                in our case it would be a compiled jar file which starts the spring server).  
+    
+    system.properties - used by heroku to specify the version of java we are using.  
