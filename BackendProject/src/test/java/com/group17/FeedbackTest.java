@@ -1,28 +1,28 @@
 package com.group17;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+//import static org.junit.Assert.assertEquals;
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.ArgumentMatchers.anyString;
+//import static org.mockito.Mockito.when;
+//
+//import org.junit.Before;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.MockitoAnnotations;
+//import org.mockito.junit.MockitoJUnitRunner;
+//import org.springframework.beans.factory.annotation.Autowired;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-
-@RunWith(MockitoJUnitRunner.Silent.class)
+//@RunWith(MockitoJUnitRunner.Silent.class)
 public class FeedbackTest {
-	public static final Feedback MOCK_FEEDBACK = new MockFeedback();
-	
-	@Autowired @InjectMocks FeedbackService feedbackService;
-	
-	@Mock WatsonGateway watsonGateway;
-	@Mock FeedbackRepository feedbackRepository;
+//	public static final Feedback MOCK_FEEDBACK = new MockFeedback();
 //	
+//	@Autowired @InjectMocks FeedbackService feedbackService;
+//	
+//	@Mock WatsonGateway watsonGateway;
+//	@Mock FeedbackRepository feedbackRepository;
+//
 //	@Before
 //	public void setup() {
 //		MockitoAnnotations.initMocks(this);
