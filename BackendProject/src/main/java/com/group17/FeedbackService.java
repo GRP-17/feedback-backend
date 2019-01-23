@@ -22,8 +22,8 @@ public class FeedbackService {
 	private final FeedbackRepository repository;
 	/** holds the instance of the factory which will make the resources */
 	private final FeedbackResourceAssembler assembler;
-	/** The ToneAnalyzer stores the IBM constants and provides endpoint calls. */
-    private final ToneAnalyzer toneAnalyzer;
+	
+	private WatsonGateway watsonGateway;
 
     /**
      * Constructor.
@@ -39,10 +39,7 @@ public class FeedbackService {
     					   String key, String version, String url) {
     	this.repository = repository;
     	this.assembler = assembler;
-    	
-        IamOptions options = new IamOptions.Builder().apiKey(key).build();
-        toneAnalyzer = new ToneAnalyzer(version, options);
-        toneAnalyzer.setEndPoint(url);
+    	this.watsonGateway = new WatsonGateway(key, version, url);
     }
     
     /**
@@ -136,22 +133,11 @@ public class FeedbackService {
 		repository.deleteById(id);
     }
     
-    /**
-     * Method that will analyze a given String, and produce
-     * a {@link ToneAnalysis} instance for the respective text.
-     * 
-     * @param text the text to analyze. Note: limit of 1000 sentences
-     */
-    private ToneAnalysis analyze(String text) {
-        ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
-        return toneAnalyzer.tone(toneOptions).execute();
-    }
-    
     private void deduceAndSetSentiment(Feedback feedback) { 
     	String text = feedback.getText();
 		// Calculate the sentiment
 		if(text.length() > 0) {
-			Sentiment sentiment = Sentiment.getByToneAnalysis(analyze(text));
+			Sentiment sentiment = watsonGateway.getSentimentByText(feedback.getText());
 			feedback.setSentiment(sentiment);
 			LoggerUtil.logAnalysis(feedback);
 		} else {
