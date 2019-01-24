@@ -14,9 +14,8 @@ public interface FeedbackRepository extends JpaRepository<Feedback, String> {
 	 * This is not case sensitive.
 	 * 
 	 * @param sentiment the sentiment to find the count of
-	 * @return the total count
+	 * @return the total count of the given sentiment
 	 * @see Sentiment
 	 */
 	long countBySentiment(String sentiment);
-	
 }

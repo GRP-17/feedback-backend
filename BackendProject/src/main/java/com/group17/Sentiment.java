@@ -36,7 +36,7 @@ public enum Sentiment {
 	/**
 	 * Constructor.
 	 */
-	private Sentiment(int relativeWeight) {
+	Sentiment(int relativeWeight) {
 		this.relativeWeight = relativeWeight;
 	}
 	

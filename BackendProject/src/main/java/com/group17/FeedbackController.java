@@ -1,38 +1,27 @@
 package com.group17;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group17.util.CommonException;
+import com.group17.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.group17.util.CommonException;
-import com.group17.util.LoggerUtil;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -41,11 +30,15 @@ import com.group17.util.LoggerUtil;
 @RestController
 @RequestMapping(value = "/feedback", produces = "application/hal+json")
 public class FeedbackController {
-	/** holds the instance of the FeedbackService  */
-	@Autowired private FeedbackService feedbackService;
+	/**
+	 * holds the instance of the FeedbackService
+	 */
+	@Autowired
+	private FeedbackService feedbackService;
 
 	/**
 	 * the default mapping for a get request to the feedback endpoint
+	 *
 	 * @return all feedback from the database, returned as resources
 	 */
 	@GetMapping()
@@ -54,13 +47,17 @@ public class FeedbackController {
 		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
 		LoggerUtil.logFeedbackFindAll(resources.size());
 
-		return new Resources<Resource<Feedback>>(
-				resources, linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel());
+		return new Resources<>(
+				resources,
+				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
+				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"));
 	}
 
 	/**
 	 * a sub-mapping for get requests
 	 * will return a resource for one piece of feedback from the database
+	 *
 	 * @param id the id of the feedback to return
 	 * @return the resource for the id given, if one exist
 	 * @throws CommonException thrown if an entry in the database could not be found for that id
@@ -73,10 +70,22 @@ public class FeedbackController {
 		return resource;
 	}
 
-	@GetMapping("/sentiment/count")
-	public ResponseEntity<?> sentimentCount() throws CommonException { 
+	@GetMapping("/count")
+	public ResponseEntity<?> getCount() throws CommonException {
+		Map<String, Long> res = new HashMap<>();
+		long count = feedbackService.getCount();
+		res.put("count", count);
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize feedback count", HttpStatus.NO_CONTENT.value());
+		}
+	}
+
+	@GetMapping("/sentiments/count")
+	public ResponseEntity<?> getSentimentsCount() throws CommonException {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
-		for(Sentiment sentiment : Sentiment.values()) {
+		for (Sentiment sentiment : Sentiment.values()) {
 			counts.put(sentiment, feedbackService.getCountBySentiment(sentiment.toString()));
 		}
 		try {
@@ -88,6 +97,7 @@ public class FeedbackController {
 
 	/**
 	 * default mapping for a post request to the feedback endpoint
+	 *
 	 * @param newFeedback the body of the post request (should be in JSON format)
 	 * @return a HTTP status of 201 'Created' and a link to the resource they just created (the endpoint to get that resource)
 	 * @throws URISyntaxException
@@ -99,14 +109,15 @@ public class FeedbackController {
 
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 		LoggerUtil.logFeedbackCreate(newFeedback);
-		
+
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
 	/**
 	 * a sub-mapping for put requests
+	 *
 	 * @param newFeedback the new feedback to save
-	 * @param id the id of the feedback to update
+	 * @param id          the id of the feedback to update
 	 * @return a resource with the updated feedback
 	 * @throws URISyntaxException
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
@@ -122,6 +133,7 @@ public class FeedbackController {
 
 	/**
 	 * a sub-mapping for delete requests
+	 *
 	 * @param id the id of the feedback to be deleted
 	 * @return an empty response
 	 */
@@ -139,6 +151,7 @@ public class FeedbackController {
 
 	/**
 	 * handles any CommonExceptions thrown
+	 *
 	 * @param ex the exception that was thrown
 	 * @return a response entity with the message and HTTP status code
 	 */
@@ -151,6 +164,7 @@ public class FeedbackController {
 
 	/**
 	 * handles any TransactionSystemExceptions
+	 *
 	 * @param ex the exception that was thrown
 	 * @return a response entity with the message and HTTP status 412 'Precondition_failed'
 	 */
@@ -167,7 +181,7 @@ public class FeedbackController {
 		// loop the list to get results
 		StringBuilder msgList = new StringBuilder();
 		for (ConstraintViolation<?> constraintViolation :
-			((ConstraintViolationException) t).getConstraintViolations()) {
+				((ConstraintViolationException) t).getConstraintViolations()) {
 			msgList.append(constraintViolation.getMessage());
 		}
 
