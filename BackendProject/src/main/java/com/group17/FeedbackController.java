@@ -72,8 +72,8 @@ public class FeedbackController {
 
 	@GetMapping("/count")
 	public ResponseEntity<?> getCount() throws CommonException {
-		Map<String, Long> res = new HashMap<>();
 		long count = feedbackService.getCount();
+		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
@@ -91,7 +91,7 @@ public class FeedbackController {
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(counts));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize sentiment map", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize sentiment counts", HttpStatus.NO_CONTENT.value());
 		}
 	}
 
@@ -172,19 +172,21 @@ public class FeedbackController {
 	public ResponseEntity<String> constraintViolationExceptionHandler(
 			TransactionSystemException ex) {
 
-		// loop until find the ConstraintViolationException
+		// Loop until find the ConstraintViolationException
 		Throwable t = ex;
 		while ((t != null) && !(t instanceof ConstraintViolationException)) {
 			t = t.getCause();
 		}
 
-		// loop the list to get results
 		StringBuilder msgList = new StringBuilder();
-		for (ConstraintViolation<?> constraintViolation :
-				((ConstraintViolationException) t).getConstraintViolations()) {
-			msgList.append(constraintViolation.getMessage());
+		if (t != null && t instanceof ConstraintViolationException) {
+			// Loop the list to get results
+			for (ConstraintViolation<?> constraintViolation :
+					((ConstraintViolationException) t).getConstraintViolations()) {
+				msgList.append(constraintViolation.getMessage());
+			}
 		}
-
+		
 		return new ResponseEntity<>(msgList.toString(), HttpStatus.PRECONDITION_FAILED);
 	}
 }

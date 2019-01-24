@@ -34,7 +34,7 @@ import com.jayway.jsonpath.JsonPath;
 @SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTest {
-	public static final Feedback MOCK_FEEDBACK = new MockFeedback();
+	private static final Sentiment EXPECTED_SENTIMENT = Sentiment.NEUTRAL;
 	
 	@Autowired private MockMvc mockMvc;
 	@Autowired private FeedbackRepository repository;
@@ -56,10 +56,13 @@ public class FeedbackControllerTest {
 	
 	@Test
 	public void testMockWatsonGateway() {
-		// Ensure that the return value is always NEUTRAL for the Autowired gateway instance
-		// here, and also the gateway instance within the Autowired service.
-		assertEquals(Sentiment.NEUTRAL, watsonGateway.getSentimentByText("This is good"));
-		assertEquals(Sentiment.NEUTRAL, feedbackService.getSentimentByText("This is good"));
+		//  Ensure that the return value is always NEUTRAL for the Autowired 
+		//  gateway instance here, and also the gateway instance within the 
+		//  Autowired feedback service.
+		assertEquals(EXPECTED_SENTIMENT, 
+					 watsonGateway.getSentimentByText("This is good"));
+		assertEquals(EXPECTED_SENTIMENT, 
+					 feedbackService.getSentimentByText("This is good"));
 	}
 
 	@Test
