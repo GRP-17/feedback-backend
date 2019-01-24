@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -126,11 +125,11 @@ public class FeedbackService {
 		}
     }
     
-    public Sentiment getSentimentByText(String text) {
-    	return watsonGateway.getSentimentByText(text);
-    }
-
     public long getCount() {
     	return repository.count();
 	}
+    
+    public WatsonGateway getWatsonGateway() {
+    	return watsonGateway;
+    }
 }
