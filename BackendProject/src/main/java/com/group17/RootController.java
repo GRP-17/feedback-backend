@@ -26,7 +26,10 @@ public class RootController {
 	@GetMapping
 	public ResourceSupport index() {
 		ResourceSupport rootResource = new ResourceSupport();
-		rootResource.add(linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
+		rootResource.add(
+			linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"),
+			linkTo(methodOn(FeedbackController.class).getCount()).withRel("feedback_count"),
+			linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("feedback_sentiment_count"));
 		return rootResource;
 	}
 	
