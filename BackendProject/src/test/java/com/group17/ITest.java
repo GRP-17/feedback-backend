@@ -5,8 +5,8 @@ import org.springframework.test.web.servlet.MockMvc;
 public interface ITest {
 	
 	MockMvc getMockMvc();
-	FeedbackRepository getMockRepository();
+	FeedbackRepository getRepository();
 	WatsonGateway getMockWatsonGateway();
-	FeedbackService getFeedbackService();
+//	FeedbackService getFeedbackService();
 
 }
