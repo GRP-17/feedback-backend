@@ -1,15 +1,15 @@
 package com.group17;
 
-import java.util.Date;
+//import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
+//import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+//import javax.persistence.Temporal;
+//import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -33,9 +33,9 @@ public class Feedback {
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
 	private String id;
 	
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false)
-    private Date created;
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @Column(name = "created", nullable = false)
+//    private Date created;
 
 	/**
 	 * The rating of the feedback. Is required to be present in valid feedback.
@@ -86,10 +86,10 @@ public class Feedback {
 		this.text = text;
 	}
 	
-	@PrePersist
-	protected void onCreate() {
-		created = new Date();
-	}
+//	@PrePersist
+//	protected void onCreate() {
+//		created = new Date();
+//	}
 	
 	public String getId() {
 		return id;
