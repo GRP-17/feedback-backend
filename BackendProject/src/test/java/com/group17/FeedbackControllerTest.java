@@ -47,6 +47,15 @@ public class FeedbackControllerTest extends BaseTest {
 	}
 	
 	@Test
+	public void testCountEndpoint() throws Exception {
+		long count = getMockRepository().count();
+		
+		getMockMvc()
+			.perform(get("/feedback/count"))
+			.andExpect(jsonPath("$.count").value(count));
+	}
+	
+	@Test
 	public void testCreateEndpoint() throws Exception {
 		String result =
 				getMockMvc()
