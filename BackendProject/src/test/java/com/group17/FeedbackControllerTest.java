@@ -3,6 +3,7 @@ package com.group17;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,9 +15,6 @@ import org.springframework.http.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
 public class FeedbackControllerTest extends BaseTest {
-	/** Stores the last created feedbackId, so that the delete test 
-	 *  can use the same one */
-	private String testFeedBackId;
 	
 	@Test
 	public void testFindAllEndpointList() throws Exception {
@@ -56,7 +54,34 @@ public class FeedbackControllerTest extends BaseTest {
 	}
 	
 	@Test
-	public void testCreateEndpoint() throws Exception {
+	public void testSentimentsCount() throws Exception {
+		// Build the JSON string we're expecting, for example:
+		// {"POSITIVE":2,"NEUTRAL":8,"NEGATIVE":1}
+		FeedbackService feedbackService = getFeedbackService();
+		StringBuilder expecting = new StringBuilder();
+		expecting.append("{");
+		for (int i = 0; i < Sentiment.values().length; i ++) {
+			String strSentiment = Sentiment.values()[i].toString();
+			
+			expecting.append('"').append(strSentiment)
+					 .append('"').append(":")
+					 .append(feedbackService.getCountBySentiment(strSentiment));
+			if(i == Sentiment.values().length - 1) {
+				expecting.append("}");
+			} else {
+				expecting.append(",");
+			}
+		}
+
+		getMockMvc()
+			.perform(get("/feedback/sentiments/count"))
+			.andExpect(status().isOk())
+			.andExpect(content().json(expecting.toString()));
+	}
+	
+	@Test
+	public void testCreateDeleteEndpoint() throws Exception {
+		// Call the create endpoint
 		String result =
 				getMockMvc()
 					.perform(
@@ -70,12 +95,11 @@ public class FeedbackControllerTest extends BaseTest {
 					.getResponse()
 					.getContentAsString();
 
-		testFeedBackId = JsonPath.parse(result).read("$.id");
+		// Call the delete endpoint to delete the entry we just created
+		String testFeedBackId = JsonPath.parse(result).read("$.id");
+		getMockMvc()
+			.perform(delete("/feedback/" + testFeedBackId))
+			.andExpect(status().isNoContent());
 	}
 	
-	@Test
-	public void testDeleteEndpoint() throws Exception {
-		getMockMvc().perform(delete("/feedback/" + testFeedBackId))
-						.andExpect(status().isNoContent());
-	}
 }
