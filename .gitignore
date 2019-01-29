@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# Application Properties (so we can have separate databases on the master & development branches)
+application.properties
+
 # Log file
 *.log
 
