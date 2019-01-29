@@ -1,6 +1,10 @@
-# feedback-backend
+# Feedback Backend
 
+## Deployment Build
 [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=master)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
+
+## Development Build
+[![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
 The backend of the application for feedback analysis.
 
