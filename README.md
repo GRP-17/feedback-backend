@@ -1,16 +1,15 @@
 # Feedback Backend
 
+The backend of the feedback analysis application.
+
 ## Deployment Build
 [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=master)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
 ## Development Build
 [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
-The backend of the application for feedback analysis.
-
-
-Useful Commands:  
-
+## Useful Commands
+### Maven
  Do the following to make Maven build the project, install any dependencies, etc:
     
     $ mvn clean install 
@@ -37,6 +36,7 @@ Useful Commands:
 
  where the -B flag just removes the coloured output.
 
+### Curl
 In order to test the backend without a frontend, open terminal and navigate inside the project folder where test.json is present. Then run the following command:
 
     curl -X POST  https://feedback-analysis-grp-app.herokuapp.com/feedback -d "@test.JSON" -H "Content-Type:application/json"
