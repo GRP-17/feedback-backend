@@ -43,9 +43,6 @@ public class BaseTest implements ITest {
 		//  Autowired feedback service.
 		assertEquals(EXPECTED_SENTIMENT, 
 					 mockWatsonGateway.getSentimentByText(TEXT_GOOD_SENTIMENT));
-//		assertEquals(EXPECTED_SENTIMENT, 
-//					 feedbackService.getWatsonGateway()
-//					 		.getSentimentByText(TEXT_GOOD_SENTIMENT));
 	}
 
 	@Override
@@ -62,10 +59,5 @@ public class BaseTest implements ITest {
 	public WatsonGateway getMockWatsonGateway() {
 		return mockWatsonGateway;
 	}
-
-//	@Override
-//	public FeedbackService getFeedbackService() {
-//		return feedbackService;
-//	}
 
 }
