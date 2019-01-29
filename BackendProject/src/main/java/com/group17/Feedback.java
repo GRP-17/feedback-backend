@@ -42,7 +42,7 @@ public class Feedback {
 	 * should be 1 - 5 (as its representing the stars given).
 	 * maps onto the rating column.
 	 */
-	@NotNull(message = "Rating is required.")
+	@NotNull(message = "Bad Feedback Format")
 	@Range(min = 1, max = 5, message = "The range of rating is {min} ~ {max}.")
 	@Column(name = "rating", columnDefinition = "INT(11)")
 	private Integer rating;
