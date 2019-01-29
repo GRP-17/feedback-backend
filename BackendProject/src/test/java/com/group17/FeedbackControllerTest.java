@@ -24,18 +24,11 @@ public class FeedbackControllerTest extends BaseTest {
 	private static List<String> feedbacksCreated = new ArrayList<String>();
 	
 	@Test
-	public void testAFindAllEndpointList() throws Exception {
-		List<Feedback> feedbackList = getRepository().findAll();
-
-		getMockMvc()
-			.perform(get("/feedback"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$._embedded.feedbackList").isArray())
-			.andExpect(jsonPath("$._embedded.feedbackList.length()").value(feedbackList.size()));
-	}
-
-	@Test
-	public void testBFindAllEndpointLinks() throws Exception {
+	public void testBFindAllEndpoint() throws Exception {
+		// We only need to test for links, as there may not be any
+		// feedback (the list of resources) present, since if the
+		// database is empty then the list will not be returned
+		
 		getMockMvc()
 			.perform(get("/feedback"))
 			.andExpect(status().isOk())
