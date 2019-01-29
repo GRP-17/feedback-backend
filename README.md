@@ -4,9 +4,11 @@ The backend of the feedback analysis application.
 
 ## Deployment Build
 [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=master)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
+     https://feedback-analysis-grp-app.herokuapp.com/feedback
 
 ## Development Build
 [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
+     https://feedback-analysis-grp-app-dev.herokuapp.com/feedback
 
 ## Useful Commands
 ### Maven
