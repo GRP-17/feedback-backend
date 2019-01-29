@@ -40,16 +40,13 @@ To skip using test.json, and specify your own:
     curl -v -X POST https://feedback-analysis-grp-app.herokuapp.com/feedback -H 'Content-Type:application/json' -d '{"rating": 5, "text": "Your feedback test here"}'
 
 ## Files
-
-    'BackendProject/' - folder is for the java project files and packages - should be able to import it into Eclipse as a Java project.  
-    
-    .gitignore - defines files and file types to be ignored.  
-    
-    .travis.yml - used to manipulate the travis ci pipeline, doesn't need anything really.  
-    
-    pom.xml - the Maven build file, defines the build path i.e dependencies and plugins etc...  
-    
-    procfile - used by heroku to tell it what the 'dynos' should run (just what it should 'host'/ run,   
-                in our case it would be a compiled jar file which starts the spring server).  
-    
+### Root Directory
+    .gitignore - defines files and file types to be ignored by git 
+    .travis.yml - used to manipulate the travis ci pipeline & specify Heroku apps to push to
     system.properties - used by heroku to specify the version of java we are using.  
+    
+### BackendProject/
+    BackendProject/ - folder is for the java project files and packages - should be able to import it into Eclipse as a Java                        project.  
+    procfile - used by heroku to tell it what the dynos should run (just what it should 'host'/ run;   
+               in our case it's a compiled jar file which starts the spring server)  
+    pom.xml - the Maven build file, defines the build path i.e dependencies, plugins, etc.    
