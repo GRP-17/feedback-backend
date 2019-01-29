@@ -19,6 +19,9 @@ import com.jayway.jsonpath.JsonPath;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTest extends BaseTest {
+	private static final String CREATE_FEEDBACK_TEXT = "This is a test.";
+	private static final int CREATE_FEEDBACK_RATING  = 1;
+	
 	/** Stores the last created feedbackId, so that the delete test 
 	 *  can use the same one(s) */
 	private static List<String> feedbacksCreated = new ArrayList<String>();
@@ -86,10 +89,12 @@ public class FeedbackControllerTest extends BaseTest {
 					.perform(
 							post("/feedback")
 							.contentType(MediaType.APPLICATION_JSON)
-							.content(new String("{\"rating\":5, \"text\": \"this is a test\"}")))
+							.content(new String("{\"rating\":" + CREATE_FEEDBACK_RATING 
+													+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT 
+													+ "\"}")))
 					.andExpect(status().isCreated())
-					.andExpect(jsonPath("$.rating").value(5))
-					.andExpect(jsonPath("$.text").value("this is a test"))
+					.andExpect(jsonPath("$.rating").value(CREATE_FEEDBACK_RATING))
+					.andExpect(jsonPath("$.text").value(CREATE_FEEDBACK_TEXT))
 					.andReturn()
 					.getResponse()
 					.getContentAsString();
@@ -98,7 +103,7 @@ public class FeedbackControllerTest extends BaseTest {
 	}
 	
 	@Test
-	public void testGDeleteEndpoint() throws Exception {
+	public void testHDeleteEndpoint() throws Exception {
 		for (String created : feedbacksCreated) {
 			getMockMvc().perform(delete("/feedback/" + created))
 				.andExpect(status().isNoContent());
