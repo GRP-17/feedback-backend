@@ -14,32 +14,30 @@ The backend of the feedback analysis application.
     
     $ mvn clean install 
     
- Note that the following will allow you to specify where the pom.xml file is that you want to build. If you run the command from outside the directory (as in the travis file):
+ Note: the following will allow you to specify where the pom.xml file is that you want to build. If you run the command from outside the directory (as in the travis file):
 
     $ mvn test (or install) -f <pom.xml filepath>
 
- Maven will run the tests automatically.  
-​    Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.  
+ Maven will run the tests automatically. Note: this is done by the maven-surefire plugin which is specified in the pom.xml (under plugins), and so is on our build path.  
 
- This will also happen on the travis-ci pipeline too :D  
- by default travis will run two commands for Maven:  
+ This will also happen on the travis-ci pipeline too, by default travis will run two commands for Maven:  
 
- First:    
+ First (install, skips tests and building javadocs):    
 
     $ mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V  
 
- Note: tests are skipped here and run in the other command (below), also it skips building the javadocs  
-
- Second:     
+ Second (run tests, where -B removes the coloured output):     
 
     $ mvn test -B  
 
- where the -B flag just removes the coloured output.
-
 ### Curl
-In order to test the backend without a frontend, open terminal and navigate inside the project folder where test.json is present. Then run the following command:
+In order to test the backend without a frontend, open terminal and navigate inside the project folder (where test.json is) present.:
 
     curl -X POST  https://feedback-analysis-grp-app.herokuapp.com/feedback -d "@test.JSON" -H "Content-Type:application/json"
+ 
+To skip using test.json, and specify your own:
+
+    curl -v -X POST https://feedback-analysis-grp-app.herokuapp.com/feedback -H 'Content-Type:application/json' -d '{"rating": 5, "text": "Your feedback test here"}'
 
 ## Files
 
