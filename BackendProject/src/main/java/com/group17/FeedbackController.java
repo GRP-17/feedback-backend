@@ -177,7 +177,8 @@ public class FeedbackController {
 	@ExceptionHandler(JsonParseException.class)
 	public ResponseEntity<String> exceptionHandler(JsonParseException ex) {
 		LoggerUtil.logException(ex);
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<String>("Unable to parse Feedback object", 
+										  HttpStatus.BAD_REQUEST);
 	}
 
 	/**
