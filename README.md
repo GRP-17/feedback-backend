@@ -43,10 +43,9 @@ To skip using test.json, and specify your own:
 ### Root Directory
     .gitignore - defines files and file types to be ignored by git 
     .travis.yml - used to manipulate the travis ci pipeline & specify Heroku apps to push to
-    system.properties - used by heroku to specify the version of java we are using.  
-    
+    system.properties - used by heroku to specify the version of java we are using
 ### BackendProject/
-    BackendProject/ - folder is for the java project files and packages - should be able to import it into Eclipse as a Java                        project.  
+    BackendProject/ - folder is for the java project files and packages - should be able to import it into Eclipse as a Java project.  
     procfile - used by heroku to tell it what the dynos should run (just what it should 'host'/ run;   
                in our case it's a compiled jar file which starts the spring server)  
     pom.xml - the Maven build file, defines the build path i.e dependencies, plugins, etc.    
