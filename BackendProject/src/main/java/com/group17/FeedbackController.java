@@ -64,7 +64,8 @@ public class FeedbackController {
 				resources,
 				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"));
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("average_rating"));
 	}
 
 	/**
