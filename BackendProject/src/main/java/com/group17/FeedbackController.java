@@ -5,6 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +160,25 @@ public class FeedbackController {
 		}
 
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/average-rating")
+	public ResponseEntity<?> getAverageRating() throws CommonException {
+		Map<String, Double> map = new HashMap<String, Double>();
+		
+		// The unformatted average - it could have many decimal values
+		double averageU = feedbackService.getAverageRating();
+		// The formatted average - trimmed of unnecessary decimal values
+		double averageF = Double.valueOf(new DecimalFormat("#.##")
+												.format(averageU));
+		
+		map.put("average-rating", averageF);
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize average rating", HttpStatus.NO_CONTENT.value());
+		}
 	}
 
 	/**

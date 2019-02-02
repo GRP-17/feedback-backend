@@ -61,6 +61,15 @@ public class FeedbackService {
     	return repository.countBySentiment(sentiment);
     }
     
+    public double getAverageRating() {
+    	long total = 0;
+    	for(int i = Feedback.MIN_RATING; i <= Feedback.MAX_RATING; i ++) {
+    		total += repository.countByRating(Integer.valueOf(i));
+    	}
+    	
+    	return (double) total / (double) repository.count();
+    }
+    
     /**
      * Update a {@link Feedback} entry in the database.
      * 
