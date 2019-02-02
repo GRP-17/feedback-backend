@@ -163,7 +163,7 @@ public class FeedbackController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("/average-rating")
+	@GetMapping("/averagerating")
 	public ResponseEntity<?> getAverageRating() throws CommonException {
 		Map<String, Double> map = new HashMap<String, Double>();
 		
@@ -173,7 +173,7 @@ public class FeedbackController {
 		double averageF = Double.valueOf(new DecimalFormat("#.##")
 												.format(averageU));
 		
-		map.put("average-rating", averageF);
+		map.put("averagerating", averageF);
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
