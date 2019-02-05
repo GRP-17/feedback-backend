@@ -65,7 +65,7 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
-				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("average_rating"));
+				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"));
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class FeedbackController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("/averagerating")
+	@GetMapping("/rating/average")
 	public ResponseEntity<?> getAverageRating() throws CommonException {
 		Map<String, Double> map = new HashMap<String, Double>();
 		
@@ -173,7 +173,7 @@ public class FeedbackController {
 		double averageF = Double.valueOf(new DecimalFormat("#.##")
 												.format(averageU));
 		
-		map.put("averagerating", averageF);
+		map.put("average", averageF);
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
