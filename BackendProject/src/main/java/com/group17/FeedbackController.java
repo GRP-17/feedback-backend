@@ -63,7 +63,8 @@ public class FeedbackController {
 				resources,
 				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"));
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"));
 	}
 
 	/**
@@ -159,6 +160,24 @@ public class FeedbackController {
 		}
 
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/rating/count")
+	public ResponseEntity<?> getStarRatingCount() throws CommonException {
+		// Key: the ratings [1..5], Value: The count of this rating
+		Map<Integer, Integer> ratings = new HashMap<Integer, Integer>();
+		
+		// TODO: create a function in feedbackService, similar to the 
+		//       feedbackService.getCountBySentiment(Sentiment)
+		//       method that will return the count for a given rating.
+		//       Then put this in the map.
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(ratings));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize star rating counts", 
+									  HttpStatus.NO_CONTENT.value());
+		}
 	}
 
 	/**
