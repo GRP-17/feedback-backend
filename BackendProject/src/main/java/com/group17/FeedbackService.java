@@ -64,7 +64,7 @@ public class FeedbackService {
     public double getAverageRating() {
     	long total = 0;
     	for(int i = Feedback.MIN_RATING; i <= Feedback.MAX_RATING; i ++) {
-    		total += repository.countByRating(Integer.valueOf(i));
+    		total += repository.countByRating(Integer.valueOf(i)) * i;
     	}
     	
     	return (double) total / (double) repository.count();
