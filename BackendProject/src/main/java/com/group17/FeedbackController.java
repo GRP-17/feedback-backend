@@ -5,6 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,9 @@ public class FeedbackController {
 				resources,
 				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"));
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"),
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"));
 	}
 
 	/**
@@ -159,6 +162,42 @@ public class FeedbackController {
 		}
 
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/rating/average")
+	public ResponseEntity<?> getAverageRating() throws CommonException {
+		Map<String, Double> map = new HashMap<String, Double>();
+		
+		// The unformatted average - it could have many decimal values
+		double averageU = feedbackService.getAverageRating();
+		// The formatted average - trimmed of unnecessary decimal values
+		double averageF = Double.valueOf(new DecimalFormat("#.##")
+												.format(averageU));
+		
+		map.put("average", averageF);
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize average rating", HttpStatus.NO_CONTENT.value());
+		}
+	}
+
+	@GetMapping("/rating/count")
+	public ResponseEntity<?> getStarRatingCount() throws CommonException {
+		// Key: the ratings [1..5], Value: The count of this rating
+		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
+
+		for(int rating = 1; rating <= 5; rating++){
+		    ratings.put(rating, feedbackService.getCountByRating(rating));
+        }
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(ratings));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize star rating counts", 
+									  HttpStatus.NO_CONTENT.value());
+		}
 	}
 
 	/**

@@ -18,4 +18,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, String> {
 	 * @see Sentiment
 	 */
 	long countBySentiment(String sentiment);
+	
+	long countByRating(Integer rating);
+	
 }

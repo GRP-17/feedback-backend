@@ -60,6 +60,27 @@ public class FeedbackService {
     public long getCountBySentiment(String sentiment) {
     	return repository.countBySentiment(sentiment);
     }
+
+
+    /**
+     * Get the total appearances of a given rating in the JPA
+     * {@link Feedback} repository.
+     *
+     * @param rating the rating being searched for
+     * @return total appearances of given rating
+     */
+    public long getCountByRating(int rating){
+    	return repository.countByRating(rating);
+	}
+    
+    public double getAverageRating() {
+    	long total = 0;
+    	for(int i = Feedback.MIN_RATING; i <= Feedback.MAX_RATING; i ++) {
+    		total += repository.countByRating(Integer.valueOf(i)) * i;
+    	}
+    	
+    	return (double) total / (double) repository.count();
+    }
     
     /**
      * Update a {@link Feedback} entry in the database.
