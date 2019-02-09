@@ -18,4 +18,15 @@ public interface FeedbackRepository extends JpaRepository<Feedback, String> {
 	 * @see Sentiment
 	 */
 	long countBySentiment(String sentiment);
+
+    /**
+     *
+     * Implemented by JPA, that will return the count of the
+     * ratings with the matching rating field.
+     *
+     * @param rating the rating to find the count of
+     * @return the total count of the given rating
+     * @see Feedback
+     */
+	long countByRating(int rating);
 }
