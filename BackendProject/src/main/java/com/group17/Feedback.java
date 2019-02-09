@@ -22,14 +22,9 @@ import org.hibernate.validator.constraints.Range;
 @Entity
 @Table(name = "feedback", schema = "hy1xosk6o5taszzw")
 public class Feedback {
-<<<<<<< HEAD
 	public static final int MIN_RATING = 1;
 	public static final int MAX_RATING = 5;
-	
-=======
-    public static final int MIN_RATING = 1;
-    public static final int MAX_RATING = 5;
->>>>>>> origin/feature-addstarratingbreakdown
+
 	/**
 	 * The id of the feedback, auto generated using the UUID generator (below).
 	 * Hence it is always 36 characters long.
