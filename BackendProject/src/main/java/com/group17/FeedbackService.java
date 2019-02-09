@@ -128,16 +128,7 @@ public class FeedbackService {
     public long getCount() {
     	return repository.count();
 	}
-
-	public double getAvgRating() {
-        long sum_rating = 0;
-        List<Feedback> allfeedback = repository.findAll();
-        for(Feedback feedback: allfeedback) {
-            sum_rating = sum_rating + feedback.getRating();
-        }
-    	return sum_rating/repository.count();
-	}
-
+    
     public WatsonGateway getWatsonGateway() {
     	return watsonGateway;
     }
