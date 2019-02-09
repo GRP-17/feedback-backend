@@ -107,6 +107,15 @@ public class FeedbackController {
 		}
 	}
 
+	@GetMapping("/average_rating")
+	public ResponseEntity<?> getAvgRating() throws CommonException {
+		double avgrating = feedbackService.getAvgRating();
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(avgrating));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize feedback average counting", HttpStatus.NO_CONTENT.value());
+		}
+	}
 	/**
 	 * default mapping for a post request to the feedback endpoint
 	 *
