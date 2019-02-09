@@ -109,4 +109,26 @@ public class FeedbackControllerTest extends BaseTest {
 				.andExpect(status().isNoContent());
 		}
 	}
+
+    @Test
+    public void testIRatingsCount() throws Exception {
+        // Build the JSON string we're expecting, for example:
+        // {"1":2,"2":0,"3":2,"4":1,"5":7}
+        StringBuilder expected = new StringBuilder();
+        expected.append('{');
+        for (int rating = Feedback.MIN_RATING; rating <= Feedback.MAX_RATING; rating++) {
+            expected.append('"').append(rating).append("\":").append(getRepository().countByRating(rating));
+
+            if(rating < Feedback.MAX_RATING){
+                expected.append(',');
+            }
+        }
+        expected.append('}');
+
+        getMockMvc()
+                .perform(get("/feedback/rating/count"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expected.toString()));
+
+    }
 }
