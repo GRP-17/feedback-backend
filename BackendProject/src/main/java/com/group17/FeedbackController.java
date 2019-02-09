@@ -167,7 +167,7 @@ public class FeedbackController {
 		// Key: the ratings [1..5], Value: The count of this rating
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
-		for(int rating = 1; rating <= 5; rating++){
+		for(int rating = Feedback.MIN_RATING; rating <= Feedback.MAX_RATING; rating++){
 		    ratings.put(rating, feedbackService.getCountByRating(rating));
         }
 		
