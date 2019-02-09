@@ -31,6 +31,7 @@ public class RootController {
 			linkTo(methodOn(FeedbackController.class).getCount()).withRel("feedback_count"),
 			linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("feedback_sentiment_count"),
 			linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("feedback_rating_average"));
+			linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("feedback_rating_count"));
 		return rootResource;
 	}
 	
