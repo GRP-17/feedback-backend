@@ -1,6 +1,6 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.DASHBOARD_ENDPOINTS;
+import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -73,7 +73,7 @@ public class RootController {
 	
 	@GetMapping("/dashboard")
 	public ResponseEntity<?> find(@RequestParam(value = "endpoint", required = false, 
-												defaultValue = DASHBOARD_ENDPOINTS) 
+												defaultValue = DASHBOARD_DEFAULT_ENDPOINTS) 
 										String[] endpoint) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();

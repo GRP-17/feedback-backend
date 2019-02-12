@@ -9,7 +9,7 @@ public class Constants {
 	public static final DecimalFormat AVERAGE_RATING_FORMAT 
 											= new DecimalFormat("#.##");
 	
-	public static final String DASHBOARD_ENDPOINTS 
+	public static final String DASHBOARD_DEFAULT_ENDPOINTS 
 											= "feedback,feedback_count,feedback_rating_average,"
 													+ "feedback_rating_count,feedback_sentiment_count";
 	
