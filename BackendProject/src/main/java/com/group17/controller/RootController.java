@@ -1,5 +1,6 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.DASHBOARD_ENDPOINTS;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -71,43 +72,40 @@ public class RootController {
 	}
 	
 	@GetMapping("/dashboard")
-	public ResponseEntity<?> find(@RequestParam String[] endpoints) {
+	public ResponseEntity<?> find(@RequestParam(value = "endpoint", required = false, 
+												defaultValue = DASHBOARD_ENDPOINTS) 
+										String[] endpoint) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<String> endpointsFound = new ArrayList<String>();
 		List<String> endpointsNotFound = new ArrayList<String>();
 		
-		if(endpoints.length == 0) {
-			endpoints = new String[] {"feedback", "feedback_count", "feedback_rating_average",
-									  "feedback_rating_count", "feedback_sentiment_count"};
-		}
-		
-		for(String endpoint : endpoints) {
+		for(String element : endpoint) {
 			boolean found = true;
 			
-			switch(endpoint.toLowerCase()) {
+			switch(element.toLowerCase()) {
 			case "feedback":
-				map.put(endpoint, feedbackService.getAllFeedback());
+				map.put(element, feedbackService.getAllFeedback());
 				break;
 			case "feedback_count":
-				map.put(endpoint, feedbackService.getCount());
+				map.put(element, feedbackService.getCount());
 				break;
 			case "feedback_rating_average":
-				map.put(endpoint, feedbackService.getAverageRating(true));
+				map.put(element, feedbackService.getAverageRating(true));
 				break;
 			case "feedback_rating_count":
-				map.put(endpoint, feedbackService.getRatingCounts());
+				map.put(element, feedbackService.getRatingCounts());
 				break;
 			case "feedback_sentiment_count":
-				map.put(endpoint, feedbackService.getSentimentCounts());
+				map.put(element, feedbackService.getSentimentCounts());
 				break;
 			default:
 				found = false;
 				break;
 			}
 			
-			if(found) endpointsFound.add(endpoint);
-			else endpointsNotFound.add(endpoint);
+			if(found) endpointsFound.add(element);
+			else endpointsNotFound.add(element);
 		}
 		
 		// Return what has been found for debugging, etc.
