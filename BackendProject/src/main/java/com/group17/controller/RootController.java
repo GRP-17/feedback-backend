@@ -16,11 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,9 +70,8 @@ public class RootController {
 		return rootResource;
 	}
 	
-	@GetMapping("/api/foos")
-	public ResponseEntity<?> find(@RequestParam(name = "endpoints", required = false) 
-										String[] endpoints) {
+	@GetMapping("/dashboard")
+	public ResponseEntity<?> find(@RequestParam String[] endpoints) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<String> endpointsFound = new ArrayList<String>();
