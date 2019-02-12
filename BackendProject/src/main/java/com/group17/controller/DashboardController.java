@@ -19,8 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.FeedbackService;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
-import com.group17.util.RelBuilder;
-import com.group17.util.RelBuilder.LinkType;
 
 @CrossOrigin
 @RestController
@@ -33,14 +31,7 @@ public class DashboardController {
 	@GetMapping()
 	@ResponseBody
 	public ResponseEntity<?> getAll() {
-		LinkType[] links = LinkType.values();
-		String[] endpoints = new String[links.length];
-		
-		for(int i = 0; i < links.length; i ++) {
-			endpoints[i] = getRel(links[i]);
-		}
-		
-		return getSelected(endpoints);
+		return getSelected(new String[]{"feedback_count", "feedback_rating_average"});
 	}
 
 	@GetMapping()
@@ -50,38 +41,39 @@ public class DashboardController {
 		
 		for(String endpoint : endpoints) {
 			// Determine which LinkType it is
-			inner: for(LinkType type : LinkType.values()) {
-				if(endpoint.contains(type.getPath().toLowerCase())) {
-					
-					switch(type) {
-					case COUNT:
-						map.put(endpoint, feedbackService.getCount());
-						break;
-						
-					case FINDALL:
-						map.put(endpoint, feedbackService.getAllFeedback());
-						break;
-						
-					case RATING_AVERAGE:
-						map.put(endpoint, feedbackService.getAverageRating(true));
-						break;
-						
-					case RATING_COUNT:
-						map.put(endpoint, feedbackService.getRatingCounts());
-						break;
-						
-					case SENTIMENT_COUNT:
-						map.put(endpoint, feedbackService.getSentimentCounts());
-						break;
-						
-					default:
-					case ROOT:
-						// We ignore ROOT - it doesn't return any useful data for the dashboard
-						break;
-					}
-					break inner;
-				}
+			switch(endpoint.toLowerCase()) {
+			case "feedback_count":
+				map.put(endpoint, feedbackService.getCount());
+				break;
+			case "rating_average":
+				map.put(endpoint, feedbackService.getAverageRating(true));
+				break;
 			}
+//					switch(type) {
+//					case COUNT:
+//						map.put(endpoint, feedbackService.getCount());
+//						break;
+//						
+//					case RATING_AVERAGE:
+//						map.put(endpoint, feedbackService.getAverageRating(true));
+//						break;
+//						
+//					case RATING_COUNT:
+//						map.put(endpoint, feedbackService.getRatingCounts());
+//						break;
+//						
+//					case SENTIMENT_COUNT:
+//						map.put(endpoint, feedbackService.getSentimentCounts());
+//						break;
+//						
+//					default:
+//					case ROOT:
+//						// We ignore ROOT - it doesn't return any useful data for the dashboard
+//						break;
+//					}
+//					break inner;
+//				}
+//			}
 		}
 		
 		try {
@@ -89,10 +81,6 @@ public class DashboardController {
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize endpoints", HttpStatus.NO_CONTENT.value());
 		}
-	}
-	
-	private String getRel(LinkType type) {
-		return RelBuilder.newInstance(type).withPrefix("feedback").build();
 	}
 	
 	/**

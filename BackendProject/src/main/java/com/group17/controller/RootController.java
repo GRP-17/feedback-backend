@@ -1,12 +1,5 @@
 package com.group17.controller;
 
-import static com.group17.util.RelBuilder.newInstance;
-import static com.group17.util.RelBuilder.LinkType.COUNT;
-import static com.group17.util.RelBuilder.LinkType.RATING_AVERAGE;
-import static com.group17.util.RelBuilder.LinkType.RATING_COUNT;
-import static com.group17.util.RelBuilder.LinkType.ROOT;
-import static com.group17.util.RelBuilder.LinkType.FINDALL;
-import static com.group17.util.RelBuilder.LinkType.SENTIMENT_COUNT;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -36,28 +29,24 @@ public class RootController {
 		rootResource.add(
 			// Add 'feedback'
 			linkTo(methodOn(FeedbackController.class).findAll())
-				.withRel(newInstance(ROOT).withPrefix("feedback").build()),
-				
-			// Add 'feedback_findall'
-			linkTo(methodOn(FeedbackController.class).findAll())
-				.withRel(newInstance(FINDALL).withPrefix("feedback").build()),
+				.withRel("feedback"),
 				
 			// Add 'feedback_count'
 			linkTo(methodOn(FeedbackController.class).getCount())
-				.withRel(newInstance(COUNT).withPrefix("feedback").build()),
+				.withRel("feedback_count"),
 			
 			// Add 'feedback_sentiment_count'
 			linkTo(methodOn(FeedbackController.class).getSentimentsCount())
-				.withRel(newInstance(SENTIMENT_COUNT).withPrefix("feedback").build()),
+				.withRel("feedback_sentiment_count"),
 			
 
 			// Add 'feedback_rating_average'
 			linkTo(methodOn(FeedbackController.class).getAverageRating())
-				.withRel(newInstance(RATING_AVERAGE).withPrefix("feedback").build()),
+				.withRel("feedback_rating_average"),
 				
 			// Add 'feedback_rating_count'
 			linkTo(methodOn(FeedbackController.class).getStarRatingCount())
-				.withRel(newInstance(RATING_COUNT).withPrefix("feedback").build()));
+				.withRel("feedback_rating_count"));
 		return rootResource;
 	}
 	
