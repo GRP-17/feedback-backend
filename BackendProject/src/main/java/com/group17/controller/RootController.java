@@ -78,38 +78,21 @@ public class RootController {
 		for(String endpoint : endpoints) {
 			// Determine which LinkType it is
 			switch(endpoint.toLowerCase()) {
+			case "feedback":
+				map.put(endpoint, feedbackService.getAllFeedback());
+				break;
 			case "feedback_count":
 				map.put(endpoint, feedbackService.getCount());
 				break;
 			case "feedback_rating_average":
 				map.put(endpoint, feedbackService.getAverageRating(true));
 				break;
+			case "feedback_rating_count":
+				map.put(endpoint, feedbackService.getRatingCounts());
+				break;
+			case "feedback_sentiment_count":
+				map.put(endpoint, feedbackService.getSentimentCounts());
 			}
-//					switch(type) {
-//					case COUNT:
-//						map.put(endpoint, feedbackService.getCount());
-//						break;
-//						
-//					case RATING_AVERAGE:
-//						map.put(endpoint, feedbackService.getAverageRating(true));
-//						break;
-//						
-//					case RATING_COUNT:
-//						map.put(endpoint, feedbackService.getRatingCounts());
-//						break;
-//						
-//					case SENTIMENT_COUNT:
-//						map.put(endpoint, feedbackService.getSentimentCounts());
-//						break;
-//						
-//					default:
-//					case ROOT:
-//						// We ignore ROOT - it doesn't return any useful data for the dashboard
-//						break;
-//					}
-//					break inner;
-//				}
-//			}
 		}
 		
 		try {
