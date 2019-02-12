@@ -99,8 +99,8 @@ public class Feedback {
 		return id;
 	}
 	
-	public Date getCreated() {
-		return created;
+	public long getCreated() {
+		return created.getTime();
 	}
 	
 	public Integer getRating() {
