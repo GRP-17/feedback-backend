@@ -28,11 +28,11 @@ public class DashboardController {
 	@Autowired
 	private FeedbackService feedbackService;
 	
-	@GetMapping()
-	@ResponseBody
-	public ResponseEntity<?> getAll() {
-		return getSelected(new String[]{"feedback_count", "feedback_rating_average"});
-	}
+//	@GetMapping()
+//	@ResponseBody
+//	public ResponseEntity<?> getAll() {
+//		return getSelected(new String[]{"feedback_count", "feedback_rating_average"});
+//	}
 
 	@GetMapping()
 	@ResponseBody
