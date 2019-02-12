@@ -99,6 +99,10 @@ public class Feedback {
 		return id;
 	}
 	
+	public long getCreated() {
+		return created.getTime();
+	}
+	
 	public Integer getRating() {
 		return rating;
 	}
@@ -141,7 +145,7 @@ public class Feedback {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Feedback [id=%s, rating=%s, text=%s, sentiment=%s]\n", 
-							 id, rating, text, sentiment);
+		return String.format("Feedback [id=%s, created=%s, rating=%s, text=%s, sentiment=%s]\n", 
+							 id, created.toString(), rating, text, sentiment);
 	}
 }
