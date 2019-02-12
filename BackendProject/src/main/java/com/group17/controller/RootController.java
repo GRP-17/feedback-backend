@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,15 +74,20 @@ public class RootController {
 		return rootResource;
 	}
 	
-	@RequestMapping(value="/dashboard/{endpoints}", method=RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<?> find(@PathVariable String[] endpoints) {
+	@GetMapping("/api/foos")
+	public ResponseEntity<?> find(@RequestParam(name = "endpoints", required = false) 
+										String[] endpoints) {
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<String> endpointsFound = new ArrayList<String>();
 		List<String> endpointsNotFound = new ArrayList<String>();
 		
+		if(endpoints.length == 0) {
+			endpoints = new String[] {"feedback", "feedback_count", "feedback_rating_average",
+									  "feedback_rating_count", "feedback_sentiment_count"};
+		}
+		
 		for(String endpoint : endpoints) {
-			// Determine which LinkType it is
 			boolean found = true;
 			
 			switch(endpoint.toLowerCase()) {
