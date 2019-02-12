@@ -1,5 +1,8 @@
 package com.group17;
 
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -22,9 +25,6 @@ import org.hibernate.validator.constraints.Range;
 @Entity
 @Table(name = "feedback", schema = "hy1xosk6o5taszzw")
 public class Feedback {
-	public static final int MIN_RATING = 1;
-	public static final int MAX_RATING = 5;
-
 	/**
 	 * The id of the feedback, auto generated using the UUID generator (below).
 	 * Hence it is always 36 characters long.
@@ -46,7 +46,7 @@ public class Feedback {
 	 * maps onto the rating column.
 	 */
 	@NotNull(message = "Bad Feedback Format")
-	@Range(min = MIN_RATING, max = MAX_RATING, 
+	@Range(min = FEEDBACK_MIN_RATING, max = FEEDBACK_MAX_RATING, 
 		   message = "The range of rating is {min} ~ {max}.")
 	@Column(name = "rating", columnDefinition = "INT(11)")
 	private Integer rating;

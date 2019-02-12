@@ -1,7 +1,9 @@
 package com.group17;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.stereotype.Component;
 
+import com.group17.util.LoggerUtil;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
@@ -25,6 +27,24 @@ public class WatsonGateway {
         toneAnalyzer.setEndPoint(url);
     }
     
+    public Sentiment getSentimentByText(String text) {
+    	return Sentiment.getByToneAnalysis(analyze(text));
+    }
+    
+    public void deduceAndSetSentiment(Feedback feedback) { 
+    	String text = feedback.getText();
+		// Calculate the sentiment
+		if(text.length() > 0) {
+			Sentiment sentiment = getSentimentByText(feedback.getText());
+			feedback.setSentiment(sentiment);
+		} else {
+			feedback.setSentiment(Sentiment.NEUTRAL);
+		}
+		
+		LoggerUtil.log(Level.INFO, "[Sentiment/Analysis] Deduced & set text"
+										+ text + " to " + feedback.getSentiment());
+    }
+    
     /**
      * Method that will analyze a given String, and produce
      * a {@link ToneAnalysis} instance for the respective text.
@@ -34,10 +54,6 @@ public class WatsonGateway {
     private ToneAnalysis analyze(String text) {
         ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
         return toneAnalyzer.tone(toneOptions).execute();
-    }
-    
-    public Sentiment getSentimentByText(String text) {
-    	return Sentiment.getByToneAnalysis(analyze(text));
     }
 
 }

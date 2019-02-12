@@ -7,6 +7,8 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
 
+import com.group17.controller.FeedbackController;
+
 /**
  * Used as a factory for the Resources
  */

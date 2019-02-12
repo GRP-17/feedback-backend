@@ -1,6 +1,12 @@
 package com.group17;
 
+import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.group17.util.CommonException;
-import com.group17.util.LoggerUtil;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -60,7 +65,14 @@ public class FeedbackService {
     public long getCountBySentiment(String sentiment) {
     	return repository.countBySentiment(sentiment);
     }
-
+    
+    public Map<Sentiment, Long> getSentimentCounts() {
+		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
+		for (Sentiment sentiment : Sentiment.values()) {
+			counts.put(sentiment, getCountBySentiment(sentiment.toString()));
+		}
+		return counts;
+    }
 
     /**
      * Get the total appearances of a given rating in the JPA
@@ -73,13 +85,29 @@ public class FeedbackService {
     	return repository.countByRating(rating);
 	}
     
-    public double getAverageRating() {
+    public Map<Integer, Long> getRatingCounts() {
+		// Key: the ratings [1..5], Value: The count of this rating
+		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
+
+		for(int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++){
+		    ratings.put(rating, getCountByRating(rating));
+        }
+		return ratings;
+    }
+    
+    public double getAverageRating(boolean formatted) {
     	long total = 0;
-    	for(int i = Feedback.MIN_RATING; i <= Feedback.MAX_RATING; i ++) {
+    	for(int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i ++) {
     		total += repository.countByRating(Integer.valueOf(i)) * i;
     	}
+
+		// The unformatted average - it could have many trailing decimal values
+    	double average = (double) total / (double) repository.count();
+    	if(formatted) {
+    		return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
+    	}
     	
-    	return (double) total / (double) repository.count();
+    	return average;
     }
     
     /**
@@ -102,7 +130,7 @@ public class FeedbackService {
 							if (newText != null) {
 								feedback.setText(newText);
 								
-								deduceAndSetSentiment(feedback);
+								watsonGateway.deduceAndSetSentiment(feedback);
 							}
 							return repository.save(feedback);
 						 })
@@ -120,7 +148,7 @@ public class FeedbackService {
      * @return the newly saved resource
      */
     public Resource<Feedback> createFeedback(Feedback feedback) {
-    	deduceAndSetSentiment(feedback);
+    	watsonGateway.deduceAndSetSentiment(feedback);
     	return assembler.toResource(repository.save(feedback));
     }
     
@@ -132,18 +160,6 @@ public class FeedbackService {
      */
     public void deleteFeedbackById(String id) throws Exception {
 		repository.deleteById(id);
-    }
-    
-    private void deduceAndSetSentiment(Feedback feedback) { 
-    	String text = feedback.getText();
-		// Calculate the sentiment
-		if(text.length() > 0) {
-			Sentiment sentiment = watsonGateway.getSentimentByText(feedback.getText());
-			feedback.setSentiment(sentiment);
-			LoggerUtil.logAnalysis(feedback);
-		} else {
-			feedback.setSentiment(Sentiment.NEUTRAL);
-		}
     }
     
     public long getCount() {
