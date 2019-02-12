@@ -1,13 +1,10 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
-import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,31 +87,6 @@ public class FeedbackController {
 		return resource;
 	}
 
-	@GetMapping("/count")
-	public ResponseEntity<?> getCount() throws CommonException {
-		long count = feedbackService.getCount();
-		Map<String, Long> res = new HashMap<String, Long>();
-		res.put("count", count);
-		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
-		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize feedback count", HttpStatus.NO_CONTENT.value());
-		}
-	}
-
-	@GetMapping("/sentiments/count")
-	public ResponseEntity<?> getSentimentsCount() throws CommonException {
-		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
-		for (Sentiment sentiment : Sentiment.values()) {
-			counts.put(sentiment, feedbackService.getCountBySentiment(sentiment.toString()));
-		}
-		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(counts));
-		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize sentiment counts", HttpStatus.NO_CONTENT.value());
-		}
-	}
-
 	/**
 	 * default mapping for a post request to the feedback endpoint
 	 *
@@ -169,39 +141,48 @@ public class FeedbackController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("/rating/average")
-	public ResponseEntity<?> getAverageRating() throws CommonException {
-		Map<String, Double> map = new HashMap<String, Double>();
-		
-		// The unformatted average - it could have many decimal values
-		double averageU = feedbackService.getAverageRating();
-		// The formatted average - trimmed of unnecessary decimal values
-		double averageF = Double.valueOf(new DecimalFormat("#.##")
-												.format(averageU));
-		
-		map.put("average", averageF);
-		
+	@GetMapping("/count")
+	public ResponseEntity<?> getCount() throws CommonException {
+		long count = feedbackService.getCount();
+		Map<String, Long> res = new HashMap<String, Long>();
+		res.put("count", count);
 		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize average rating", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize feedback count", HttpStatus.NO_CONTENT.value());
+		}
+	}
+
+	@GetMapping("/sentiments/count")
+	public ResponseEntity<?> getSentimentsCount() throws CommonException {
+		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts();
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(counts));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize sentiment counts", HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/rating/count")
 	public ResponseEntity<?> getStarRatingCount() throws CommonException {
-		// Key: the ratings [1..5], Value: The count of this rating
-		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
-
-		for(int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++){
-		    ratings.put(rating, feedbackService.getCountByRating(rating));
-        }
-		
+		Map<Integer, Long> ratings = feedbackService.getRatingCounts();
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(ratings));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize star rating counts", 
 									  HttpStatus.NO_CONTENT.value());
+		}
+	}
+	
+	@GetMapping("/rating/average")
+	public ResponseEntity<?> getAverageRating() throws CommonException {
+		Map<String, Double> map = new HashMap<String, Double>();
+		map.put("average", feedbackService.getAverageRating(true));
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize average rating", HttpStatus.NO_CONTENT.value());
 		}
 	}
 

@@ -1,9 +1,12 @@
 package com.group17;
 
+import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +66,14 @@ public class FeedbackService {
     public long getCountBySentiment(String sentiment) {
     	return repository.countBySentiment(sentiment);
     }
-
+    
+    public Map<Sentiment, Long> getSentimentCounts() {
+		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
+		for (Sentiment sentiment : Sentiment.values()) {
+			counts.put(sentiment, getCountBySentiment(sentiment.toString()));
+		}
+		return counts;
+    }
 
     /**
      * Get the total appearances of a given rating in the JPA
@@ -76,13 +86,29 @@ public class FeedbackService {
     	return repository.countByRating(rating);
 	}
     
-    public double getAverageRating() {
+    public Map<Integer, Long> getRatingCounts() {
+		// Key: the ratings [1..5], Value: The count of this rating
+		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
+
+		for(int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++){
+		    ratings.put(rating, getCountByRating(rating));
+        }
+		return ratings;
+    }
+    
+    public double getAverageRating(boolean formatted) {
     	long total = 0;
     	for(int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i ++) {
     		total += repository.countByRating(Integer.valueOf(i)) * i;
     	}
+
+		// The unformatted average - it could have many trailing decimal values
+    	double average = (double) total / (double) repository.count();
+    	if(formatted) {
+    		return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
+    	}
     	
-    	return (double) total / (double) repository.count();
+    	return average;
     }
     
     /**
