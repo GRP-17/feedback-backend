@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +40,15 @@ public class DashboardController {
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize endpoints", HttpStatus.NO_CONTENT.value());
+		}
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<String> findOne(@PathVariable String id) {
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(id + " Test"));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize endpoints", HttpStatus.NO_CONTENT.value());
 		}
