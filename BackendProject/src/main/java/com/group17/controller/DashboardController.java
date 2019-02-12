@@ -35,8 +35,8 @@ public class DashboardController {
 		FeedbackController inst = methodOn(FeedbackController.class);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("feedback", inst.findAll());
-		map.put("feedback_count", inst.getCount());
+		map.put("feedback", inst.findAll().getContent().toString());
+		map.put("feedback_count", inst.getCount().getBody());
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
