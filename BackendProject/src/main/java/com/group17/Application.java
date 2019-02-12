@@ -1,5 +1,6 @@
 package com.group17;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -29,6 +30,6 @@ public class Application implements ApplicationRunner {
 	 */
 	@Override
 	public void run(ApplicationArguments applicationArguments) throws Exception {
-		LoggerUtil.getLogger().info("Application started");
+		LoggerUtil.log(Level.INFO, "Application started");
 	}
 }

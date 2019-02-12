@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.group17.util.CommonException;
-import com.group17.util.LoggerUtil;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -131,7 +130,7 @@ public class FeedbackService {
 							if (newText != null) {
 								feedback.setText(newText);
 								
-								deduceAndSetSentiment(feedback);
+								watsonGateway.deduceAndSetSentiment(feedback);
 							}
 							return repository.save(feedback);
 						 })
@@ -149,7 +148,7 @@ public class FeedbackService {
      * @return the newly saved resource
      */
     public Resource<Feedback> createFeedback(Feedback feedback) {
-    	deduceAndSetSentiment(feedback);
+    	watsonGateway.deduceAndSetSentiment(feedback);
     	return assembler.toResource(repository.save(feedback));
     }
     
@@ -161,18 +160,6 @@ public class FeedbackService {
      */
     public void deleteFeedbackById(String id) throws Exception {
 		repository.deleteById(id);
-    }
-    
-    private void deduceAndSetSentiment(Feedback feedback) { 
-    	String text = feedback.getText();
-		// Calculate the sentiment
-		if(text.length() > 0) {
-			Sentiment sentiment = watsonGateway.getSentimentByText(feedback.getText());
-			feedback.setSentiment(sentiment);
-			LoggerUtil.logAnalysis(feedback);
-		} else {
-			feedback.setSentiment(Sentiment.NEUTRAL);
-		}
     }
     
     public long getCount() {

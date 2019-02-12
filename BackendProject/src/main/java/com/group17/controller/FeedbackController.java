@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -58,9 +59,9 @@ public class FeedbackController {
 	 */
 	@GetMapping()
 	public Resources<Resource<Feedback>> findAll() {
-
 		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
-		LoggerUtil.logFeedbackFindAll(resources.size());
+		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size() 
+										+ " resources in the repository");
 
 		return new Resources<>(
 				resources,
@@ -81,9 +82,9 @@ public class FeedbackController {
 	 */
 	@GetMapping("/{id}")
 	public Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
-
 		Resource<Feedback> resource = feedbackService.getFeedbackById(id);
-		LoggerUtil.logFeedbackFindOne(resource.getContent());
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + id
+										+ ". Object: " + resource.getContent().toString());
 		return resource;
 	}
 
@@ -98,9 +99,9 @@ public class FeedbackController {
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
-
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
-		LoggerUtil.logFeedbackCreate(newFeedback);
+		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
+										+ ". Object: " + newFeedback.toString());
 
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
@@ -119,7 +120,8 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
-		LoggerUtil.logFeedbackUpdate(resource.getContent());
+		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + id
+										+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
@@ -134,7 +136,7 @@ public class FeedbackController {
 
 		try {
 			feedbackService.deleteFeedbackById(id);
-			LoggerUtil.logFeedbackDeleted(id);
+			LoggerUtil.log(Level.INFO, "[Feedback/Delete] Deleted: " + id);
 		} catch (Exception e) {
 		}
 
@@ -146,28 +148,43 @@ public class FeedbackController {
 		long count = feedbackService.getCount();
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
+		
+		LoggerUtil.log(Level.INFO, "[Feedback/Count] Counted: " + count);
+		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize feedback count", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize feedback count", 
+									  HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/sentiments/count")
 	public ResponseEntity<?> getSentimentsCount() throws CommonException {
 		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts();
+		
 		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(counts));
+			String countsAsString = new ObjectMapper().writeValueAsString(counts);
+			LoggerUtil.log(Level.INFO, 
+						   "[Feedback/SentimentCount] Counted: " + countsAsString);
+			
+			return ResponseEntity.ok(countsAsString);
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize sentiment counts", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize sentiment counts", 
+									  HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/rating/count")
 	public ResponseEntity<?> getStarRatingCount() throws CommonException {
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts();
+		
 		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(ratings));
+			String ratingsAsString = new ObjectMapper().writeValueAsString(ratings);
+			LoggerUtil.log(Level.INFO, 
+						   "[Feedback/RatingCount] Counted: " + ratingsAsString);
+			
+			return ResponseEntity.ok(ratingsAsString);
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize star rating counts", 
 									  HttpStatus.NO_CONTENT.value());
@@ -176,13 +193,18 @@ public class FeedbackController {
 	
 	@GetMapping("/rating/average")
 	public ResponseEntity<?> getAverageRating() throws CommonException {
+		double average = feedbackService.getAverageRating(true);
 		Map<String, Double> map = new HashMap<String, Double>();
-		map.put("average", feedbackService.getAverageRating(true));
+		map.put("average", average);
+		
+		LoggerUtil.log(Level.INFO, 
+					   "[Feedback/RatingAverage] Calculated Average: " + average);
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize average rating", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize average rating", 
+									  HttpStatus.NO_CONTENT.value());
 		}
 	}
 

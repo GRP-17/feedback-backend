@@ -3,9 +3,12 @@ package com.group17.controller;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
@@ -74,9 +77,13 @@ public class RootController {
 	@ResponseBody
 	public ResponseEntity<?> find(@PathVariable String[] endpoints) {
 		Map<String, Object> map = new HashMap<String, Object>();
+		List<String> endpointsFound = new ArrayList<String>();
+		List<String> endpointsNotFound = new ArrayList<String>();
 		
 		for(String endpoint : endpoints) {
 			// Determine which LinkType it is
+			boolean found = true;
+			
 			switch(endpoint.toLowerCase()) {
 			case "feedback":
 				map.put(endpoint, feedbackService.getAllFeedback());
@@ -92,13 +99,29 @@ public class RootController {
 				break;
 			case "feedback_sentiment_count":
 				map.put(endpoint, feedbackService.getSentimentCounts());
+				break;
+			default:
+				found = false;
+				break;
 			}
+			
+			if(found) endpointsFound.add(endpoint);
+			else endpointsNotFound.add(endpoint);
 		}
+		
+		// Return what has been found for debugging, etc.
+		map.put("endpoints_found", endpointsFound);
+		map.put("endpoints_not_found", endpointsNotFound);
+		
+		LoggerUtil.log(Level.INFO, "[Root/Dashboard] " 
+										+ endpointsFound.size() + " returned, " 
+										+ endpointsNotFound.size() + " not found");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize endpoints", HttpStatus.NO_CONTENT.value());
+			throw new CommonException("Unable to serialize endpoints", 
+									  HttpStatus.NO_CONTENT.value());
 		}
 	}
 	
