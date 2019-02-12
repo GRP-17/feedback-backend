@@ -1,5 +1,8 @@
 package com.group17;
 
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +78,7 @@ public class FeedbackService {
     
     public double getAverageRating() {
     	long total = 0;
-    	for(int i = Feedback.MIN_RATING; i <= Feedback.MAX_RATING; i ++) {
+    	for(int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i ++) {
     		total += repository.countByRating(Integer.valueOf(i)) * i;
     	}
     	

@@ -1,5 +1,7 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -191,7 +193,7 @@ public class FeedbackController {
 		// Key: the ratings [1..5], Value: The count of this rating
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
-		for(int rating = Feedback.MIN_RATING; rating <= Feedback.MAX_RATING; rating++){
+		for(int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++){
 		    ratings.put(rating, feedbackService.getCountByRating(rating));
         }
 		

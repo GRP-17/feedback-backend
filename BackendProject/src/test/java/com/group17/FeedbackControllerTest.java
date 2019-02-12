@@ -1,5 +1,7 @@
 package com.group17;
 
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -116,10 +118,10 @@ public class FeedbackControllerTest extends BaseTest {
         // {"1":2,"2":0,"3":2,"4":1,"5":7}
         StringBuilder expected = new StringBuilder();
         expected.append('{');
-        for (int rating = Feedback.MIN_RATING; rating <= Feedback.MAX_RATING; rating++) {
+        for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
             expected.append('"').append(rating).append("\":").append(getRepository().countByRating(rating));
 
-            if(rating < Feedback.MAX_RATING){
+            if(rating < FEEDBACK_MAX_RATING){
                 expected.append(',');
             }
         }
