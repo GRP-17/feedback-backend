@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,16 +27,16 @@ public class DashboardController {
 	
 	@Autowired
 	private FeedbackService feedbackService;
-	
+//	
 //	@GetMapping()
 //	@ResponseBody
 //	public ResponseEntity<?> getAll() {
-//		return getSelected(new String[]{"feedback_count", "feedback_rating_average"});
+//		return find(new String[]{"feedback_count", "feedback_rating_average"});
 //	}
 
-	@GetMapping()
+	@RequestMapping(value="/find/{endpoints}", method=RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<?> getSelected(@PathVariable String[] endpoints) {
+	public ResponseEntity<?> find(@PathVariable String[] endpoints) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		for(String endpoint : endpoints) {
@@ -45,7 +45,7 @@ public class DashboardController {
 			case "feedback_count":
 				map.put(endpoint, feedbackService.getCount());
 				break;
-			case "rating_average":
+			case "feedback_rating_average":
 				map.put(endpoint, feedbackService.getAverageRating(true));
 				break;
 			}
