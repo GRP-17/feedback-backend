@@ -67,7 +67,11 @@ public class RootController {
 				
 			// Add 'feedback_rating_count'
 			linkTo(methodOn(FeedbackController.class).getStarRatingCount())
-				.withRel("feedback_rating_count"));
+				.withRel("feedback_rating_count"),
+		
+
+			// Add 'dashboard'
+			linkTo(find(null)).withRel("dashboard"));
 		return rootResource;
 	}
 	
