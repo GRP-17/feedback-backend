@@ -43,11 +43,10 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testCRootEndpoint() throws Exception {
 		// This should link to the '/feedback' endpoint, but this double checks it
-//		getMockMvc()
-//			.perform(get(""))
-//			.andExpect(status().isOk())
-//			.andExpect(jsonPath("$._links").isMap());
-//		getMockMvc().perform(get(""));
+		getMockMvc()
+			.perform(get(""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$._links").isMap());
 	}
 	
 	@Test
