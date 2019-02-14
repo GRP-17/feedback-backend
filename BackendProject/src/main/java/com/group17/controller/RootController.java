@@ -71,7 +71,7 @@ public class RootController {
 		
 
 			// Add 'dashboard'
-			linkTo(methodOn(RootController.class).find(null)).withSelfRel().expand());
+			linkTo(methodOn(RootController.class).find(null)).withSelfRel().expand().withRel("dashboard"));
 		return rootResource;
 	}
 	
