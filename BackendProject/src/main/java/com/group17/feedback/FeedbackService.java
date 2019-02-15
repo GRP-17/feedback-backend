@@ -179,7 +179,7 @@ public class FeedbackService {
 		long today = DateUtil.getToday();
 		// Create some dummy values to test the endpoint & allow frontend development
 		Random random = new Random(today);
-		for(int i = 0; i <= Integer.MAX_VALUE; i ++) {
+		for(int i = 0; i <= 30; i ++) {
 			long delta = today - TimeUnit.DAYS.toMillis(i);
 			map.put(delta, (long) random.nextInt(30));
 		}
