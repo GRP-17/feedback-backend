@@ -17,4 +17,5 @@ public class DayResourceAssembler implements ResourceAssembler<Day, Resource<Day
 				linkTo(methodOn(FeedbackController.class).findOne(feedback.getId())).withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback")*/);
 	}
+	
 }

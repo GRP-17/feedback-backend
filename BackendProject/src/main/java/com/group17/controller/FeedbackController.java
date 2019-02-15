@@ -69,7 +69,8 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
 				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"));
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"),
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay()).withRel("rating_negative"));
 	}
 
 	/**
@@ -204,6 +205,21 @@ public class FeedbackController {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize average rating", 
+									  HttpStatus.NO_CONTENT.value());
+		}
+	}
+	
+	@GetMapping("/rating/negativeperday")
+	public ResponseEntity<?> getNegativePerDay() throws CommonException {
+		Map<Long, Long> map = feedbackService.getNegativeRatingCounts();
+		
+		LoggerUtil.log(Level.INFO, 
+					   "[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize negative rating counts", 
 									  HttpStatus.NO_CONTENT.value());
 		}
 	}

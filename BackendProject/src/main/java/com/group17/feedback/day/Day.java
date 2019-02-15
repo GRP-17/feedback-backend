@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "day"/*, schema = "hy1xosk6o5taszzw"*/)
+@Table(name = "days", schema = "hy1xosk6o5taszzw")
 public class Day {
 	@Id
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")

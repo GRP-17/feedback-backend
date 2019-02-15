@@ -51,14 +51,17 @@ public class DashboardController {
 			case "feedback_count":
 				map.put(element, feedbackService.getCount());
 				break;
+			case "feedback_sentiment_count":
+				map.put(element, feedbackService.getSentimentCounts());
+				break;
 			case "feedback_rating_average":
 				map.put(element, feedbackService.getAverageRating(true));
 				break;
 			case "feedback_rating_count":
 				map.put(element, feedbackService.getRatingCounts());
 				break;
-			case "feedback_sentiment_count":
-				map.put(element, feedbackService.getSentimentCounts());
+			case "feedback_rating_negative":
+				map.put(element, feedbackService.getNegativeRatingCounts());
 				break;
 			default:
 				found = false;

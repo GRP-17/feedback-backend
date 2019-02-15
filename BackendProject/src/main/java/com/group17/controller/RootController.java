@@ -47,6 +47,10 @@ public class RootController {
 			// Add 'feedback_rating_count'
 			linkTo(methodOn(FeedbackController.class).getStarRatingCount())
 				.withRel("feedback_rating_count"),
+				
+			// Add 'feedback_rating_negative'
+			linkTo(methodOn(FeedbackController.class).getNegativePerDay())
+				.withRel("feedback_rating_negative"),
 		
 
 			// Add 'dashboard'
