@@ -234,7 +234,7 @@ public class FeedbackController {
 		Map<String, Object> map = feedbackService.getCommonPhrases();
 		
 		LoggerUtil.log(Level.INFO, 
-					"[Feedback/RatingAverage] Returned " + map.size() + " phrases");
+					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));

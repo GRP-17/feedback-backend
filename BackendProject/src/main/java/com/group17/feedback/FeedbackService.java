@@ -191,56 +191,48 @@ public class FeedbackService {
 		return new HashMap<String, Object>(){{ put("result", maps); }};
 	}
     public Map<String, Object> getCommonPhrases() {
-		// Key: Phrase (n-gram)
-		// Value:
-		//	 Key: 	n-gram data key
-		//	 Value: n-gram data value
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		map.put("phrase", 
-				new HashMap<String, Object>() {{
-					put("credit limit",
-							new HashMap<String, Object>()
-							{{
-								put("volume", 145);
-								put("average_rating", 3.50);
-								put("sentiments", 
-									new HashMap<String, Integer>()
-									{{
-										put(Sentiment.POSITIVE.toString(), 1);
-										put(Sentiment.NEUTRAL.toString(), 1);
-										put(Sentiment.NEGATIVE.toString(), 8);
-									}});
-							}});
-					put("pin reminder",
-							new HashMap<String, Object>()
-							{{
-								put("volume", 40);
-								put("average_rating", 4.75);
-								put("sentiments", 
-									new HashMap<String, Integer>()
-									{{
-										put(Sentiment.POSITIVE.toString(), 1);
-										put(Sentiment.NEUTRAL.toString(), 5);
-										put(Sentiment.NEGATIVE.toString(), 40);
-									}});
-							}});
-					put("credit reminder",
-						new HashMap<String, Object>()
-						{{
-							put("volume", 38);
-							put("average_rating", 3.3);
-							put("sentiments", 
-								new HashMap<String, Integer>()
-								{{
-									put(Sentiment.POSITIVE.toString(), 2);
-									put(Sentiment.NEUTRAL.toString(), 4);
-									put(Sentiment.NEGATIVE.toString(), 40);
-								}});
-						}});
-				}});
+		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
 		
-		return map;
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "credit limit");
+			put("volume", 145);
+			put("average_rating", 3.50);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 1);
+					put(Sentiment.NEUTRAL.toString(), 1);
+					put(Sentiment.NEGATIVE.toString(), 8);
+				}});
+		}});
+		
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "pin reminder");
+			put("volume", 40);
+			put("average_rating", 4.75);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 1);
+					put(Sentiment.NEUTRAL.toString(), 5);
+					put(Sentiment.NEGATIVE.toString(), 40);
+				}});
+		}});
+		
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "credit reminder");
+			put("volume", 38);
+			put("average_rating", 3.3);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 2);
+					put(Sentiment.NEUTRAL.toString(), 4);
+					put(Sentiment.NEGATIVE.toString(), 40);
+				}});
+		}});
+		
+		return new HashMap<String, Object>(){{ put("result", maps); }};
     }
     
     private void setSentiment(Feedback feedback) {
