@@ -231,7 +231,7 @@ public class FeedbackController {
 		// Value:
 		//	 Key: 	n-gram data key
 		//	 Value: n-gram data value
-		Map<String, Map<String, Object>> map = feedbackService.getCommonPhrases();
+		Map<String, Object> map = feedbackService.getCommonPhrases();
 		
 		LoggerUtil.log(Level.INFO, 
 					"[Feedback/RatingAverage] Returned " + map.size() + " phrases");
