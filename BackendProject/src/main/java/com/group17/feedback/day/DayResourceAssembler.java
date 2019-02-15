@@ -12,10 +12,7 @@ public class DayResourceAssembler implements ResourceAssembler<Day, Resource<Day
 
 	@Override
 	public Resource<Day> toResource(Day day) {
-		return new Resource<>(
-				day/*,
-				linkTo(methodOn(FeedbackController.class).findOne(feedback.getId())).withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback")*/);
+		return new Resource<Day>(day);
 	}
 	
 }

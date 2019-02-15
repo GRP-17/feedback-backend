@@ -34,8 +34,8 @@ public class FeedbackService {
 	/** holds the instance of the factory which will make the resources */
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 	
-	@Autowired private DayRepository dayRepo;
-	@Autowired private DayResourceAssembler dayAssembler;
+//	@Autowired private DayRepository dayRepo;
+//	@Autowired private DayResourceAssembler dayAssembler;
 	
 	@Autowired private WatsonGateway watsonGateway;
 
@@ -178,22 +178,27 @@ public class FeedbackService {
 		// Key: The Day (in ms), Value: The Number of negative ratings
 		Map<Long, Long> map = new HashMap<Long, Long>();
 
+
+		long today = getToday();
+		// Create some dummy values to test the endpoint & allow frontend development
+		Random random = new Random(today);
+		for(int i = 0; i <= Integer.MAX_VALUE; i ++) {
+			long delta = today - TimeUnit.DAYS.toMillis(i);
+			map.put(delta, (long) random.nextInt(30));
+		}
+		
+		return map;
+    }
+    
+    private long getToday() {
 		// Get the time at midnight today
 		Calendar date = new GregorianCalendar();
 		date.set(Calendar.HOUR_OF_DAY, 0);
 		date.set(Calendar.MINUTE, 0);
 		date.set(Calendar.SECOND, 0);
 		date.set(Calendar.MILLISECOND, 0);
-
-		// Create some dummy values to test the endpoint & allow frontend development
-		Random random = new Random(date.getTimeInMillis());
-		for(int i = 0; i <= Integer.MAX_VALUE; i ++) {
-			Calendar clone = (Calendar) date.clone();
-			clone.setTimeInMillis(clone.getTimeInMillis() - TimeUnit.DAYS.toMillis(i));
-			map.put(clone.getTimeInMillis(), (long) random.nextInt(30));
-		}
 		
-		return map;
+		return date.getTimeInMillis();
     }
     
     private void setSentiment(Feedback feedback, boolean isUpdate) {
