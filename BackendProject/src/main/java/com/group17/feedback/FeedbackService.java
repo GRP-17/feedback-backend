@@ -237,37 +237,6 @@ public class FeedbackService {
 		return map;
     }
     
-    /**
-     * Update a {@link Feedback} entry in the database.
-     * 
-     * @param id the identifier of the entry to update
-     * @param newFeedback the object containing the data to overwrite with
-     * @return the newly saved resource
-     * @throws CommonException if the id isn't valid (no entry with that given id)
-     */
-    public Resource<Feedback> updateFeedback(String id, Feedback newFeedback) throws CommonException {
-		Feedback updatedFeedback =
-				repository.findById(id)
-					.map(feedback -> {
-							Integer newRating = newFeedback.getRating();
-							String newText = newFeedback.getText();
-							if (newRating != null) {
-								feedback.setRating(newRating);
-							}
-							if (newText != null) {
-								feedback.setText(newText);
-								
-								watsonGateway.deduceAndSetSentiment(feedback);
-							}
-							return repository.save(feedback);
-						 })
-					.orElseThrow(
-							() ->
-							new CommonException(
-									"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
-    	return assembler.toResource(updatedFeedback);
-    }
-    
     private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
     	
