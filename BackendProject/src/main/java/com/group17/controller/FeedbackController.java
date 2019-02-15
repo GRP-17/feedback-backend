@@ -212,7 +212,7 @@ public class FeedbackController {
 	
 	@GetMapping("/rating/negativeperday")
 	public ResponseEntity<?> getNegativePerDay() throws CommonException {
-		Map<Long, Long> map = feedbackService.getNegativeRatingCounts();
+		Map<String, Object> map = feedbackService.getNegativeRatingCounts();
 		
 		LoggerUtil.log(Level.INFO, 
 					"[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");
