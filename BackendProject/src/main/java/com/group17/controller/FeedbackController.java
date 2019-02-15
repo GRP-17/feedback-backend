@@ -70,7 +70,8 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
 				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"),
 				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"),
-				linkTo(methodOn(FeedbackController.class).getNegativePerDay()).withRel("rating_negative"));
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay()).withRel("rating_negative"),
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases()).withRel("common_phrases"));
 	}
 
 	/**
@@ -214,13 +215,32 @@ public class FeedbackController {
 		Map<Long, Long> map = feedbackService.getNegativeRatingCounts();
 		
 		LoggerUtil.log(Level.INFO, 
-					   "[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");
+					"[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize negative rating counts", 
-									  HttpStatus.NO_CONTENT.value());
+									HttpStatus.NO_CONTENT.value());
+		}
+	}
+
+	@GetMapping("/commonphrases")
+	public ResponseEntity<?> getCommonPhrases() throws CommonException {
+		// Key: Phrase (n-gram)
+		// Value:
+		//	 Key: 	n-gram data key
+		//	 Value: n-gram data value
+		Map<String, Map<String, Object>> map = feedbackService.getCommonPhrases();
+		
+		LoggerUtil.log(Level.INFO, 
+					"[Feedback/RatingAverage] Returned " + map.size() + " phrases");
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize average rating", 
+									HttpStatus.NO_CONTENT.value());
 		}
 	}
 

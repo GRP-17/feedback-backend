@@ -14,7 +14,7 @@ public class Constants {
 	public static final String DASHBOARD_DEFAULT_ENDPOINTS 
 											= "feedback,feedback_count,feedback_rating_average,"
 													+ "feedback_rating_count,feedback_sentiment_count,"
-													+ "feedback_rating_negative";
+													+ "feedback_rating_negative,feedback_common_phrases";
 	
 	private Constants() {}
 

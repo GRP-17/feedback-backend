@@ -51,6 +51,10 @@ public class RootController {
 			// Add 'feedback_rating_negative'
 			linkTo(methodOn(FeedbackController.class).getNegativePerDay())
 				.withRel("feedback_rating_negative"),
+				
+			// Add 'feedback_common_phrases'
+			linkTo(methodOn(FeedbackController.class).getCommonPhrases())
+				.withRel("feedback_common_phrases"),
 		
 
 			// Add 'dashboard'
