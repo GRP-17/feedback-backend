@@ -224,7 +224,7 @@ public class FeedbackService {
 				new HashMap<String, Object>(){
 				{
 					put("volume", 38);
-					put("average_rating", -1);
+					put("average_rating", 3.3);
 					put("sentiments", 
 						new HashMap<String, Integer>()
 						{{
