@@ -4,6 +4,7 @@ import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,33 +172,23 @@ public class FeedbackService {
     	return average;
     }
     
-    public Map<String, Object> getNegativeRatingCounts() {
-		// Key: The Day (in ms), Value: The Number of negative ratings
-    	
-    	// Date:
-		long today = DateUtil.getToday();
-		
-    	
-    	Map<String, Object> map = new HashMap<String, Object>();
-    	map.put("result", 
-    			new HashMap<String, Object>()
-    			{{
-    				// Create some dummy values to test the endpoint & allow frontend development
-    				Random random = new Random(today);
-    				for(int i = 0; i <= 30; i ++) {
-    					long delta = today - TimeUnit.DAYS.toMillis(i);
-    					
-    					put(DateUtil.format(delta),
-    						new HashMap<String, Object>()
-    						{{
-    							put("timestamp", delta);
-    							put("negative_count", (long) random.nextInt(30));
-    						}});
-    				}
-    			}});
+    public HashMap<String, Object> getNegativeRatingCounts() {
 
+		// Create some dummy values to test the endpoint & allow frontend development
+    	List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    	long today = DateUtil.getToday();
+    	Random random = new Random(today);
+    	for(int i = 0; i <= 30; i ++) {
+    		long delta = today - TimeUnit.DAYS.toMillis(i);
 
-		return map;
+    		maps.add(new HashMap<String, Object>() {{
+    			put("timestamp", delta);
+    			put("negative_count", (long) random.nextInt(30));
+    			put("locale", DateUtil.format(delta));
+    		}});
+    	}
+    	
+		return new HashMap<String, Object>(){{ put("result", maps); }};
 	}
     public Map<String, Object> getCommonPhrases() {
 		// Key: Phrase (n-gram)
