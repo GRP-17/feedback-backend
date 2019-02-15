@@ -47,6 +47,10 @@ public class RootController {
 			// Add 'feedback_rating_count'
 			linkTo(methodOn(FeedbackController.class).getStarRatingCount())
 				.withRel("feedback_rating_count"),
+				
+			// Add 'feedback_common_phrases'
+			linkTo(methodOn(FeedbackController.class).getCommonPhrases())
+				.withRel("feedback_common_phrases"),
 		
 
 			// Add 'dashboard'

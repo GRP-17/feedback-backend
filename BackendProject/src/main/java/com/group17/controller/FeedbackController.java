@@ -69,7 +69,8 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
 				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"));
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"),
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases()).withRel("common_phrases"));
 	}
 
 	/**
@@ -199,6 +200,25 @@ public class FeedbackController {
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Calculated Average: " + average);
+		
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize average rating", 
+									  HttpStatus.NO_CONTENT.value());
+		}
+	}
+	
+	@GetMapping("/commonphrases")
+	public ResponseEntity<?> getCommonPhrases() throws CommonException {
+		// Key: Phrase (n-gram)
+		// Value:
+		//	 Key: 	n-gram data key
+		//	 Value: n-gram data value
+		Map<String, Map<String, Object>> map = feedbackService.getCommonPhrases();
+		
+		LoggerUtil.log(Level.INFO, 
+					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));

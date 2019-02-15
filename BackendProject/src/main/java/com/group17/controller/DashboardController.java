@@ -60,6 +60,9 @@ public class DashboardController {
 			case "feedback_sentiment_count":
 				map.put(element, feedbackService.getSentimentCounts());
 				break;
+			case "feedback_common_phrases":
+				map.put(element, feedbackService.getCommonPhrases());
+				break;
 			default:
 				found = false;
 				break;

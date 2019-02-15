@@ -112,6 +112,57 @@ public class FeedbackService {
     	return average;
     }
     
+    public Map<String, Map<String, Object>> getCommonPhrases() {
+		// Key: Phrase (n-gram)
+		// Value:
+		//	 Key: 	n-gram data key
+		//	 Value: n-gram data value
+		Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+		
+		// Add some dummy data
+		map.put("credit limit", 
+				new HashMap<String, Object>(){
+				{
+					put("volume", 145);
+					put("average_rating", 3.50);
+					put("sentiments", 
+						new HashMap<String, Integer>()
+						{{
+							put(Sentiment.POSITIVE.toString(), 1);
+							put(Sentiment.NEUTRAL.toString(), 1);
+							put(Sentiment.NEGATIVE.toString(), 8);
+						}});
+				}});
+		map.put("pin reminder", 
+				new HashMap<String, Object>(){
+				{
+					put("volume", 40);
+					put("average_rating", 4.75);
+					put("sentiments", 
+						new HashMap<String, Integer>()
+						{{
+							put(Sentiment.POSITIVE.toString(), 1);
+							put(Sentiment.NEUTRAL.toString(), 5);
+							put(Sentiment.NEGATIVE.toString(), 40);
+						}});
+				}});
+		map.put("credit increase", 
+				new HashMap<String, Object>(){
+				{
+					put("volume", 38);
+					put("average_rating", -1);
+					put("sentiments", 
+						new HashMap<String, Integer>()
+						{{
+							put(Sentiment.POSITIVE.toString(), 2);
+							put(Sentiment.NEUTRAL.toString(), 4);
+							put(Sentiment.NEGATIVE.toString(), 40);
+						}});
+				}});
+		
+		return map;
+    }
+    
     /**
      * Update a {@link Feedback} entry in the database.
      * 
