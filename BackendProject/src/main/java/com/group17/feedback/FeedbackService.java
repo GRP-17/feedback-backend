@@ -171,19 +171,32 @@ public class FeedbackService {
     	return average;
     }
     
-    public Map<Long, Long> getNegativeRatingCounts() {
+    public Map<String, Object> getNegativeRatingCounts() {
 		// Key: The Day (in ms), Value: The Number of negative ratings
-		Map<Long, Long> map = new HashMap<Long, Long>();
-
-
+    	
+    	// Date:
 		long today = DateUtil.getToday();
-		// Create some dummy values to test the endpoint & allow frontend development
-		Random random = new Random(today);
-		for(int i = 0; i <= 30; i ++) {
-			long delta = today - TimeUnit.DAYS.toMillis(i);
-			map.put(delta, (long) random.nextInt(30));
-		}
 		
+    	
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("result", 
+    			new HashMap<String, Object>()
+    			{{
+    				// Create some dummy values to test the endpoint & allow frontend development
+    				Random random = new Random(today);
+    				for(int i = 0; i <= 30; i ++) {
+    					long delta = today - TimeUnit.DAYS.toMillis(i);
+    					
+    					put(DateUtil.format(delta),
+    						new HashMap<String, Object>()
+    						{{
+    							put("timestamp", delta);
+    							put("negative_count", (long) random.nextInt(30));
+    						}});
+    				}
+    			}});
+
+
 		return map;
 	}
     public Map<String, Object> getCommonPhrases() {
