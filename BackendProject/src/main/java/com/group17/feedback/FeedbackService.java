@@ -69,7 +69,7 @@ public class FeedbackService {
      * @return the newly saved resource
      */
     public Resource<Feedback> createFeedback(Feedback feedback) {
-    	setSentiment(feedback, false);
+    	setSentiment(feedback);
     	return feedbackAssembler.toResource(feedbackRepo.save(feedback));
     }
     
@@ -93,7 +93,7 @@ public class FeedbackService {
 							if (newText != null) {
 								feedback.setText(newText);
 								
-								setSentiment(feedback, true);
+								setSentiment(feedback);
 							}
 							return feedbackRepo.save(feedback);
 						 })
@@ -187,10 +187,12 @@ public class FeedbackService {
 		return map;
     }
     
-    private void setSentiment(Feedback feedback, boolean isUpdate) {
+    private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
     	
-    	// TODO add logic to check if the sentiment even changed
+    	// TODO Check here to see if the Sentiment is NEGATIVE,
+    	//  	if it is, then increment the negative reviews for
+    	//		today (DateUtil) will help.
     }
     
     public long getCount() {
