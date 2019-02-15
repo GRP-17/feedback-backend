@@ -193,7 +193,7 @@ public class FeedbackService {
 		//	 Value: n-gram data value
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		map.put("phrase", 
+		map.put("phrases", 
 				new HashMap<String, Object>() {{
 					put("credit limit",
 							new HashMap<String, Object>()
