@@ -1,8 +1,9 @@
-package com.group17;
+package com.group17.tone;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.stereotype.Component;
 
+import com.group17.feedback.Feedback;
 import com.group17.util.LoggerUtil;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;

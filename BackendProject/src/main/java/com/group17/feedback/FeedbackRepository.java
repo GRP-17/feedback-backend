@@ -1,6 +1,8 @@
-package com.group17;
+package com.group17.feedback;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.group17.tone.Sentiment;
 
 /**
  * Used to represent the database using Jpa

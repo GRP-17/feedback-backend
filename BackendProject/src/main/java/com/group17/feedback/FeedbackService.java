@@ -1,4 +1,4 @@
-package com.group17;
+package com.group17.feedback;
 
 import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
@@ -14,6 +14,8 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.group17.tone.Sentiment;
+import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
 
 /**

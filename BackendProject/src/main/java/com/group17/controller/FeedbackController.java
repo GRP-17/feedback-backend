@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.group17.Feedback;
-import com.group17.FeedbackService;
-import com.group17.Sentiment;
+import com.group17.feedback.Feedback;
+import com.group17.feedback.FeedbackService;
+import com.group17.tone.Sentiment;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 

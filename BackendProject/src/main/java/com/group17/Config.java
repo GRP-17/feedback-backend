@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import com.group17.tone.WatsonGateway;
+
 @Configuration
 @ComponentScan("com.group17")
 public class Config {

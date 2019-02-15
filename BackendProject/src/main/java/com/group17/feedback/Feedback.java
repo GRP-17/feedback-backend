@@ -1,4 +1,4 @@
-package com.group17;
+package com.group17.feedback;
 
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
@@ -18,6 +18,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
+
+import com.group17.tone.Sentiment;
 
 /**
  * defines the schema, of the table we want to map to, as a Java object

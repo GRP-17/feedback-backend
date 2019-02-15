@@ -1,4 +1,4 @@
-package com.group17;
+package com.group17.feedback;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
