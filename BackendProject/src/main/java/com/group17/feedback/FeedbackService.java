@@ -4,8 +4,6 @@ import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +16,10 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.feedback.day.DayRepository;
-import com.group17.feedback.day.DayResourceAssembler;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
+import com.group17.util.DateUtil;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -179,7 +176,7 @@ public class FeedbackService {
 		Map<Long, Long> map = new HashMap<Long, Long>();
 
 
-		long today = getToday();
+		long today = DateUtil.getToday();
 		// Create some dummy values to test the endpoint & allow frontend development
 		Random random = new Random(today);
 		for(int i = 0; i <= Integer.MAX_VALUE; i ++) {
@@ -188,17 +185,6 @@ public class FeedbackService {
 		}
 		
 		return map;
-    }
-    
-    private long getToday() {
-		// Get the time at midnight today
-		Calendar date = new GregorianCalendar();
-		date.set(Calendar.HOUR_OF_DAY, 0);
-		date.set(Calendar.MINUTE, 0);
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
-		
-		return date.getTimeInMillis();
     }
     
     private void setSentiment(Feedback feedback, boolean isUpdate) {
