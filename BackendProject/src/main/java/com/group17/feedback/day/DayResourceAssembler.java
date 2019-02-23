@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DayResourceAssembler implements ResourceAssembler<Day, Resource<Day>> {
+	/**
+	 * Generates a resource from the Day object supplied
+	 * @param day the object to make into a resource
+	 * @return a resource object wrapping up the feedback, has links to the feedback itself and the endpoint
+	 */
 
 	@Override
 	public Resource<Day> toResource(Day day) {

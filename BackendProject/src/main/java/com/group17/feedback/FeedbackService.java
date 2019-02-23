@@ -12,6 +12,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.group17.feedback.day.Day;
+import com.group17.feedback.day.DayRepository;
+import com.group17.feedback.day.DayResourceAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -32,8 +35,8 @@ public class FeedbackService {
 	/** holds the instance of the factory which will make the resources */
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 	
-//	@Autowired private DayRepository dayRepo;
-//	@Autowired private DayResourceAssembler dayAssembler;
+	@Autowired private DayRepository dayRepo;
+	@Autowired private DayResourceAssembler dayAssembler;
 	
 	@Autowired private WatsonGateway watsonGateway;
 
@@ -114,6 +117,40 @@ public class FeedbackService {
     public void deleteFeedbackById(String id) throws Exception {
 		feedbackRepo.deleteById(id);
     }
+
+	/**
+	 * Save a {@link Day} entry to the database.
+	 *
+	 * @param id what to save
+	 * @return the newly saved resource
+	 */
+	public Resource<Day> createDay(String id) {
+		long date = Long.parseLong(id);
+		Day day = new Day(date, 1);
+		return dayAssembler.toResource(dayRepo.save(day));
+	}
+
+	/**
+	 * Update a {@link Day} entry in the database.
+	 *
+	 * @param id the identifier of the entry to update
+	 * @return the newly saved resource
+	 * @throws CommonException if the id isn't valid (no entry with that given id)
+	 */
+	public Resource<Day> updateDay(String id) throws CommonException {
+		Day updatedDay =
+				dayRepo.findById(id)
+						.map(day -> {
+							int count = day.getNegativeSentimentCount()+1;
+							day.setNegativeCount(count);
+							return dayRepo.save(day);
+						})
+						.orElseThrow(
+								() ->
+										new CommonException(
+												"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
+		return dayAssembler.toResource(updatedDay);
+	}
     
     /**
      * Get the total appearances of a given {@link Sentiment} in the
@@ -180,9 +217,10 @@ public class FeedbackService {
     	Random random = new Random(today);
     	for(int i = 0; i <= 30; i ++) {
     		long delta = today - TimeUnit.DAYS.toMillis(i);
+    		String format = DateUtil.format(delta);
 
     		maps.add(new HashMap<String, Object>() {{
-    			put("timestamp", delta);
+    			put("timestamp", format);
     			put("negative_count", (long) random.nextInt(30));
     			put("locale", DateUtil.format(delta));
     		}});
@@ -244,10 +282,17 @@ public class FeedbackService {
     
     private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
-    	
-    	// TODO Check here to see if the Sentiment is NEGATIVE,
-    	//  	if it is, then increment the negative reviews for
-    	//		today (DateUtil) will help.
+		if (feedback.getSentiment() == "Negative"){
+			Long timestamp = feedback.getCreated();
+			String id = DateUtil.format(timestamp);
+			if (dayRepo.existsById(id)){
+				updateDay(id);
+			}
+			else
+			{
+				createDay(id);
+			}
+		}
     }
     
     public long getCount() {
