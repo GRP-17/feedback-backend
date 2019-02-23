@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class DateUtil {
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 	
 	private DateUtil() {}
 	

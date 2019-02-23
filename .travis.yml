@@ -1,13 +1,14 @@
 language: java
 jdk: oraclejdk8
-before_script:
-- cd BackendProject
+# before_script:
+
 script:
-- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-- mvn test -B
-- mvn cobertura:cobertura
+  - cd BackendProject
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn test -B
+  - mvn cobertura:cobertura
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: heroku
   api_key:
@@ -19,4 +20,4 @@ deploy:
 notifications:
   webhooks:
     urls:
-    - secure: SNWN50K7UV8H9Ex8a42iKiW9uiBXu5sqCvkfGVyM/rlOFIa5zSeRCbyR+920uv6HMqqehcnRGch3psm0fgeqnvvM1ZFl0/FWnWi0GsYfiqIdE8SZagcA0PFhSLqW9qcaT5D1O7pzDfTo6MWF16HnAJ1seyhbipVZQJ919l2j0RcYEcKXWEePJSn+ywGC95ospCk+gNtWKp5Y0/r5KDMQaWE2xU+zB2FbLnwhusveAzBJhCpY5hMa+cXkLlOFkkD+3Tt9DVD5yIdvHNhBoj5El3MruFd7RjsZ26Grj0QP5G2d/LPZF9e3X4//7tBpjXgy4h2vGejZ+SFfaFoGekM3fRca1zui1Z5SU/aunG1CDxKt0mHeno0PEwqEnqDtMe+VnH0uLfv1pc2LPhhOhW5+xC03be23fPUaLK3t0mvKMhzRun8PsdQfd37dWHwnU5dIYB4o6aEr1lkmfA3+pBexM9xpEidkte5UKaoTE3PVv92XEZD2QXq8GYQAe3j9BuM14BMlyHVEBhDdkttrNNKKSwIL4Ohf079/D/nfeyYC/BFsbXIewf/32+B8NldZg3gqBOa+04hZacNHwJ4jFe4WiypOpVxiAXvVVt1quolPIVNOrX14C9Rw3Utb/ZAPp5at+zxTDTpQmLSWwblDreOP6FQA41+JndJu/RqyvFavxYY=
+      - secure: SNWN50K7UV8H9Ex8a42iKiW9uiBXu5sqCvkfGVyM/rlOFIa5zSeRCbyR+920uv6HMqqehcnRGch3psm0fgeqnvvM1ZFl0/FWnWi0GsYfiqIdE8SZagcA0PFhSLqW9qcaT5D1O7pzDfTo6MWF16HnAJ1seyhbipVZQJ919l2j0RcYEcKXWEePJSn+ywGC95ospCk+gNtWKp5Y0/r5KDMQaWE2xU+zB2FbLnwhusveAzBJhCpY5hMa+cXkLlOFkkD+3Tt9DVD5yIdvHNhBoj5El3MruFd7RjsZ26Grj0QP5G2d/LPZF9e3X4//7tBpjXgy4h2vGejZ+SFfaFoGekM3fRca1zui1Z5SU/aunG1CDxKt0mHeno0PEwqEnqDtMe+VnH0uLfv1pc2LPhhOhW5+xC03be23fPUaLK3t0mvKMhzRun8PsdQfd37dWHwnU5dIYB4o6aEr1lkmfA3+pBexM9xpEidkte5UKaoTE3PVv92XEZD2QXq8GYQAe3j9BuM14BMlyHVEBhDdkttrNNKKSwIL4Ohf079/D/nfeyYC/BFsbXIewf/32+B8NldZg3gqBOa+04hZacNHwJ4jFe4WiypOpVxiAXvVVt1quolPIVNOrX14C9Rw3Utb/ZAPp5at+zxTDTpQmLSWwblDreOP6FQA41+JndJu/RqyvFavxYY=

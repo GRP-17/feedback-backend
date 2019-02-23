@@ -15,11 +15,11 @@ import com.group17.util.DateUtil;
 @Entity
 @Table(name = "days", schema = "hy1xosk6o5taszzw")
 public class Day {
-	@Id
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;
-	
+
+    @Id
 	@NotNull(message = "Needs a locale date")
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
 	private String timestamp;
@@ -45,7 +45,11 @@ public class Day {
 	public long getDateTimestamp() {
 		return date.getTime();
 	}
-	
+
+	public void setNegativeCount(int count){
+		this.negativeCount = count;
+	}
+
 	public int getNegativeSentimentCount() {
 		return negativeCount;
 	}
