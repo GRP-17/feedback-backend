@@ -4,6 +4,7 @@ import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.group17.feedback.day.Day;
+import com.group17.feedback.day.DayRepository;
+import com.group17.feedback.day.DayResourceAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -31,8 +35,8 @@ public class FeedbackService {
 	/** holds the instance of the factory which will make the resources */
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 	
-//	@Autowired private DayRepository dayRepo;
-//	@Autowired private DayResourceAssembler dayAssembler;
+	@Autowired private DayRepository dayRepo;
+	@Autowired private DayResourceAssembler dayAssembler;
 	
 	@Autowired private WatsonGateway watsonGateway;
 
@@ -113,6 +117,40 @@ public class FeedbackService {
     public void deleteFeedbackById(String id) throws Exception {
 		feedbackRepo.deleteById(id);
     }
+
+	/**
+	 * Save a {@link Day} entry to the database.
+	 *
+	 * @param id what to save
+	 * @return the newly saved resource
+	 */
+	public Resource<Day> createDay(String id) {
+		long date = Long.parseLong(id);
+		Day day = new Day(date, 1);
+		return dayAssembler.toResource(dayRepo.save(day));
+	}
+
+	/**
+	 * Update a {@link Day} entry in the database.
+	 *
+	 * @param id the identifier of the entry to update
+	 * @return the newly saved resource
+	 * @throws CommonException if the id isn't valid (no entry with that given id)
+	 */
+	public Resource<Day> updateDay(String id) throws CommonException {
+		Day updatedDay =
+				dayRepo.findById(id)
+						.map(day -> {
+							int count = day.getNegativeSentimentCount()+1;
+							day.setNegativeCount(count);
+							return dayRepo.save(day);
+						})
+						.orElseThrow(
+								() ->
+										new CommonException(
+												"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
+		return dayAssembler.toResource(updatedDay);
+	}
     
     /**
      * Get the total appearances of a given {@link Sentiment} in the
@@ -171,78 +209,83 @@ public class FeedbackService {
     	return average;
     }
     
-    public Map<Long, Long> getNegativeRatingCounts() {
-		// Key: The Day (in ms), Value: The Number of negative ratings
-		Map<Long, Long> map = new HashMap<Long, Long>();
+    public HashMap<String, Object> getNegativeRatingCounts() {
 
-
-		long today = DateUtil.getToday();
 		// Create some dummy values to test the endpoint & allow frontend development
-		Random random = new Random(today);
-		for(int i = 0; i <= 30; i ++) {
-			long delta = today - TimeUnit.DAYS.toMillis(i);
-			map.put(delta, (long) random.nextInt(30));
-		}
-		
-		return map;
+    	List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    	long today = DateUtil.getToday();
+    	Random random = new Random(today);
+    	for(int i = 0; i <= 30; i ++) {
+    		long delta = today - TimeUnit.DAYS.toMillis(i);
+    		String format = DateUtil.format(delta);
+
+    		maps.add(new HashMap<String, Object>() {{
+    			put("timestamp", format);
+    			put("negative_count", (long) random.nextInt(30));
+    			put("locale", DateUtil.format(delta));
+    		}});
+    	}
+    	
+		return new HashMap<String, Object>(){{ put("result", maps); }};
 	}
-    public Map<String, Map<String, Object>> getCommonPhrases() {
-		// Key: Phrase (n-gram)
-		// Value:
-		//	 Key: 	n-gram data key
-		//	 Value: n-gram data value
-		Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    public Map<String, Object> getCommonPhrases() {
+		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
 		
-		// Add some dummy data
-		map.put("credit limit", 
-				new HashMap<String, Object>(){
-				{
-					put("volume", 145);
-					put("average_rating", 3.50);
-					put("sentiments", 
-						new HashMap<String, Integer>()
-						{{
-							put(Sentiment.POSITIVE.toString(), 1);
-							put(Sentiment.NEUTRAL.toString(), 1);
-							put(Sentiment.NEGATIVE.toString(), 8);
-						}});
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "credit limit");
+			put("volume", 145);
+			put("average_rating", 3.50);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 1);
+					put(Sentiment.NEUTRAL.toString(), 1);
+					put(Sentiment.NEGATIVE.toString(), 8);
 				}});
-		map.put("pin reminder", 
-				new HashMap<String, Object>(){
-				{
-					put("volume", 40);
-					put("average_rating", 4.75);
-					put("sentiments", 
-						new HashMap<String, Integer>()
-						{{
-							put(Sentiment.POSITIVE.toString(), 1);
-							put(Sentiment.NEUTRAL.toString(), 5);
-							put(Sentiment.NEGATIVE.toString(), 40);
-						}});
-				}});
-		map.put("credit increase", 
-				new HashMap<String, Object>(){
-				{
-					put("volume", 38);
-					put("average_rating", 3.3);
-					put("sentiments", 
-						new HashMap<String, Integer>()
-						{{
-							put(Sentiment.POSITIVE.toString(), 2);
-							put(Sentiment.NEUTRAL.toString(), 4);
-							put(Sentiment.NEGATIVE.toString(), 40);
-						}});
-				}});
+		}});
 		
-		return map;
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "pin reminder");
+			put("volume", 40);
+			put("average_rating", 4.75);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 1);
+					put(Sentiment.NEUTRAL.toString(), 5);
+					put(Sentiment.NEGATIVE.toString(), 40);
+				}});
+		}});
+		
+		maps.add(new HashMap<String, Object>(){{
+			put("phrase", "credit reminder");
+			put("volume", 38);
+			put("average_rating", 3.3);
+			put("sentiments", 
+				new HashMap<String, Integer>()
+				{{
+					put(Sentiment.POSITIVE.toString(), 2);
+					put(Sentiment.NEUTRAL.toString(), 4);
+					put(Sentiment.NEGATIVE.toString(), 40);
+				}});
+		}});
+		
+		return new HashMap<String, Object>(){{ put("result", maps); }};
     }
     
     private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
-    	
-    	// TODO Check here to see if the Sentiment is NEGATIVE,
-    	//  	if it is, then increment the negative reviews for
-    	//		today (DateUtil) will help.
+		if (feedback.getSentiment() == "Negative"){
+			Long timestamp = feedback.getCreated();
+			String id = DateUtil.format(timestamp);
+			if (dayRepo.existsById(id)){
+				updateDay(id);
+			}
+			else
+			{
+				createDay(id);
+			}
+		}
     }
     
     public long getCount() {

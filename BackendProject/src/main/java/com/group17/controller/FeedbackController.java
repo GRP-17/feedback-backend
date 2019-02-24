@@ -212,7 +212,7 @@ public class FeedbackController {
 	
 	@GetMapping("/rating/negativeperday")
 	public ResponseEntity<?> getNegativePerDay() throws CommonException {
-		Map<Long, Long> map = feedbackService.getNegativeRatingCounts();
+		Map<String, Object> map = feedbackService.getNegativeRatingCounts();
 		
 		LoggerUtil.log(Level.INFO, 
 					"[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");
@@ -231,10 +231,10 @@ public class FeedbackController {
 		// Value:
 		//	 Key: 	n-gram data key
 		//	 Value: n-gram data value
-		Map<String, Map<String, Object>> map = feedbackService.getCommonPhrases();
+		Map<String, Object> map = feedbackService.getCommonPhrases();
 		
 		LoggerUtil.log(Level.INFO, 
-					"[Feedback/RatingAverage] Returned " + map.size() + " phrases");
+					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
