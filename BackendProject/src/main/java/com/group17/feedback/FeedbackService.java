@@ -20,6 +20,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.group17.feedback.ngram.NGramService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
@@ -39,6 +40,7 @@ public class FeedbackService {
 	@Autowired private DayResourceAssembler dayAssembler;
 	
 	@Autowired private WatsonGateway watsonGateway;
+	@Autowired private NGramService ngramService;
 
     /**
      * Get every {@link Resource} in the database.
