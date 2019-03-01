@@ -51,7 +51,7 @@ public class PhraseService {
 
 			@Override
 			public int compare(Phrase o1, Phrase o2) {
-				return o1.getNegativeVolume() - o2.getNegativeVolume();
+				return o2.getNegativeVolume() - o1.getNegativeVolume();
 			}
 			
 		});
