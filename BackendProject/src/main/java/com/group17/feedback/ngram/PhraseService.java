@@ -2,6 +2,7 @@ package com.group17.feedback.ngram;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
@@ -42,11 +43,27 @@ public class PhraseService {
 	}
 	
 	public List<Phrase> getMostCommonPhrases(int count, long timePeriod) {
-		// TODO - Implement
-		if(repository.count() == 0) {
-			return new ArrayList<Phrase>();
+		
+		// TODO: Find a better way of doing this
+		List<Phrase> phrases = repository.findAll();
+		phrases.sort(new Comparator<Phrase>() 
+		{
+
+			@Override
+			public int compare(Phrase o1, Phrase o2) {
+				return o1.getNegativeVolume() - o2.getNegativeVolume();
+			}
+			
+		});
+		
+		List<Phrase> reduced = new ArrayList<Phrase>();
+		for(int i = 0; i < count; i ++) {
+			if(i >= phrases.size()) break;
+			
+			reduced.add(phrases.get(i));
 		}
-		return repository.findAll();
+		
+		return reduced;
 	}
 	
 	public long getCountByNgram(String ngram) {
