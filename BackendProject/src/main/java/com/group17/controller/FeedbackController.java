@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import com.group17.feedback.NegativePerDay.NegativePerDayService;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -36,6 +35,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
+import com.group17.feedback.negativeperday.NegativePerDayService;
+import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
@@ -50,11 +51,10 @@ public class FeedbackController {
 	/**
 	 * holds the instance of the FeedbackService
 	 */
-	@Autowired
-	private FeedbackService feedbackService;
+	@Autowired private FeedbackService feedbackService;
+	@Autowired private PhraseService phraseService;
 
-	@Autowired
-	private NegativePerDayService negativePerDayService;
+	@Autowired private NegativePerDayService negativePerDayService;
 
 	/**
 	 * the default mapping for a get request to the feedback endpoint
@@ -107,14 +107,20 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 
-		if (newFeedback.getSentiment().equals("NEGATIVE")) {
-			// increase negative rating this day
+    	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
+    		LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id " 
+    										+ newFeedback.getId());
+    		
+			// Increase negative rating this day
 			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
-		}
+
+    		// N-Grams
+    		long now = System.currentTimeMillis();
+    		phraseService.createPhrases(now, newFeedback.getText());
+    	}
 
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
-
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 

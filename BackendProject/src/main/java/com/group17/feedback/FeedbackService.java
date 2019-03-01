@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
@@ -71,7 +70,7 @@ public class FeedbackService {
      * @return the newly saved resource
      */
     public Resource<Feedback> createFeedback(Feedback feedback) {
-    	setSentiment(feedback);
+    	watsonGateway.deduceAndSetSentiment(feedback);
     	return feedbackAssembler.toResource(feedbackRepo.save(feedback));
     }
 
@@ -95,7 +94,7 @@ public class FeedbackService {
 							if (newText != null) {
 								feedback.setText(newText);
 
-								setSentiment(feedback);
+								watsonGateway.deduceAndSetSentiment(feedback);
 							}
 							return feedbackRepo.save(feedback);
 						 })
@@ -188,29 +187,9 @@ public class FeedbackService {
 		  return new HashMap<String, Object>(){{ put("result", maps); }};
     }
 
-    private void setSentiment(Feedback feedback) {
-    	watsonGateway.deduceAndSetSentiment(feedback);
-			if (feedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
-				LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id " + feedback.getId());
-				
-				// N-Grams
-				long now = System.currentTimeMillis();
-				phraseService.createPhrases(now, feedback.getText());
-				
-				// Days
-				Long timestamp = feedback.getCreated();
-				String id = DateUtil.format(timestamp);
-				if (dayRepo.existsById(id)) {
-					updateDay(id);
-				} else {
-					createDay(id);
-				}
-			}
-    }
-
     public long getCount() {
     	return feedbackRepo.count();
-	  }
+    }
 
     public WatsonGateway getWatsonGateway() {
     	return watsonGateway;
