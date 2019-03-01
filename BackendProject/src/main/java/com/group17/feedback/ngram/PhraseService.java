@@ -1,12 +1,14 @@
 package com.group17.feedback.ngram;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.group17.util.LoggerUtil;
 
 @Service
 public class PhraseService {
@@ -25,6 +27,8 @@ public class PhraseService {
 				phrase = new Phrase(token, 0);
 			}
 			phrase.setNegativeVolume(phrase.getNegativeVolume() + 1);
+			
+			LoggerUtil.log(Level.INFO, "Incremented phrase count for " + token);
 		}
 		repository.saveAll(phrases);
 	}
