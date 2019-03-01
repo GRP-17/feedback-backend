@@ -10,14 +10,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.group17.feedback.day.Day;
+import com.group17.feedback.day.DayRepository;
+import com.group17.feedback.day.DayResourceAssembler;
+import com.group17.feedback.ngram.Phrase;
+import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
+import com.group17.util.DateUtil;
+import com.group17.util.LoggerUtil;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -30,6 +38,7 @@ public class FeedbackService {
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 
 	@Autowired private WatsonGateway watsonGateway;
+	@Autowired private PhraseService phraseService;
 
     /**
      * Get every {@link Resource} in the database.
@@ -106,7 +115,7 @@ public class FeedbackService {
      * @throws Exception if the id isn't valid (no entry with that given id)
      */
     public void deleteFeedbackById(String id) throws Exception {
-		feedbackRepo.deleteById(id);
+		  feedbackRepo.deleteById(id);
     }
 
     /**
@@ -139,7 +148,7 @@ public class FeedbackService {
      */
     public long getCountByRating(int rating){
     	return feedbackRepo.countByRating(rating);
-	}
+	  }
 
     public Map<Integer, Long> getRatingCounts() {
 		// Key: the ratings [1..5], Value: The count of this rating
@@ -157,7 +166,7 @@ public class FeedbackService {
     		total += feedbackRepo.countByRating(Integer.valueOf(i)) * i;
     	}
 
-		// The unformatted average - it could have many trailing decimal values
+		  // The unformatted average - it could have many trailing decimal values
     	double average = (double) total / (double) feedbackRepo.count();
     	if(formatted) {
     		return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
@@ -167,48 +176,18 @@ public class FeedbackService {
     }
 
     public Map<String, Object> getCommonPhrases() {
-		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    	LoggerUtil.log(Level.INFO, "Retrieving common phrases");
+		  List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    	
+    	for(Phrase phrase : phraseService.getMostCommonPhrases(10, TimeUnit.DAYS.toMillis(28))) {
+    		String ngram = phrase.getNgram();
+    		maps.add(new HashMap<String, Object>() {{
+    			put("phrase", ngram);
+    			put("volume", phraseService.getCountByNgram(ngram));
+    		}});
+    	}
 
-		maps.add(new HashMap<String, Object>(){{
-			put("phrase", "credit limit");
-			put("volume", 145);
-			put("average_rating", 3.50);
-			put("sentiments",
-				new HashMap<String, Integer>()
-				{{
-					put(Sentiment.POSITIVE.toString(), 1);
-					put(Sentiment.NEUTRAL.toString(), 1);
-					put(Sentiment.NEGATIVE.toString(), 8);
-				}});
-		}});
-
-		maps.add(new HashMap<String, Object>(){{
-			put("phrase", "pin reminder");
-			put("volume", 40);
-			put("average_rating", 4.75);
-			put("sentiments",
-				new HashMap<String, Integer>()
-				{{
-					put(Sentiment.POSITIVE.toString(), 1);
-					put(Sentiment.NEUTRAL.toString(), 5);
-					put(Sentiment.NEGATIVE.toString(), 40);
-				}});
-		}});
-
-		maps.add(new HashMap<String, Object>(){{
-			put("phrase", "credit reminder");
-			put("volume", 38);
-			put("average_rating", 3.3);
-			put("sentiments",
-				new HashMap<String, Integer>()
-				{{
-					put(Sentiment.POSITIVE.toString(), 2);
-					put(Sentiment.NEUTRAL.toString(), 4);
-					put(Sentiment.NEGATIVE.toString(), 40);
-				}});
-		}});
-
-		return new HashMap<String, Object>(){{ put("result", maps); }};
+		  return new HashMap<String, Object>(){{ put("result", maps); }};
     }
 
     private void setSentiment(Feedback feedback) {
@@ -217,7 +196,7 @@ public class FeedbackService {
 
     public long getCount() {
     	return feedbackRepo.count();
-	}
+	  }
 
     public WatsonGateway getWatsonGateway() {
     	return watsonGateway;
