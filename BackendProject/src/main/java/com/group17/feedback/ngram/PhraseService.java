@@ -22,6 +22,9 @@ public class PhraseService {
 	
 	public List<Phrase> getMostCommonPhrases(int count, long timePeriod) {
 		// TODO - Implement
+		if(repository.count() == 0) {
+			return new ArrayList<Phrase>();
+		}
 		return repository.findAll();
 	}
 	
