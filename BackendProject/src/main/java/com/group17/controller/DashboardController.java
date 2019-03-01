@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.group17.feedback.NegativePerDay.NegativePerDayService;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,9 @@ public class DashboardController {
 	
 	@Autowired
 	private FeedbackService feedbackService;
-	
+	@Autowired
+	private NegativePerDayService negativePerDayService;
+
 	@GetMapping()
 	public ResponseEntity<?> find(@RequestParam(value = "endpoint", required = false, 
 												defaultValue = DASHBOARD_DEFAULT_ENDPOINTS) 
@@ -61,7 +64,7 @@ public class DashboardController {
 				map.put(element, feedbackService.getRatingCounts());
 				break;
 			case "feedback_rating_negative":
-				map.put(element, feedbackService.getNegativeRatingCounts());
+				map.put(element, negativePerDayService.findNegativePerDay());
 				break;
 			case "feedback_common_phrases":
 				map.put(element, feedbackService.getCommonPhrases());

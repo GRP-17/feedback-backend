@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.group17.feedback.NegativePerDay.NegativePerDayService;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -51,6 +52,9 @@ public class FeedbackController {
 	 */
 	@Autowired
 	private FeedbackService feedbackService;
+
+	@Autowired
+	private NegativePerDayService negativePerDayService;
 
 	/**
 	 * the default mapping for a get request to the feedback endpoint
@@ -102,6 +106,12 @@ public class FeedbackController {
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
+
+		if (newFeedback.getSentiment().equals("NEGATIVE")) {
+			// increase negative rating this day
+			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
+		}
+
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
 
@@ -212,7 +222,7 @@ public class FeedbackController {
 	
 	@GetMapping("/rating/negativeperday")
 	public ResponseEntity<?> getNegativePerDay() throws CommonException {
-		Map<String, Object> map = feedbackService.getNegativeRatingCounts();
+		Map<String, Object> map = negativePerDayService.findNegativePerDay();
 		
 		LoggerUtil.log(Level.INFO, 
 					"[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");

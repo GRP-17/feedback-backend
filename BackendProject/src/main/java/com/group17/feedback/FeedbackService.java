@@ -8,13 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.group17.feedback.day.Day;
-import com.group17.feedback.day.DayRepository;
-import com.group17.feedback.day.DayResourceAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -23,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
-import com.group17.util.DateUtil;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser for analysing
@@ -34,29 +28,26 @@ public class FeedbackService {
 	@Autowired private FeedbackRepository feedbackRepo;
 	/** holds the instance of the factory which will make the resources */
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
-	
-	@Autowired private DayRepository dayRepo;
-	@Autowired private DayResourceAssembler dayAssembler;
-	
+
 	@Autowired private WatsonGateway watsonGateway;
 
     /**
      * Get every {@link Resource} in the database.
-     * 
+     *
      * @return all of the entries
      */
     public List<Resource<Feedback>> getAllFeedback() {
     	return feedbackRepo.findAll().stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
     }
-    
+
     /**
      * Get a single {@link Resource} object.
-     * 
+     *
      * @param id the identifier of the requested entry
      * @return the entry
      * @throws CommonException if the id isn't valid (no entry with that given id)
      */
-    public Resource<Feedback> getFeedbackById(String id) throws CommonException {		
+    public Resource<Feedback> getFeedbackById(String id) throws CommonException {
     	Feedback feedback =
     		feedbackRepo.findById(id)
 				.orElseThrow(
@@ -65,10 +56,10 @@ public class FeedbackService {
 							"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
     	return feedbackAssembler.toResource(feedback);
     }
-    
+
     /**
      * Save a {@link Feedback} entry to the database.
-     * 
+     *
      * @param feedback what to save
      * @return the newly saved resource
      */
@@ -76,10 +67,10 @@ public class FeedbackService {
     	setSentiment(feedback);
     	return feedbackAssembler.toResource(feedbackRepo.save(feedback));
     }
-    
+
     /**
      * Update a {@link Feedback} entry in the database.
-     * 
+     *
      * @param id the identifier of the entry to update
      * @param newFeedback the object containing the data to overwrite with
      * @return the newly saved resource
@@ -96,7 +87,7 @@ public class FeedbackService {
 							}
 							if (newText != null) {
 								feedback.setText(newText);
-								
+
 								setSentiment(feedback);
 							}
 							return feedbackRepo.save(feedback);
@@ -107,10 +98,10 @@ public class FeedbackService {
 									"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
     	return feedbackAssembler.toResource(updatedFeedback);
     }
-    
+
     /**
      * Delete a {@link Feedback} entry in the database.
-     * 
+     *
      * @param id the id of the {@link Feedback to delete}
      * @throws Exception if the id isn't valid (no entry with that given id)
      */
@@ -118,53 +109,19 @@ public class FeedbackService {
 		feedbackRepo.deleteById(id);
     }
 
-	/**
-	 * Save a {@link Day} entry to the database.
-	 *
-	 * @param id what to save
-	 * @return the newly saved resource
-	 */
-	public Resource<Day> createDay(String id) {
-		long date = Long.parseLong(id);
-		Day day = new Day(date, 1);
-		return dayAssembler.toResource(dayRepo.save(day));
-	}
-
-	/**
-	 * Update a {@link Day} entry in the database.
-	 *
-	 * @param id the identifier of the entry to update
-	 * @return the newly saved resource
-	 * @throws CommonException if the id isn't valid (no entry with that given id)
-	 */
-	public Resource<Day> updateDay(String id) throws CommonException {
-		Day updatedDay =
-				dayRepo.findById(id)
-						.map(day -> {
-							int count = day.getNegativeSentimentCount()+1;
-							day.setNegativeCount(count);
-							return dayRepo.save(day);
-						})
-						.orElseThrow(
-								() ->
-										new CommonException(
-												"Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
-		return dayAssembler.toResource(updatedDay);
-	}
-    
     /**
      * Get the total appearances of a given {@link Sentiment} in the
      * JPA {@link Feedback} repository.
      * <p>
      * This is not case sensitive.
-     * 
+     *
      * @param sentiment the sentiment search for
      * @return the total appearances
      */
     public long getCountBySentiment(String sentiment) {
     	return feedbackRepo.countBySentiment(sentiment);
     }
-    
+
     public Map<Sentiment, Long> getSentimentCounts() {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
 		for (Sentiment sentiment : Sentiment.values()) {
@@ -183,7 +140,7 @@ public class FeedbackService {
     public long getCountByRating(int rating){
     	return feedbackRepo.countByRating(rating);
 	}
-    
+
     public Map<Integer, Long> getRatingCounts() {
 		// Key: the ratings [1..5], Value: The count of this rating
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
@@ -193,7 +150,7 @@ public class FeedbackService {
         }
 		return ratings;
     }
-    
+
     public double getAverageRating(boolean formatted) {
     	long total = 0;
     	for(int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i ++) {
@@ -205,37 +162,18 @@ public class FeedbackService {
     	if(formatted) {
     		return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
     	}
-    	
+
     	return average;
     }
-    
-    public HashMap<String, Object> getNegativeRatingCounts() {
 
-		// Create some dummy values to test the endpoint & allow frontend development
-    	List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-    	long today = DateUtil.getToday();
-    	Random random = new Random(today);
-    	for(int i = 0; i <= 30; i ++) {
-    		long delta = today - TimeUnit.DAYS.toMillis(i);
-    		String format = DateUtil.format(delta);
-
-    		maps.add(new HashMap<String, Object>() {{
-    			put("timestamp", format);
-    			put("negative_count", (long) random.nextInt(30));
-    			put("locale", DateUtil.format(delta));
-    		}});
-    	}
-    	
-		return new HashMap<String, Object>(){{ put("result", maps); }};
-	}
     public Map<String, Object> getCommonPhrases() {
 		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-		
+
 		maps.add(new HashMap<String, Object>(){{
 			put("phrase", "credit limit");
 			put("volume", 145);
 			put("average_rating", 3.50);
-			put("sentiments", 
+			put("sentiments",
 				new HashMap<String, Integer>()
 				{{
 					put(Sentiment.POSITIVE.toString(), 1);
@@ -243,12 +181,12 @@ public class FeedbackService {
 					put(Sentiment.NEGATIVE.toString(), 8);
 				}});
 		}});
-		
+
 		maps.add(new HashMap<String, Object>(){{
 			put("phrase", "pin reminder");
 			put("volume", 40);
 			put("average_rating", 4.75);
-			put("sentiments", 
+			put("sentiments",
 				new HashMap<String, Integer>()
 				{{
 					put(Sentiment.POSITIVE.toString(), 1);
@@ -256,12 +194,12 @@ public class FeedbackService {
 					put(Sentiment.NEGATIVE.toString(), 40);
 				}});
 		}});
-		
+
 		maps.add(new HashMap<String, Object>(){{
 			put("phrase", "credit reminder");
 			put("volume", 38);
 			put("average_rating", 3.3);
-			put("sentiments", 
+			put("sentiments",
 				new HashMap<String, Integer>()
 				{{
 					put(Sentiment.POSITIVE.toString(), 2);
@@ -269,29 +207,18 @@ public class FeedbackService {
 					put(Sentiment.NEGATIVE.toString(), 40);
 				}});
 		}});
-		
+
 		return new HashMap<String, Object>(){{ put("result", maps); }};
     }
-    
+
     private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
-		if (feedback.getSentiment() == "Negative"){
-			Long timestamp = feedback.getCreated();
-			String id = DateUtil.format(timestamp);
-			if (dayRepo.existsById(id)){
-				updateDay(id);
-			}
-			else
-			{
-				createDay(id);
-			}
-		}
     }
-    
+
     public long getCount() {
     	return feedbackRepo.count();
 	}
-    
+
     public WatsonGateway getWatsonGateway() {
     	return watsonGateway;
     }
