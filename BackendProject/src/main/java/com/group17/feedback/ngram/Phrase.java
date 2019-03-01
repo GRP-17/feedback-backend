@@ -16,7 +16,7 @@ import com.group17.feedback.ngram.Phrase.PhraseId;
 
 @Entity
 @IdClass(PhraseId.class)
-@Table(name = "phrases", schema = "hy1xosk6o5taszzw")
+@Table(name = "phrases", schema = "mpbn3u6xk4946yq9")
 public class Phrase {
 	@Id
 	private Date date;
