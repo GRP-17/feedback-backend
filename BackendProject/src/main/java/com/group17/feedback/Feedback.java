@@ -129,6 +129,10 @@ public class Feedback {
 		this.sentiment = sentiment;
 	}
 	
+	public Sentiment getSentimentEnum() {
+		return Sentiment.valueOf(sentiment.toUpperCase());
+	}
+	
 	public void setSentiment(Sentiment sentiment) {
 		setSentiment(sentiment.toString());
 	}
