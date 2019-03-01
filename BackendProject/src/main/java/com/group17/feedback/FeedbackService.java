@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
@@ -251,7 +252,9 @@ public class FeedbackService {
     
     private void setSentiment(Feedback feedback) {
     	watsonGateway.deduceAndSetSentiment(feedback);
-		if (feedback.getSentiment().equals(Sentiment.NEGATIVE.toString())) {
+		if (feedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
+			LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id " + feedback.getId());
+			
 			// N-Grams
 			long now = System.currentTimeMillis();
 			phraseService.createPhrases(now, feedback.getText());
