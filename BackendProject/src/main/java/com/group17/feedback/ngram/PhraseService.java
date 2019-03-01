@@ -1,7 +1,9 @@
 package com.group17.feedback.ngram;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,14 @@ public class PhraseService {
 	public void createPhrases(long when, String feedbackText) {
 		ArrayList<Phrase> phrases = new ArrayList<Phrase>();
 		for(String token : gateway.analyse(feedbackText)) {
-			phrases.add(new Phrase(when, token));
+			
+			Optional<Phrase> optional = repository.findById(token);
+			boolean create = !optional.isPresent();
+			Phrase phrase = create ? null : optional.get();
+			if(create) {
+				phrase = new Phrase(token, 0);
+			}
+			phrase.setNegativeVolume(phrase.getNegativeVolume() + 1);
 		}
 		repository.saveAll(phrases);
 	}
