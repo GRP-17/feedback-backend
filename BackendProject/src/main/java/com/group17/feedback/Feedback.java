@@ -101,8 +101,8 @@ public class Feedback {
 		return id;
 	}
 	
-	public long getCreated() {
-		return created.getTime();
+	public Date getCreated() {
+		return created;
 	}
 	
 	public Integer getRating() {
