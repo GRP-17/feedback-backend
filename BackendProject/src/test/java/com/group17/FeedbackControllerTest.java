@@ -12,12 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import com.google.gson.Gson;
+import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
+import com.group17.util.LoggerUtil;
 import com.jayway.jsonpath.JsonPath;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -29,10 +34,13 @@ public class FeedbackControllerTest extends BaseTest {
 	 *  can use the same one(s) */
 	private static List<String> feedbacksCreated = new ArrayList<String>();
 	
+	@Autowired PhraseService serv;
+	
 	@Test
 	public void testACommonPhrases() throws Exception {
-		getMockMvc()
-			.perform(get("/commonphrases"));
+		LoggerUtil.log(Level.WARN, new Gson().toJson(serv.createPhrases(System.currentTimeMillis(), "Credit rating credit score")));
+
+		getMockMvc().perform(get("/commonphrases"));
 	}
 	
 	@Test
