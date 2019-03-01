@@ -16,7 +16,7 @@ public class PhraseService {
 	@Autowired private PhraseRepository repository;
 	@Autowired private SearchboxGateway gateway;
 	
-	public void createPhrases(long when, String feedbackText) {
+	public Collection<String> createPhrases(long when, String feedbackText) {
 		ArrayList<Phrase> phrases = new ArrayList<Phrase>();
 		Collection<String> tokens = gateway.analyse(feedbackText);
 		LoggerUtil.log(Level.INFO, "[Phrase/Analyze] Loaded " + tokens.size() + " tokens");
@@ -38,6 +38,7 @@ public class PhraseService {
 			LoggerUtil.log(Level.INFO, "Incremented phrase count for " + token);
 		}
 		repository.saveAll(phrases);
+		return tokens;
 	}
 	
 	public List<Phrase> getMostCommonPhrases(int count, long timePeriod) {
