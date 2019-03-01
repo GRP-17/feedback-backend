@@ -32,6 +32,14 @@ public class Phrase {
 		this(System.currentTimeMillis(), "unknown");
 	}
 	
+	public Date getDate() {
+		return date;
+	}
+	
+	public String getNgram() {
+		return ngram;
+	}
+	
 	public class PhraseId implements Serializable {
 	    @Temporal(TemporalType.TIMESTAMP)
 	    @Column(name = "date", nullable = false)

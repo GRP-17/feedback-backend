@@ -12,16 +12,16 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.group17.feedback.day.Day;
-import com.group17.feedback.day.DayRepository;
-import com.group17.feedback.day.DayResourceAssembler;
-
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.group17.feedback.day.Day;
+import com.group17.feedback.day.DayRepository;
+import com.group17.feedback.day.DayResourceAssembler;
+import com.group17.feedback.ngram.Phrase;
 import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
@@ -236,48 +236,17 @@ public class FeedbackService {
     
     public Map<String, Object> getCommonPhrases() {
     	LoggerUtil.log(Level.INFO, "Retrieving common phrases");
-//		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-//		
-//		maps.add(new HashMap<String, Object>(){{
-//			put("phrase", "credit limit");
-//			put("volume", 145);
-//			put("average_rating", 3.50);
-//			put("sentiments", 
-//				new HashMap<String, Integer>()
-//				{{
-//					put(Sentiment.POSITIVE.toString(), 1);
-//					put(Sentiment.NEUTRAL.toString(), 1);
-//					put(Sentiment.NEGATIVE.toString(), 8);
-//				}});
-//		}});
-//		
-//		maps.add(new HashMap<String, Object>(){{
-//			put("phrase", "pin reminder");
-//			put("volume", 40);
-//			put("average_rating", 4.75);
-//			put("sentiments", 
-//				new HashMap<String, Integer>()
-//				{{
-//					put(Sentiment.POSITIVE.toString(), 1);
-//					put(Sentiment.NEUTRAL.toString(), 5);
-//					put(Sentiment.NEGATIVE.toString(), 40);
-//				}});
-//		}});
-//		
-//		maps.add(new HashMap<String, Object>(){{
-//			put("phrase", "credit reminder");
-//			put("volume", 38);
-//			put("average_rating", 3.3);
-//			put("sentiments", 
-//				new HashMap<String, Integer>()
-//				{{
-//					put(Sentiment.POSITIVE.toString(), 2);
-//					put(Sentiment.NEUTRAL.toString(), 4);
-//					put(Sentiment.NEGATIVE.toString(), 40);
-//				}});
-//		}});
+		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    	
+    	for(Phrase phrase : phraseService.getMostCommonPhrases(10, TimeUnit.DAYS.toMillis(28))) {
+    		String ngram = phrase.getNgram();
+    		maps.add(new HashMap<String, Object>() {{
+    			put("phrase", ngram);
+    			put("volume", phraseService.getCountByNgram(ngram));
+    		}});
+    	}
 		
-		return new HashMap<String, Object>(){{ put("result", new ArrayList<>()); }};
+		return new HashMap<String, Object>(){{ put("result", maps); }};
     }
     
     private void setSentiment(Feedback feedback) {

@@ -24,5 +24,9 @@ public class PhraseService {
 		// TODO - Implement
 		return repository.findAll();
 	}
+	
+	public long getCountByNgram(String ngram) {
+		return repository.countByNgram(ngram.toLowerCase());
+	}
 
 }
