@@ -1,4 +1,4 @@
-package com.group17.feedback.NegativePerDay;
+package com.group17.feedback.negativeperday;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
