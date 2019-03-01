@@ -1,24 +1,18 @@
 package com.group17.feedback.NegativePerDay;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-
 import com.group17.util.DateUtil;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Entity
 @Table(name = "negative_per_day", schema = "hy1xosk6o5taszzw")
 public class NegativePerDay {
 	@Id
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
-    private Date date;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+	private Date date;
 
 	@NotNull(message = "Needs a negative sentiment count")
 	@Column(name = "volume", columnDefinition = "INT(11)")
@@ -45,12 +39,12 @@ public class NegativePerDay {
 		return date;
 	}
 
-	public void setVolume(int count){
-		this.volume = count;
-	}
-
 	public int getVolume() {
 		return volume;
+	}
+
+	public void setVolume(int count) {
+		this.volume = count;
 	}
 
 	public void increaseVolume(int increment) {

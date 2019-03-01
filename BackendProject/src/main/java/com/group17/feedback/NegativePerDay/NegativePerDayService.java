@@ -14,17 +14,13 @@ public class NegativePerDayService {
 	public void increaseNegativeByDate(int increment, Date date) {
 		// ensure this is midnight date
 		date = DateUtil.getDayStart(date);
-		System.out.println(date.toString());
 
 		if (negativePerDayRepository.existsById(date)) {
 			// update
 			NegativePerDay existedNegativePerDay = negativePerDayRepository.getOne(date);
 
-			System.out.println(existedNegativePerDay.getDate());
 			existedNegativePerDay.increaseVolume(increment);
-			System.out.println(existedNegativePerDay.getDate());
 			NegativePerDay entity = negativePerDayRepository.save(existedNegativePerDay);
-			System.out.println(entity.getDate());
 		} else {
 			// create
 			NegativePerDay negativePerDay = new NegativePerDay(date, 1);
