@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
@@ -16,15 +17,11 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.feedback.day.Day;
-import com.group17.feedback.day.DayRepository;
-import com.group17.feedback.day.DayResourceAssembler;
 import com.group17.feedback.ngram.Phrase;
 import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
-import com.group17.util.DateUtil;
 import com.group17.util.LoggerUtil;
 
 /**
