@@ -5,6 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +105,7 @@ public class FeedbackController {
 	 */
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
-			throws URISyntaxException, TransactionSystemException {
+			throws URISyntaxException, TransactionSystemException, Exception {
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 
     	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
@@ -116,12 +117,14 @@ public class FeedbackController {
 
     		// N-Grams
     		long now = System.currentTimeMillis();
-    		phraseService.createPhrases(now, newFeedback.getText());
+    		Collection<String> toReturn = phraseService.createPhrases(now, newFeedback.getText());
+    		return ResponseEntity.ok(new ObjectMapper().writeValueAsString(toReturn));
     	}
-
-		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
-										+ ". Object: " + newFeedback.toString());
-		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
+    	return ResponseEntity.ok(new ObjectMapper().writeValueAsString("test")); 
+//
+//		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
+//										+ ". Object: " + newFeedback.toString());
+//		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
 	/**

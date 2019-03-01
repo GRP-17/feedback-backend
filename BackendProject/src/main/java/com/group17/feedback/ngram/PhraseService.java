@@ -1,8 +1,8 @@
 package com.group17.feedback.ngram;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,21 +16,29 @@ public class PhraseService {
 	@Autowired private PhraseRepository repository;
 	@Autowired private SearchboxGateway gateway;
 	
-	public void createPhrases(long when, String feedbackText) {
+	public Collection<String> createPhrases(long when, String feedbackText) {
 		ArrayList<Phrase> phrases = new ArrayList<Phrase>();
-		for(String token : gateway.analyse(feedbackText)) {
+		Collection<String> tokens = gateway.analyse(feedbackText);
+		LoggerUtil.log(Level.INFO, "[Phrase/Analyze] Loaded " + tokens.size() + " tokens");
+		
+		for(String token : tokens) {
+			token = token.toLowerCase();
 			
-			Optional<Phrase> optional = repository.findById(token);
-			boolean create = !optional.isPresent();
-			Phrase phrase = create ? null : optional.get();
-			if(create) {
-				phrase = new Phrase(token, 0);
+			if(repository.existsById(token)) {
+				// update
+				Phrase phrase = repository.getOne(token);
+				phrase.setNegativeVolume(phrase.getNegativeVolume() + 1);
+				repository.save(phrase);
+			} else {
+				//create
+				Phrase phrase = new Phrase(token, 1);
+				repository.save(phrase);
 			}
-			phrase.setNegativeVolume(phrase.getNegativeVolume() + 1);
 			
 			LoggerUtil.log(Level.INFO, "Incremented phrase count for " + token);
 		}
 		repository.saveAll(phrases);
+		return tokens;
 	}
 	
 	public List<Phrase> getMostCommonPhrases(int count, long timePeriod) {
