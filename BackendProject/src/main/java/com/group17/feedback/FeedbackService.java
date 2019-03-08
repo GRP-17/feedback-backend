@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
@@ -17,7 +16,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.feedback.ngram.Phrase;
 import com.group17.feedback.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
@@ -175,14 +173,14 @@ public class FeedbackService {
     public Map<String, Object> getCommonPhrases() {
     	LoggerUtil.log(Level.INFO, "Retrieving common phrases");
 		  List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-    	
-    	for(Phrase phrase : phraseService.getMostCommonPhrases(10, TimeUnit.DAYS.toMillis(28))) {
-    		String ngram = phrase.getNgram();
-    		maps.add(new HashMap<String, Object>() {{
-    			put("phrase", ngram);
-    			put("volume", phraseService.getCountByNgram(ngram));
-    		}});
-    	}
+//    	
+//    	for(Phrase phrase : phraseService.getMostCommonPhrases(10, TimeUnit.DAYS.toMillis(28))) {
+//    		String ngram = phrase.getNgram();
+//    		maps.add(new HashMap<String, Object>() {{
+//    			put("phrase", ngram);
+//    			put("volume", phraseService.getCountByNgram(ngram));
+//    		}});
+//    	}
 
 		  return new HashMap<String, Object>(){{ put("result", maps); }};
     }
