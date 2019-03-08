@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.HashSet;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.group17.feedback.FeedbackRepository;
-import com.group17.feedback.ngram.SearchboxGateway;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 
@@ -30,7 +27,6 @@ public class BaseTest implements ITest {
 	private static final String TEXT_GOOD_SENTIMENT = "This is good";
 	
 	@Mock private WatsonGateway mockWatsonGateway;
-	@Mock private SearchboxGateway searchboxGateway;
 
 	@Autowired private MockMvc mockMvc;
 	@Autowired private FeedbackRepository repository;
@@ -42,7 +38,6 @@ public class BaseTest implements ITest {
 
 		// Make any Watson Gateway Request for Sentiments return NEUTRAL
 		when(mockWatsonGateway.getSentimentByText(anyString())).thenReturn(Sentiment.NEUTRAL);
-		when(searchboxGateway.analyse(anyString())).thenReturn(new HashSet<String>());
 	}
 	
 	@Test
