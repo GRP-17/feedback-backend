@@ -115,8 +115,7 @@ public class FeedbackController {
 			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
 
     		// N-Grams
-    		long now = System.currentTimeMillis();
-    		phraseService.createPhrases(now, newFeedback.getText());
+			// TODO - POST text to searchbox through PhraseService
     	}
 
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
