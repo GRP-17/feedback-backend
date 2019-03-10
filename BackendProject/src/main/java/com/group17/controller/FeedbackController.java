@@ -5,13 +5,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.group17.feedback.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -246,7 +245,7 @@ public class FeedbackController {
 		// Value:
 		//	 Key: 	n-gram data key
 		//	 Value: n-gram data value
-		Map<String, Object> map = feedbackService.getCommonPhrases();
+		Queue<TermVector> map = feedbackService.getCommonPhrases();
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");

@@ -11,3 +11,8 @@ curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searc
     "field_statistics": false 
     } 
 }'
+
+# curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/b' -d ' 
+# { 
+#     "text_field" : "Credit page is annoying" 
+# }' 

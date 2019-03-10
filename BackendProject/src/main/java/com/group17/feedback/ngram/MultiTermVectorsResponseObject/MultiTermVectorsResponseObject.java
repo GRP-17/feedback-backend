@@ -9,7 +9,7 @@ import java.util.Map;
 public class MultiTermVectorsResponseObject {
 
     // for storing all teh terms and there frequency
-    private Map<String, Integer> terms = new HashMap<>();
+    private Map<String, TermVector> terms = new HashMap<>();
 
     // Jackson method for converting the JSON docs property to what I want...
     // which is all the terms from each document
@@ -33,13 +33,13 @@ public class MultiTermVectorsResponseObject {
                             (Map<String, Object>) entry.getValue()
                     ).get("doc_freq");
 
-                    this.terms.put(term, doc_freq);
+                    this.terms.put(term, new TermVector(term, doc_freq));
                 }
             }
         }
     }
 
-    public Map<String, Integer> getTerms() {
+    public Map<String, TermVector> getTerms() {
         return terms;
     }
 }

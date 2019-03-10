@@ -4,12 +4,10 @@ import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.group17.feedback.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -167,11 +165,24 @@ public class FeedbackService {
     return average;
   }
 
-  public Map<String, Object> getCommonPhrases() {
+  public Queue<TermVector> getCommonPhrases() {
     LoggerUtil.log(Level.INFO, "Retrieving common phrases");
-    System.out.println(phraseService.getCommonPhrases());
-    return new HashMap<String, Object>() {
-    };
+
+    Map<String, TermVector> phrases = phraseService.getCommonPhrases();
+    
+    // sort the data structure
+    List<TermVector> sortedPhrases = new ArrayList<>(phrases.values());
+    Collections.sort(sortedPhrases);
+
+    // convert to linked list to be able to remove the front ones
+    LinkedList<TermVector> qSortedPhrases = new LinkedList<>(sortedPhrases);
+
+    // only keep top 10
+    while (qSortedPhrases.size() > 10) {
+      qSortedPhrases.pop();
+    }
+    System.out.println(qSortedPhrases);
+    return qSortedPhrases;
   }
 
   public long getCount() {
