@@ -169,7 +169,7 @@ public class FeedbackService {
     LoggerUtil.log(Level.INFO, "Retrieving common phrases");
 
     Map<String, TermVector> phrases = phraseService.getCommonPhrases();
-    
+
     // sort the data structure
     List<TermVector> sortedPhrases = new ArrayList<>(phrases.values());
     Collections.sort(sortedPhrases);
@@ -181,7 +181,6 @@ public class FeedbackService {
     while (qSortedPhrases.size() > 10) {
       qSortedPhrases.pop();
     }
-    System.out.println(qSortedPhrases);
     return qSortedPhrases;
   }
 

@@ -63,7 +63,6 @@ public class SearchboxGateway {
 			// down to just the terms and their frequencies
 			MultiTermVectorsResponseObject response = new ObjectMapper().readValue(EntityUtils.toString(res.getEntity()),
 					MultiTermVectorsResponseObject.class);
-			System.out.println(response.getTerms());
 			return response.getTerms();
 
 		} catch (Exception e) {
