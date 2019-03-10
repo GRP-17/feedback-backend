@@ -1,0 +1,13 @@
+# curl "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc" 
+
+curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors' -d ' 
+{ 
+    "ids" : ["a", "b"], 
+    "parameters": { 
+        "fields": [ 
+            "text_field" 
+        ], 
+    "term_statistics": true,
+    "field_statistics": false 
+    } 
+}'
