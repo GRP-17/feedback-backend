@@ -1,4 +1,4 @@
-package com.group17.feedback.negativeperday;
+package com.group17.negativeperday;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

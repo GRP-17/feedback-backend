@@ -1,4 +1,4 @@
-package com.group17.feedback.ngram;
+package com.group17.ngram;
 
 import java.io.IOException;
 
