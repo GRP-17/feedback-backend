@@ -3,19 +3,17 @@
 The backend of the feedback analysis application.
 
 ## Builds
-### Deployment Build
-[![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=master)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
-     https://feedback-analysis-grp-app.herokuapp.com/feedback
+### Deployment Build [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=master)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
-### Development Build
-[![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
-     https://feedback-analysis-grp-app-dev.herokuapp.com/feedback
+### Development Build [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
 ## Useful Links
 
-| Name | Description | URL |
-| --- | --- | --- |
-| `wiki` | The project wiki | https://github.com/GRP-17/feedback-backend/wiki |
+| Name | URL |
+| --- | --- |
+| `deployment app` | https://feedback-analysis-grp-app.herokuapp.com/feedback |
+| `development app` | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
+| `wiki` | https://github.com/GRP-17/feedback-backend/wiki |
 
 ## Useful Commands
 ### Maven
