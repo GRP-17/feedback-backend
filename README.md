@@ -11,9 +11,9 @@ The backend of the feedback analysis application.
 
 | Name | URL |
 | --- | --- |
-| `deployment app` | https://feedback-analysis-grp-app.herokuapp.com/feedback |
-| `development app` | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
-| `wiki` | https://github.com/GRP-17/feedback-backend/wiki |
+| deployment app | https://feedback-analysis-grp-app.herokuapp.com/feedback |
+| development app | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
+| wiki | https://github.com/GRP-17/feedback-backend/wiki |
 
 ## Useful Commands
 ### Maven
