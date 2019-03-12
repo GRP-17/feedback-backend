@@ -69,6 +69,5 @@ public class SearchboxGateway {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
+  }
 }

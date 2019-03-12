@@ -8,10 +8,7 @@ import java.util.Map;
 
 @Service
 public class PhraseService {
-
-	@Autowired
-	private SearchboxGateway gateway;
-
+  
 	// use the gateway to make a request to the mtermvectors endpoint
 	// and return the terms and their frequencies
 	public Map<String, TermVector> getCommonPhrases() {
@@ -28,5 +25,5 @@ public class PhraseService {
 		Map<String, TermVector> result = gateway.getMTermVectors(ids, fields);
 		return result;
 	}
-
+  
 }
