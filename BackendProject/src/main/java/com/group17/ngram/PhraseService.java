@@ -8,6 +8,9 @@ import java.util.Map;
 
 @Service
 public class PhraseService {
+
+	@Autowired
+	SearchboxGateway gateway;
   
 	// use the gateway to make a request to the mtermvectors endpoint
 	// and return the terms and their frequencies
