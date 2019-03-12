@@ -1,6 +1,6 @@
-package com.group17.feedback.ngram;
+package com.group17.ngram;
 
-import com.group17.feedback.ngram.MultiTermVectorsResponseObject.TermVector;
+import com.group17.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
-package com.group17.feedback.ngram;
+package com.group17.ngram;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.group17.feedback.ngram.MultiTermVectorsResponseObject.MultiTermVectorsResponseObject;
-import com.group17.feedback.ngram.MultiTermVectorsResponseObject.TermVector;
+import com.group17.ngram.MultiTermVectorsResponseObject.MultiTermVectorsResponseObject;
+import com.group17.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;

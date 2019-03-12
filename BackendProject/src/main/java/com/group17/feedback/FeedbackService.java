@@ -7,14 +7,14 @@ import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.group17.feedback.ngram.MultiTermVectorsResponseObject.TermVector;
+import com.group17.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.feedback.ngram.PhraseService;
+import com.group17.ngram.PhraseService;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;

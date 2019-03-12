@@ -1,4 +1,4 @@
-package com.group17.feedback.ngram.MultiTermVectorsResponseObject;
+package com.group17.ngram.MultiTermVectorsResponseObject;
 
 public class TermVector implements Comparable<TermVector>{
     private final String term;

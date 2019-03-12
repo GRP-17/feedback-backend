@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.group17.feedback.ngram.SearchboxGateway;
+import com.group17.ngram.SearchboxGateway;
 import com.group17.tone.WatsonGateway;
 
 import io.searchbox.client.JestClient;

@@ -1,4 +1,4 @@
-package com.group17.feedback.negativeperday;
+package com.group17.negativeperday;
 
 import com.group17.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;

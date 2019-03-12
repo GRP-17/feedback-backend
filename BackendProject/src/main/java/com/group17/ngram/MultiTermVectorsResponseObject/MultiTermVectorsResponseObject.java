@@ -1,4 +1,4 @@
-package com.group17.feedback.ngram.MultiTermVectorsResponseObject;
+package com.group17.ngram.MultiTermVectorsResponseObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
