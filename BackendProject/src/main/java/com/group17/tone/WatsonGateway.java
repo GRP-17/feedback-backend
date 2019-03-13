@@ -13,7 +13,9 @@ import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneOptions;
 @Component // for spring bean autowiring (dependency injection)
 public class WatsonGateway {
 	/** The ToneAnalyzer stores the IBM constants and provides endpoint calls. */
-    private final ToneAnalyzer toneAnalyzer;
+    private static ToneAnalyzer toneAnalyzer;
+    
+    private String key, version, url;
     
     /**
      * Constructor.
@@ -23,9 +25,9 @@ public class WatsonGateway {
      * @param url the url to the tone analyser
      */
     public WatsonGateway(String key, String version, String url) {
-        IamOptions options = new IamOptions.Builder().apiKey(key).build();
-        toneAnalyzer = new ToneAnalyzer(version, options);
-        toneAnalyzer.setEndPoint(url);
+    	this.key = key;
+    	this.version = version;
+    	this.url = url;
     }
     
     public Sentiment getSentimentByText(String text) {
@@ -53,6 +55,12 @@ public class WatsonGateway {
      * @param text the text to analyze. Note: limit of 1000 sentences
      */
     private ToneAnalysis analyze(String text) {
+    	if(toneAnalyzer == null) {
+            IamOptions options = new IamOptions.Builder().apiKey(key).build();
+            toneAnalyzer = new ToneAnalyzer(version, options);
+            toneAnalyzer.setEndPoint(url);
+    	}
+    	
         ToneOptions toneOptions = new ToneOptions.Builder().text(text).build();
         return toneAnalyzer.tone(toneOptions).execute();
     }

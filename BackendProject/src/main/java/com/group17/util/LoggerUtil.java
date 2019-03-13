@@ -22,7 +22,7 @@ public class LoggerUtil {
 	 * @param exception the exception to be logged
 	 */
 	public static void logException(Exception exception) {
-		logger.warn("[Exception] " + exception.getMessage());
+		logger.catching(exception);
 	}
 	
 	/**
