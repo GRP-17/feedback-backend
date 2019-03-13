@@ -6,9 +6,25 @@ import java.util.Map;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneScore;
 
+/**
+ * An enum of all the possible Sentiments to be within a 
+ * {@link com.group17.feedback.Feedback}'s text.
+ */
 public enum Sentiment {
+	/**
+	 * A positive tone.
+	 */
 	POSITIVE(1),
+	/**
+	 * A neutral tone.
+	 * <p>
+	 * This could contain unrecognised or colloquial words, a foreign language
+	 * or evenly mixed text.
+	 */
 	NEUTRAL(0),
+	/**
+	 * A negative tone.
+	 */
 	NEGATIVE(-1);
 	
 	/**
@@ -34,7 +50,9 @@ public enum Sentiment {
 	private int relativeWeight;	
 	
 	/**
-	 * Constructor.
+	 * Constructor for this Sentiment.
+	 * 
+	 * @param relativeWeight the weight assigned to this Sentiment
 	 */
 	Sentiment(int relativeWeight) {
 		this.relativeWeight = relativeWeight;
@@ -44,8 +62,8 @@ public enum Sentiment {
 	 * Use the analysis to find the relative weights of the tones in the text
 	 * and from there deduce the overall Sentiment of a given analysis object.
 	 * 
-	 * @param analysis what to find the Sentiment for
-	 * @return the Sentiment
+	 * @param analysis the object of what to find the Sentiment of
+	 * @return the Sentiment deduced for this analysis object
 	 */
 	public static Sentiment getByToneAnalysis(ToneAnalysis analysis) {
 		if(analysis.getDocumentTone() == null) return NEUTRAL;

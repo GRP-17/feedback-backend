@@ -9,13 +9,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.group17.util.LoggerUtil;
 
 /**
- * The actual application
+ * The Spring Boot Application that initialises everything.
  */
 @SpringBootApplication
 public class Application implements ApplicationRunner {
 
 	/**
-	 * The single entry point into the java application
+	 * The single entry point into the java application.
+	 * 
 	 * @param args any command line arguments
 	 * @throws Exception thrown when SpringApplication fails to run
 	 */
@@ -24,12 +25,15 @@ public class Application implements ApplicationRunner {
 	}
 
 	/**
-	 * implements the run method for the ApplicationRunner interface
-	 * @param applicationArguments an arguments the application should start with
+	 * Implements the run method for the {@link org.springframework.boot.ApplicationRunner} 
+	 * interface.
+	 * 
+	 * @param applicationArguments the arguments the application should start with
 	 * @throws Exception thrown if the application fails to run/start
 	 */
 	@Override
 	public void run(ApplicationArguments applicationArguments) throws Exception {
 		LoggerUtil.log(Level.INFO, "Application started");
 	}
+	
 }

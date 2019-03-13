@@ -1,6 +1,7 @@
 package com.group17.controller;
 
 import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
+import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.feedback.FeedbackService;
-import com.group17.feedback.negativeperday.NegativePerDayService;
+import com.group17.negativeperday.NegativePerDayService;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 
@@ -67,7 +68,7 @@ public class DashboardController {
 				map.put(element, negativePerDayService.findNegativePerDay());
 				break;
 			case "feedback_common_phrases":
-				map.put(element, feedbackService.getCommonPhrases());
+				map.put(element, feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT));
 				break;
 			default:
 				found = false;

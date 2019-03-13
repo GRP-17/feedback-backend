@@ -2,12 +2,11 @@ package com.group17.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -35,8 +34,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
-import com.group17.feedback.negativeperday.NegativePerDayService;
-import com.group17.feedback.ngram.PhraseService;
+import com.group17.negativeperday.NegativePerDayService;
+import com.group17.ngram.NGramService;
+import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
@@ -52,7 +52,7 @@ public class FeedbackController {
 	 * holds the instance of the FeedbackService
 	 */
 	@Autowired private FeedbackService feedbackService;
-	@Autowired private PhraseService phraseService;
+	@Autowired private NGramService ngramService;
 
 	@Autowired private NegativePerDayService negativePerDayService;
 
@@ -107,16 +107,18 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 
+		// N-Grams
+		ngramService.onFeedbackCreated(newFeedback);
+		
     	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
     		LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id " 
     										+ newFeedback.getId());
     		
 			// Increase negative rating this day
 			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
-
-    		// N-Grams
-			// TODO - PUT text to searchbox through PhraseService
     	}
+		// N-Grams
+		ngramService.onFeedbackCreated(newFeedback);
 
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
@@ -153,6 +155,7 @@ public class FeedbackController {
 
 		try {
 			feedbackService.deleteFeedbackById(id);
+			ngramService.onFeedbackRemoved(id);
 			LoggerUtil.log(Level.INFO, "[Feedback/Delete] Deleted: " + id);
 		} catch (Exception e) {
 		}
@@ -246,7 +249,7 @@ public class FeedbackController {
 		// Value:
 		//	 Key: 	n-gram data key
 		//	 Value: n-gram data value
-		Map<String, Object> map = feedbackService.getCommonPhrases();
+		Collection<TermVector> map = feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT);
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
