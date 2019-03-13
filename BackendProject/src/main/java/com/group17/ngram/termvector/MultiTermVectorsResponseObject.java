@@ -1,4 +1,4 @@
-package com.group17.ngram.MultiTermVectorsResponseObject;
+package com.group17.ngram.termvector;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class MultiTermVectorsResponseObject {
 
-    // for storing all teh terms and there frequency
-    private Map<String, TermVector> terms = new HashMap<>();
+    // for storing all the terms and there frequency
+    private Map<String, TermVector> terms = new HashMap<String, TermVector>();
 
     // Jackson method for converting the JSON docs property to what I want...
     // which is all the terms from each document
@@ -42,4 +42,5 @@ public class MultiTermVectorsResponseObject {
     public Map<String, TermVector> getTerms() {
         return terms;
     }
+    
 }
