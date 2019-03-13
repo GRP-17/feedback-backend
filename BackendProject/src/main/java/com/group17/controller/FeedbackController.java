@@ -245,11 +245,12 @@ public class FeedbackController {
 
 	@GetMapping("/commonphrases")
 	public ResponseEntity<?> getCommonPhrases() throws CommonException {
-		// Key: Phrase (n-gram)
-		// Value:
-		//	 Key: 	n-gram data key
-		//	 Value: n-gram data value
-		Collection<TermVector> map = feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT);
+
+		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
+		map.put("result", feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT));
+
+		// It should actually return this
+//		Collection<TermVector> map = feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT);
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");

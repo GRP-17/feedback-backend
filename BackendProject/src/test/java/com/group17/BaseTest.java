@@ -22,12 +22,18 @@ import com.group17.mocking.MockWatsonGateway;
 import com.group17.ngram.NGramService;
 import com.group17.tone.Sentiment;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 public class BaseTest implements ITest {
 	private static final Sentiment EXPECTED_SENTIMENT = Sentiment.NEUTRAL;
-	private static final String TEXT_GOOD_SENTIMENT = "This is good";
+	private static final String TEXT_GOOD_SENTIMENT   = "This is good";
+
+	private static final Feedback DUMMY_FEEDBACK 	  = new Feedback();
+	private static final String DUMMY_FEEDBACK_ID 	  = "dummy id";
+	private static final List<String> DUMMY_IDS		  = new ArrayList<String>();
 	
 	@Autowired private FeedbackService feedbackService;
 	@Autowired private NGramService ngramService;
@@ -57,9 +63,9 @@ public class BaseTest implements ITest {
 	
 	@Test
 	public void testMockSearchboxGateway() {
-		assertEquals(ngramService.onFeedbackCreated(new Feedback()), true);
-		assertEquals(ngramService.onFeedbackRemoved("dummy id"), true);
-		assertEquals(ngramService.getCommonPhrases(new ArrayList<String>()).isEmpty(), true);
+		assertEquals(ngramService.onFeedbackCreated(DUMMY_FEEDBACK), true);
+		assertEquals(ngramService.onFeedbackRemoved(DUMMY_FEEDBACK_ID), true);
+		assertEquals(ngramService.getCommonPhrases(DUMMY_IDS).isEmpty(), true);
 	}
 	
 	@Override
