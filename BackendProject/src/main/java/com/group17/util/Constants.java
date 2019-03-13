@@ -14,6 +14,8 @@ public class Constants {
 													+ "feedback_rating_count,feedback_sentiment_count,"
 													+ "feedback_rating_negative,feedback_common_phrases";
 	
+	public static final int DEFAULT_COMMON_PHRASES_AMOUNT = 10;
+	
 	private Constants() {}
 
 }

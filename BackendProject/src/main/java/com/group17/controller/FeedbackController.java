@@ -2,6 +2,7 @@ package com.group17.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,7 +11,6 @@ import java.util.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import com.group17.ngram.MultiTermVectorsResponseObject.TermVector;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -36,6 +36,7 @@ import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.PhraseService;
+import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
@@ -245,7 +246,7 @@ public class FeedbackController {
 		// Value:
 		//	 Key: 	n-gram data key
 		//	 Value: n-gram data value
-		Queue<TermVector> map = feedbackService.getCommonPhrases();
+		Collection<TermVector> map = feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT);
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
