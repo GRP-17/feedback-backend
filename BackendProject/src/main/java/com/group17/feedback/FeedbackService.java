@@ -27,7 +27,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.ngram.PhraseService;
+import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
@@ -54,7 +54,7 @@ public class FeedbackService {
 	@Autowired
 	private WatsonGateway watsonGateway;
 	@Autowired
-	private PhraseService phraseService;
+	private NGramService phraseService;
 
 	/**
 	 * Get every {@link Resource} in the database.
@@ -225,4 +225,9 @@ public class FeedbackService {
 	public WatsonGateway getWatsonGateway() {
 		return watsonGateway;
 	}
+	
+	public void setWatsonGateway(WatsonGateway gateway) {
+		this.watsonGateway = gateway;
+	}
+	
 }

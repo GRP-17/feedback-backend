@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
-import com.group17.ngram.PhraseService;
+import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.util.CommonException;
@@ -52,7 +52,7 @@ public class FeedbackController {
 	 * holds the instance of the FeedbackService
 	 */
 	@Autowired private FeedbackService feedbackService;
-	@Autowired private PhraseService phraseService;
+	@Autowired private NGramService ngramService;
 
 	@Autowired private NegativePerDayService negativePerDayService;
 
@@ -107,16 +107,18 @@ public class FeedbackController {
 			throws URISyntaxException, TransactionSystemException {
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 
+		// N-Grams
+		ngramService.onFeedbackCreated(newFeedback);
+		
     	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
     		LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id " 
     										+ newFeedback.getId());
     		
 			// Increase negative rating this day
 			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
-
-    		// N-Grams
-			// TODO - PUT text to searchbox through PhraseService
     	}
+		// N-Grams
+		ngramService.onFeedbackCreated(newFeedback);
 
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
@@ -153,6 +155,7 @@ public class FeedbackController {
 
 		try {
 			feedbackService.deleteFeedbackById(id);
+			ngramService.onFeedbackRemoved(id);
 			LoggerUtil.log(Level.INFO, "[Feedback/Delete] Deleted: " + id);
 		} catch (Exception e) {
 		}

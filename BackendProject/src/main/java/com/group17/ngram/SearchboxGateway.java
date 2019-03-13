@@ -3,6 +3,7 @@ package com.group17.ngram;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import org.apache.logging.log4j.Level;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,13 +19,66 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.group17.ngram.termvector.MultiTermVectorsResponseObject;
 import com.group17.ngram.termvector.TermVector;
+import com.group17.util.LoggerUtil;
 
 @Component
 public class SearchboxGateway {
+	private static final String CONTENT_TYPE = "application/json";
+	
+	private static final String PUT_URL
+				= "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/";
+	private static final String DELETE_URL = PUT_URL;
+	
 	private static final String POST_URL 
 				= "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors";
+	
+	public boolean put(String id, String text) {
+		try {
+			delete(id); // Ensure there's no duplicates
+			
+			HttpClient httpClient = HttpClientBuilder.create().build();
 
-	public Map<String, TermVector> getMTermVectors(Collection<String> ids, ArrayList<String> fields) {
+			//post http request to the mtermvectors url
+			HttpPost req = new HttpPost(PUT_URL + id);
+
+			// build the data to send
+			JsonObject body = new JsonObject();
+			body.add("text_field", new JsonPrimitive(text));
+			
+			//convert the json to a string entity ready to send in the request
+			StringEntity data = new StringEntity(body.toString());
+			data.setContentType(CONTENT_TYPE);
+			req.setEntity(data);
+
+			// execute request
+			httpClient.execute(req);
+			
+			LoggerUtil.log(Level.INFO, "PUT (" + id + ", " + text + ") " + " into searchbox");
+			return true;
+		} catch (Exception exception) {
+			LoggerUtil.logException(exception);
+			return false;
+		}
+	}
+	
+	public boolean delete(String id) {
+		try {
+			HttpClient httpClient = HttpClientBuilder.create().build();
+
+			//post http request to the mtermvectors url
+			HttpPost req = new HttpPost(DELETE_URL + id);
+			httpClient.execute(req);
+			
+			LoggerUtil.log(Level.INFO, "DELETED " + id + " from searchbox");
+			return true;
+		} catch (Exception exception) {
+			LoggerUtil.logException(exception);
+			return false;
+		}
+	}
+	
+	public Map<String, TermVector> getMTermVectors(Collection<String> ids, 
+												   ArrayList<String> fields) {
 		try {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
@@ -37,7 +91,7 @@ public class SearchboxGateway {
 			
 			//convert the json to a string entity ready to send in the request
 			StringEntity data = new StringEntity(body.toString());
-			data.setContentType("application/json");
+			data.setContentType(CONTENT_TYPE);
 			req.setEntity(data);
 
 			// execute request and capture the response
@@ -50,8 +104,8 @@ public class SearchboxGateway {
 							.readValue(EntityUtils.toString(res.getEntity()),
 									   MultiTermVectorsResponseObject.class);
 			return response.getTerms();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception exception) {
+			LoggerUtil.logException(exception);
 			return null;
 		}
 	}

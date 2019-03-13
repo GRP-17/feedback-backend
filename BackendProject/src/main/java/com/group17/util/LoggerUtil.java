@@ -13,7 +13,7 @@ public class LoggerUtil {
 	private LoggerUtil() {}
 	
 	public static void logException(Exception exception) {
-		logger.warn("[Exception] " + exception.getMessage());
+		logger.catching(exception);
 	}
 	
 	public static void log(Level level, String message) {
