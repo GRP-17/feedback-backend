@@ -1,6 +1,7 @@
 package com.group17.controller;
 
 import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
+import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class DashboardController {
 				map.put(element, negativePerDayService.findNegativePerDay());
 				break;
 			case "feedback_common_phrases":
-				map.put(element, feedbackService.getCommonPhrases());
+				map.put(element, feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT));
 				break;
 			default:
 				found = false;
