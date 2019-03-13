@@ -193,7 +193,7 @@ public class FeedbackService {
 		    		.getResultList();
 	}
 
-	public Collection<TermVector> getCommonPhrases(int amount) {
+	public Map<String, Collection<TermVector>> getCommonPhrases(int amount) {
 		LoggerUtil.log(Level.INFO, "Retrieving common phrases");
 
 		Set<String> ids = new HashSet<String>();
@@ -202,16 +202,19 @@ public class FeedbackService {
 		}
 		
 		Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-
-		// sort the data structure
 		List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
 		Collections.sort(sortedPhrases);
 
-		if(sortedPhrases.isEmpty()) {
-			return sortedPhrases;
-		} else {
-			return sortedPhrases.subList(0, Math.min(sortedPhrases.size(), amount));
+		List<TermVector> toReturn = new ArrayList<TermVector>();
+		for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
+			TermVector vec = sortedPhrases.get(i);
+			vec.getTerm().replace("  ", " "); // Remove any double spacing
+			toReturn.add(vec);
 		}
+		
+		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
+		map.put("result", toReturn);
+		return map;
 	}
 	
 	private EntityManager getEntityManager(Class<?> entityClazz) {
