@@ -1,12 +1,15 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -92,6 +95,16 @@ public class FeedbackController {
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + id
 										+ ". Object: " + resource.getContent().toString());
 		return resource;
+	}
+	
+	@GetMapping("/paged")
+	public Resources<Resource<Feedback>> getPaged(@PathVariable int indexTo,
+												  @PathVariable int indexFrom)
+	{
+		return new Resources<>(
+				// ADD List<Resource<Feedback>> here
+				// Add a getter for this in the feedbackService()
+				);
 	}
 
 	/**
