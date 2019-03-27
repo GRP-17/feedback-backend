@@ -1,12 +1,15 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -51,10 +55,13 @@ public class FeedbackController {
 	/**
 	 * holds the instance of the FeedbackService
 	 */
-	@Autowired private FeedbackService feedbackService;
-	@Autowired private NGramService ngramService;
+	@Autowired 
+	private FeedbackService feedbackService;
+	@Autowired 
+	private NGramService ngramService;
 
-	@Autowired private NegativePerDayService negativePerDayService;
+	@Autowired 
+	private NegativePerDayService negativePerDayService;
 
 	/**
 	 * the default mapping for a get request to the feedback endpoint
@@ -62,20 +69,28 @@ public class FeedbackController {
 	 * @return all feedback from the database, returned as resources
 	 */
 	@GetMapping()
-	public Resources<Resource<Feedback>> findAll() {
+	public Resources<Resource<Feedback>> findAll(@RequestParam(value = "dashboardId") 
+														int dashboardId) {
 		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
 		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size() 
 										+ " resources in the repository");
 
 		return new Resources<>(
 				resources,
-				linkTo(methodOn(FeedbackController.class).findAll()).withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).getCount()).withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount()).withRel("sentiment_count"),
-				linkTo(methodOn(FeedbackController.class).getAverageRating()).withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount()).withRel("rating_count"),
-				linkTo(methodOn(FeedbackController.class).getNegativePerDay()).withRel("rating_negative"),
-				linkTo(methodOn(FeedbackController.class).getCommonPhrases()).withRel("common_phrases"));
+				linkTo(methodOn(FeedbackController.class).findAll(dashboardId))
+					.withSelfRel(),
+				linkTo(methodOn(FeedbackController.class).getCount(dashboardId))
+					.withRel("count"),
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId))
+					.withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId))
+					.withRel("rating_average"),
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId))
+					.withRel("rating_count"),
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId))
+					.withRel("rating_negative"),
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId))
+					.withRel("common_phrases"));
 	}
 
 	/**
@@ -164,7 +179,8 @@ public class FeedbackController {
 	}
 	
 	@GetMapping("/count")
-	public ResponseEntity<?> getCount() throws CommonException {
+	public ResponseEntity<?> getCount(@RequestParam(value = "dashboardId") 
+											int dashboardId) throws CommonException {
 		long count = feedbackService.getCount();
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
@@ -180,7 +196,8 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/sentiments/count")
-	public ResponseEntity<?> getSentimentsCount() throws CommonException {
+	public ResponseEntity<?> getSentimentsCount(@RequestParam(value = "dashboardId") 
+													int dashboardId) throws CommonException {
 		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts();
 		
 		try {
@@ -196,7 +213,8 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/rating/count")
-	public ResponseEntity<?> getStarRatingCount() throws CommonException {
+	public ResponseEntity<?> getStarRatingCount(@RequestParam(value = "dashboardId") 
+													int dashboardId) throws CommonException {
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts();
 		
 		try {
@@ -212,7 +230,8 @@ public class FeedbackController {
 	}
 	
 	@GetMapping("/rating/average")
-	public ResponseEntity<?> getAverageRating() throws CommonException {
+	public ResponseEntity<?> getAverageRating(@RequestParam(value = "dashboardId") 
+													int dashboardId) throws CommonException {
 		double average = feedbackService.getAverageRating(true);
 		Map<String, Double> map = new HashMap<String, Double>();
 		map.put("average", average);
@@ -229,7 +248,8 @@ public class FeedbackController {
 	}
 	
 	@GetMapping("/rating/negativeperday")
-	public ResponseEntity<?> getNegativePerDay() throws CommonException {
+	public ResponseEntity<?> getNegativePerDay(@RequestParam(value = "dashboardId") 
+													int dashboardId) throws CommonException {
 		Map<String, Object> map = negativePerDayService.findNegativePerDay();
 		
 		LoggerUtil.log(Level.INFO, 
@@ -244,10 +264,12 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/commonphrases")
-	public ResponseEntity<?> getCommonPhrases() throws CommonException {
+	public ResponseEntity<?> getCommonPhrases(@RequestParam(value = "dashboardId") 
+													int dashboardId) throws CommonException {
 
 		Map<String, Collection<TermVector>> map 
-						= feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT);
+						= feedbackService.getCommonPhrases(dashboardId, 
+														   COMMON_PHRASES_AMOUNT);
 		
 		LoggerUtil.log(Level.INFO, 
 					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");

@@ -1,11 +1,8 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
-import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
+import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.Level;
@@ -15,12 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group17.dashboard.DashboardEndpoint;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.util.CommonException;
@@ -36,56 +34,41 @@ public class DashboardController {
 	@Autowired
 	private NegativePerDayService negativePerDayService;
 
-	@GetMapping()
-	public ResponseEntity<?> find(@RequestParam(value = "endpoint", required = false, 
-												defaultValue = DASHBOARD_DEFAULT_ENDPOINTS) 
-										String[] endpoint) {
+	@GetMapping("{/dashboardId}")
+	public ResponseEntity<?> find(@PathVariable int dashboardId) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		List<String> endpointsFound = new ArrayList<String>();
-		List<String> endpointsNotFound = new ArrayList<String>();
 		
-		for(String element : endpoint) {
-			boolean found = true;
+		for(DashboardEndpoint endpoint : DashboardEndpoint.values()) {
+			String key = endpoint.getJsonKey();
 			
-			switch(element.toLowerCase()) {
-			case "feedback":
-				map.put(element, feedbackService.getAllFeedback());
+			switch(endpoint) {
+			case FEEDBACK:
+				map.put(key, feedbackService.getAllFeedback());
 				break;
-			case "feedback_count":
-				map.put(element, feedbackService.getCount());
+			case FEEDBACK_COUNT:
+				map.put(key, feedbackService.getCount());
 				break;
-			case "feedback_sentiment_count":
-				map.put(element, feedbackService.getSentimentCounts());
+			case FEEDBACK_SENTIMENT_COUNT:
+				map.put(key, feedbackService.getSentimentCounts());
 				break;
-			case "feedback_rating_average":
-				map.put(element, feedbackService.getAverageRating(true));
+			case FEEDBACK_RATING_AVERAGE:
+				map.put(key, feedbackService.getAverageRating(true));
 				break;
-			case "feedback_rating_count":
-				map.put(element, feedbackService.getRatingCounts());
+			case FEEDBACK_RATING_COUNT:
+				map.put(key, feedbackService.getRatingCounts());
 				break;
-			case "feedback_rating_negative":
-				map.put(element, negativePerDayService.findNegativePerDay());
+			case FEEDBACK_RATING_NEGATIVE:
+				map.put(key, negativePerDayService.findNegativePerDay());
 				break;
-			case "feedback_common_phrases":
-				map.put(element, feedbackService.getCommonPhrases(DEFAULT_COMMON_PHRASES_AMOUNT));
-				break;
-			default:
-				found = false;
+			case FEEDBACK_COMMON_PHRASES:
+				map.put(key, feedbackService.getCommonPhrases(dashboardId, COMMON_PHRASES_AMOUNT));
 				break;
 			}
-			
-			if(found) endpointsFound.add(element);
-			else endpointsNotFound.add(element);
 		}
 		
 		// Return what has been found for debugging, etc.
-		map.put("endpoints_found", endpointsFound);
-		map.put("endpoints_not_found", endpointsNotFound);
-		
-		LoggerUtil.log(Level.INFO, "[Root/Dashboard] " 
-										+ endpointsFound.size() + " returned, " 
-										+ endpointsNotFound.size() + " not found");
+		LoggerUtil.log(Level.INFO, "[Root/Dashboard] Returned " + map.size() + " values");
 		
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));

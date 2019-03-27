@@ -28,37 +28,37 @@ public class RootController {
 		ResourceSupport rootResource = new ResourceSupport();
 		rootResource.add(
 			// Add 'feedback'
-			linkTo(methodOn(FeedbackController.class).findAll())
+			linkTo(methodOn(FeedbackController.class).findAll(-1))
 				.withRel("feedback"),
 				
 			// Add 'feedback_count'
-			linkTo(methodOn(FeedbackController.class).getCount())
+			linkTo(methodOn(FeedbackController.class).getCount(-1))
 				.withRel("feedback_count"),
 			
 			// Add 'feedback_sentiment_count'
-			linkTo(methodOn(FeedbackController.class).getSentimentsCount())
+			linkTo(methodOn(FeedbackController.class).getSentimentsCount(-1))
 				.withRel("feedback_sentiment_count"),
 			
 
 			// Add 'feedback_rating_average'
-			linkTo(methodOn(FeedbackController.class).getAverageRating())
+			linkTo(methodOn(FeedbackController.class).getAverageRating(-1))
 				.withRel("feedback_rating_average"),
 				
 			// Add 'feedback_rating_count'
-			linkTo(methodOn(FeedbackController.class).getStarRatingCount())
+			linkTo(methodOn(FeedbackController.class).getStarRatingCount(-1))
 				.withRel("feedback_rating_count"),
 				
 			// Add 'feedback_rating_negative'
-			linkTo(methodOn(FeedbackController.class).getNegativePerDay())
+			linkTo(methodOn(FeedbackController.class).getNegativePerDay(-1))
 				.withRel("feedback_rating_negative"),
 				
 			// Add 'feedback_common_phrases'
-			linkTo(methodOn(FeedbackController.class).getCommonPhrases())
+			linkTo(methodOn(FeedbackController.class).getCommonPhrases(-1))
 				.withRel("feedback_common_phrases"),
 		
 
-			// Add 'dashboard'
-			linkTo(methodOn(DashboardController.class).find(null))
+			// Add 'dashboard' as self relation - the values don't matter
+			linkTo(methodOn(DashboardController.class).find(-1))
 				.withSelfRel().expand().withRel("dashboard"));
 		return rootResource;
 	}

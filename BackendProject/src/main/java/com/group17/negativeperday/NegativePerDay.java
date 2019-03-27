@@ -4,12 +4,24 @@ import com.group17.util.DateUtil;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.GenericGenerator;
+
 import java.util.Date;
 
 @Entity
 @Table(name = "negative_per_day", schema = "hy1xosk6o5taszzw")
 public class NegativePerDay {
 	@Id
+	@GeneratedValue(generator = "uuid2")
+	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "id", columnDefinition = "VARCHAR(36)")
+	private String id;
+	
+	@NotNull(message = "Invalid dashboardId")
+	@Column(name = "dashboardId", columnDefinition = "INT(11)")
+	private int dashboardId;
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
 	private Date date;

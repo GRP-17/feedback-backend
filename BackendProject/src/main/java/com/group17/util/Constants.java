@@ -15,13 +15,7 @@ public class Constants {
 	public static final DecimalFormat AVERAGE_RATING_FORMAT 
 											= new DecimalFormat("#.##");
 	
-	/** The default endpoints to return in the dashboard if none are specified */
-	public static final String DASHBOARD_DEFAULT_ENDPOINTS 
-											= "feedback,feedback_count,feedback_rating_average,"
-													+ "feedback_rating_count,feedback_sentiment_count,"
-													+ "feedback_rating_negative,feedback_common_phrases";
-	
-	public static final int DEFAULT_COMMON_PHRASES_AMOUNT = 10;
+	public static final int COMMON_PHRASES_AMOUNT = 10;
 	
 	private Constants() {}
 

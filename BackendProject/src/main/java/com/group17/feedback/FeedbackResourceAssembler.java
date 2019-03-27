@@ -24,7 +24,11 @@ public class FeedbackResourceAssembler implements ResourceAssembler<Feedback, Re
 	public Resource<Feedback> toResource(Feedback feedback) {
 		return new Resource<>(
 				feedback,
-				linkTo(methodOn(FeedbackController.class).findOne(feedback.getId())).withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
+				linkTo(methodOn(FeedbackController.class)
+							.findOne(feedback.getId()))
+					.withSelfRel(),
+				linkTo(methodOn(FeedbackController.class)
+							.findAll(feedback.getDashboardId()))
+					.withRel("feedback"));
 	}
 }

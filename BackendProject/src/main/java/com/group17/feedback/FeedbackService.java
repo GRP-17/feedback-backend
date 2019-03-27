@@ -181,7 +181,7 @@ public class FeedbackService {
 		return average;
 	}
 	
-	private Collection<?> getIds() {
+	private Collection<?> getCommonPhrasesIds() {
 		Calendar cal = new GregorianCalendar();
 	    cal.add(Calendar.MONTH, -1);
 	    Date lastMonthDate = cal.getTime();   
@@ -193,11 +193,11 @@ public class FeedbackService {
 		    		.getResultList();
 	}
 
-	public Map<String, Collection<TermVector>> getCommonPhrases(int amount) {
+	public Map<String, Collection<TermVector>> getCommonPhrases(int dashboardId, int amount) {
 		LoggerUtil.log(Level.INFO, "Retrieving common phrases");
 
 		Set<String> ids = new HashSet<String>();
-		for(Object id : getIds()) {
+		for(Object id : getCommonPhrasesIds()) {
 			ids.add((String) id);
 		}
 		

@@ -38,8 +38,12 @@ public class Feedback {
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
 	private String id;
 	
+	@NotNull(message = "Invalid dashboardId")
+	@Column(name = "dashboardId", columnDefinition = "INT(11)")
+	private int dashboardId;
+	
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false)
+    @Column(name = "created", nullable = false, columnDefinition = "TIMESTAMP")
     private Date created;
 
 	/**
@@ -87,7 +91,8 @@ public class Feedback {
 	 * @param rating the rating of the feedback
 	 * @param text the comment left with the feedback
 	 */
-	public Feedback(Integer rating, String text) {
+	public Feedback(Integer dashboardId, Integer rating, String text) {
+		this.dashboardId = dashboardId;
 		this.rating = rating;
 		this.text = text;
 	}
@@ -99,6 +104,10 @@ public class Feedback {
 	
 	public String getId() {
 		return id;
+	}
+	
+	public Integer getDashboardId() {
+		return dashboardId;
 	}
 	
 	public Date getCreated() {
@@ -151,7 +160,7 @@ public class Feedback {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Feedback [id=%s, created=%s, rating=%s, text=%s, sentiment=%s]\n", 
-							 id, created.toString(), rating, text, sentiment);
+		return String.format("Feedback [id=%s, dashboardId=%s, created=%s, rating=%s, text=%s, sentiment=%s]\n", 
+							 id, dashboardId, created.toString(), rating, text, sentiment);
 	}
 }
