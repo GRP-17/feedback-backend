@@ -1,6 +1,5 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_END;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_START;
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
