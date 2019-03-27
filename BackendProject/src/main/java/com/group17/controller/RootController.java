@@ -55,7 +55,7 @@ public class RootController {
 			// Add 'feedback_common_phrases'
 			linkTo(methodOn(FeedbackController.class).getCommonPhrases())
 				.withRel("feedback_common_phrases"),
-		
+
 
 			// Add 'dashboard'
 			linkTo(methodOn(DashboardController.class).find(null))

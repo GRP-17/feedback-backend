@@ -6,11 +6,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -96,15 +98,23 @@ public class FeedbackController {
 										+ ". Object: " + resource.getContent().toString());
 		return resource;
 	}
-	
+
+	/**
+	 * a mapping for get requests
+	 * will return feedback paginated
+	 *
+	 * @param indexTo
+	 * @param indexFrom
+	 * @return the resource for the page given
+	 */
 	@GetMapping("/paged")
 	public Resources<Resource<Feedback>> getPaged(@PathVariable int indexTo,
 												  @PathVariable int indexFrom)
 	{
-		return new Resources<>(
-				// ADD List<Resource<Feedback>> here
-				// Add a getter for this in the feedbackService()
-				);
+		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(indexTo, indexFrom);
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + 25
+				+ "feedbacks on page" + indexFrom);
+		return new Resources<>(resource);
 	}
 
 	/**

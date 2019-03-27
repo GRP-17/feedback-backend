@@ -18,12 +18,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +39,7 @@ import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
 import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Defines the service that will handle sending the text to a IBM ToneAnalyser
@@ -50,6 +57,7 @@ public class FeedbackService {
 	/** holds the instance of the factory which will make the resources */
 	@Autowired
 	private FeedbackResourceAssembler feedbackAssembler;
+	@PersistenceContext EntityManager entityManager;
 
 	@Autowired
 	private WatsonGateway watsonGateway;
@@ -76,6 +84,36 @@ public class FeedbackService {
 		Feedback feedback = feedbackRepo.findById(id)
 				.orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 		return feedbackAssembler.toResource(feedback);
+	}
+
+	public List<Resource<Feedback>> getPagedFeedback(int indexTo, int indexFrom)
+	{
+		List<Resource<Feedback>> resources= new ArrayList<>();
+		int pageNumber = indexFrom;
+		int pageSize = 25;
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<Long> countQuery = criteriaBuilder
+				.createQuery(Long.class);
+		countQuery.select(criteriaBuilder
+				.count(countQuery.from(Feedback.class)));
+		Long count = entityManager.createQuery(countQuery)
+				.getSingleResult();
+
+		CriteriaQuery<Feedback> criteriaQuery = criteriaBuilder
+				.createQuery(Feedback.class);
+		Root<Feedback> from = criteriaQuery.from(Feedback.class);
+		CriteriaQuery<Feedback> select = criteriaQuery.select(from);
+
+		TypedQuery<Feedback> typedQuery = entityManager.createQuery(select);
+		while (pageNumber < count.intValue()) {
+			typedQuery.setFirstResult(pageNumber - 1);
+			typedQuery.setMaxResults(pageSize);
+			resources.add(pageNumber, (Resource<Feedback>) typedQuery.getResultList());
+			pageNumber += pageSize;
+		}
+
+		return resources;
 	}
 
 	/**
@@ -231,6 +269,10 @@ public class FeedbackService {
 	
 	public void setWatsonGateway(WatsonGateway gateway) {
 		this.watsonGateway = gateway;
+	}
+
+	public EntityManager getEntityManager(){
+		return entityManager;
 	}
 	
 }
