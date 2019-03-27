@@ -31,6 +31,10 @@ public class RootController {
 			linkTo(methodOn(FeedbackController.class).findAll())
 				.withRel("feedback"),
 				
+			// Add 'feedback_paged'
+			linkTo(methodOn(FeedbackController.class).getPaged(0, 0))
+				.withRel("feedback_paged"),
+				
 			// Add 'feedback_count'
 			linkTo(methodOn(FeedbackController.class).getCount())
 				.withRel("feedback_count"),
@@ -38,7 +42,6 @@ public class RootController {
 			// Add 'feedback_sentiment_count'
 			linkTo(methodOn(FeedbackController.class).getSentimentsCount())
 				.withRel("feedback_sentiment_count"),
-			
 
 			// Add 'feedback_rating_average'
 			linkTo(methodOn(FeedbackController.class).getAverageRating())

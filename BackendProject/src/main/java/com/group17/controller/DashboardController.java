@@ -1,6 +1,8 @@
 package com.group17.controller;
 
 import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_END;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_START;
 import static com.group17.util.Constants.DEFAULT_COMMON_PHRASES_AMOUNT;
 
 import java.util.ArrayList;
@@ -50,7 +52,8 @@ public class DashboardController {
 			
 			switch(element.toLowerCase()) {
 			case "feedback":
-				map.put(element, feedbackService.getAllFeedback());
+				map.put(element, feedbackService.getPagedFeedback(DASHBOARD_FEEDBACK_START,
+																  DASHBOARD_FEEDBACK_END));
 				break;
 			case "feedback_count":
 				map.put(element, feedbackService.getCount());

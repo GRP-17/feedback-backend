@@ -30,11 +30,6 @@ public class FeedbackControllerTest extends BaseTest {
 	private static List<String> feedbacksCreated = new ArrayList<String>();
 	
 	@Test
-	public void testACommonPhrases() throws Exception {
-		getMockMvc().perform(get("/commonphrases"));
-	}
-	
-	@Test
 	public void testBFindAllEndpoint() throws Exception {
 		// We only need to test for links, as there may not be any
 		// feedback (the list of resources) present, since if the
