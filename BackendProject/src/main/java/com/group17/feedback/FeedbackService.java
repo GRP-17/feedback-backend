@@ -30,11 +30,11 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.group17.exception.CommonException;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
-import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 
 /**
@@ -212,7 +212,7 @@ public class FeedbackService {
 		    		.getResultList();
 	}
 
-	public Map<String, Collection<TermVector>> getCommonPhrases(int dashboardId, int amount) {
+	public Map<String, Collection<TermVector>> getCommonPhrases(String dashboardId, int amount) {
 		LoggerUtil.log(Level.INFO, "Retrieving common phrases");
 
 		Set<String> ids = new HashSet<String>();

@@ -39,8 +39,8 @@ public class Feedback {
 	private String id;
 	
 	@NotNull(message = "Invalid dashboardId")
-	@Column(name = "dashboardId", columnDefinition = "INT(11)")
-	private int dashboardId;
+	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
+	private String dashboardId;
 	
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = false, columnDefinition = "TIMESTAMP")
@@ -91,7 +91,7 @@ public class Feedback {
 	 * @param rating the rating of the feedback
 	 * @param text the comment left with the feedback
 	 */
-	public Feedback(Integer dashboardId, Integer rating, String text) {
+	public Feedback(String dashboardId, Integer rating, String text) {
 		this.dashboardId = dashboardId;
 		this.rating = rating;
 		this.text = text;
@@ -106,7 +106,7 @@ public class Feedback {
 		return id;
 	}
 	
-	public Integer getDashboardId() {
+	public String getDashboardId() {
 		return dashboardId;
 	}
 	

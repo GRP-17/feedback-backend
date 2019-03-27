@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.dashboard.DashboardEndpoint;
+import com.group17.exception.CommonException;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
-import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 
 @CrossOrigin
@@ -37,7 +37,7 @@ public class DashboardController {
 	private NegativePerDayService negativePerDayService;
 
 	@GetMapping("{/dashboardId}")
-	public ResponseEntity<?> find(@PathVariable int dashboardId) {
+	public ResponseEntity<?> find(@PathVariable String dashboardId) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 

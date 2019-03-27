@@ -11,11 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -37,17 +32,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ValueConstants;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group17.exception.CommonException;
+import com.group17.exception.NoDashboardIdException;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
-import com.group17.util.CommonException;
 import com.group17.util.LoggerUtil;
 
 /**
@@ -69,38 +66,6 @@ public class FeedbackController {
 	private NegativePerDayService negativePerDayService;
 
 	/**
-	 * the default mapping for a get request to the feedback endpoint
-	 *
-	 * @return all feedback from the database, returned as resources
-	 */
-	@GetMapping()
-	public Resources<Resource<Feedback>> findAll(@RequestParam(value = "dashboardId")
-														int dashboardId) {
-		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
-		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size()
-										+ " resources in the repository");
-
-		return new Resources<>(
-				resources,
-				linkTo(methodOn(FeedbackController.class).findAll(dashboardId))
-					.withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).getCount(dashboardId))
-					.withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getPaged(-1, -1))
-					.withRel("paged"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId))
-					.withRel("sentiment_count"),
-				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId))
-					.withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId))
-					.withRel("rating_count"),
-				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId))
-					.withRel("rating_negative"),
-				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId))
-					.withRel("common_phrases"));
-	}
-
-	/**
 	 * a sub-mapping for get requests
 	 * will return a resource for one piece of feedback from the database
 	 *
@@ -115,25 +80,7 @@ public class FeedbackController {
 										+ ". Object: " + resource.getContent().toString());
 		return resource;
 	}
-
-	/**
-	 * a mapping for get requests
-	 * will return feedback paginated
-	 *
-	 * @param indexTo
-	 * @param indexFrom
-	 * @return the resource for the page given
-	 */
-	@GetMapping("/paged")
-	public Resources<Resource<Feedback>> getPaged(@PathVariable int indexTo,
-												  @PathVariable int indexFrom)
-	{
-		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(indexTo, indexFrom);
-		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + 25
-				+ "feedbacks on page" + indexFrom);
-		return new Resources<Resource<Feedback>>(resource);
-	}
-
+	
 	/**
 	 * default mapping for a post request to the feedback endpoint
 	 *
@@ -202,10 +149,74 @@ public class FeedbackController {
 
 		return ResponseEntity.noContent().build();
 	}
+	
+	/**
+	 * the default mapping for a get request to the feedback endpoint
+	 *
+	 * @return all feedback from the database, returned as resources
+	 */
+	@GetMapping()
+	public Resources<Resource<Feedback>> findAll(@RequestParam(value = "dashboardId", 
+															   required = false,
+															   defaultValue = ValueConstants.DEFAULT_NONE)
+													String dashboardId)
+								throws NoDashboardIdException {
+		
+		// They have gone to http://.../feedback/ rather than
+		// http://.../feedback?{feedbackId}
+		if(dashboardId == null || dashboardId.equals(ValueConstants.DEFAULT_NONE)) {
+			throw new NoDashboardIdException(NoDashboardIdException.Type.PARAMETER);
+		}
+		
+		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
+		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size()
+										+ " resources in the repository");
+
+		return new Resources<>(
+				resources,
+				linkTo(methodOn(FeedbackController.class).findAll(dashboardId))
+					.withSelfRel(),
+				linkTo(methodOn(FeedbackController.class).getCount(dashboardId))
+					.withRel("count"),
+				linkTo(methodOn(FeedbackController.class).getPaged(dashboardId, -1, -1))
+					.withRel("paged"),
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId))
+					.withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId))
+					.withRel("rating_average"),
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId))
+					.withRel("rating_count"),
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId))
+					.withRel("rating_negative"),
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId))
+					.withRel("common_phrases"));
+	}
+
+	/**
+	 * a mapping for get requests
+	 * will return feedback paginated
+	 *
+	 * @param indexTo
+	 * @param indexFrom
+	 * @return the resource for the page given
+	 */
+	@GetMapping("/paged")
+	public Resources<Resource<Feedback>> getPaged(@RequestParam(value = "dashboardId", 
+			   													required = true)
+												  		String dashboardId,
+												  @PathVariable int indexTo,
+												  @PathVariable int indexFrom)
+	{
+		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(indexTo, indexFrom);
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + 25
+				+ "feedbacks on page" + indexFrom);
+		return new Resources<Resource<Feedback>>(resource);
+	}
 
 	@GetMapping("/count")
-	public ResponseEntity<?> getCount(@RequestParam(value = "dashboardId")
-											int dashboardId) throws CommonException {
+	public ResponseEntity<?> getCount(@RequestParam(value = "dashboardId", 
+													required = true)
+											String dashboardId) throws CommonException {
 		long count = feedbackService.getCount();
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
@@ -221,8 +232,9 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/sentiments/count")
-	public ResponseEntity<?> getSentimentsCount(@RequestParam(value = "dashboardId")
-													int dashboardId) throws CommonException {
+	public ResponseEntity<?> getSentimentsCount(@RequestParam(value = "dashboardId", 
+															  required = true)
+													String dashboardId) throws CommonException {
 		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts();
 
 		try {
@@ -238,8 +250,9 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/rating/count")
-	public ResponseEntity<?> getStarRatingCount(@RequestParam(value = "dashboardId")
-													int dashboardId) throws CommonException {
+	public ResponseEntity<?> getStarRatingCount(@RequestParam(value = "dashboardId", 
+															  required = true)
+													String dashboardId) throws CommonException {
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts();
 
 		try {
@@ -255,8 +268,9 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/rating/average")
-	public ResponseEntity<?> getAverageRating(@RequestParam(value = "dashboardId")
-													int dashboardId) throws CommonException {
+	public ResponseEntity<?> getAverageRating(@RequestParam(value = "dashboardId", 
+															required = true)
+													String dashboardId) throws CommonException {
 		double average = feedbackService.getAverageRating(true);
 		Map<String, Double> map = new HashMap<String, Double>();
 		map.put("average", average);
@@ -273,8 +287,9 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/rating/negativeperday")
-	public ResponseEntity<?> getNegativePerDay(@RequestParam(value = "dashboardId")
-													int dashboardId) throws CommonException {
+	public ResponseEntity<?> getNegativePerDay(@RequestParam(value = "dashboardId", 
+															 required = true)
+													String dashboardId) throws CommonException {
 		Map<String, Object> map = negativePerDayService.findNegativePerDay();
 
 		LoggerUtil.log(Level.INFO,
@@ -289,8 +304,9 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/commonphrases")
-	public ResponseEntity<?> getCommonPhrases(@RequestParam(value = "dashboardId")
-													int dashboardId) throws CommonException {
+	public ResponseEntity<?> getCommonPhrases(@RequestParam(value = "dashboardId", 
+															required = true)
+													String dashboardId) throws CommonException {
 
 		Map<String, Collection<TermVector>> map
 						= feedbackService.getCommonPhrases(dashboardId,
@@ -313,11 +329,11 @@ public class FeedbackController {
 	 * @param ex the exception that was thrown
 	 * @return a response entity with the message and HTTP status code
 	 */
-	/* Error Handlers */
 	@ExceptionHandler(CommonException.class)
-	public ResponseEntity<String> exceptionHandler(CommonException ex) {
+	public ResponseEntity<String> exceptionHandlerCommon(CommonException ex) {
 		LoggerUtil.logException(ex);
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.valueOf(ex.getErrorCode()));
+		return new ResponseEntity<String>(ex.getMessage(), 
+										  HttpStatus.valueOf(ex.getErrorCode()));
 	}
 
 	@ExceptionHandler(JsonParseException.class)
@@ -326,7 +342,7 @@ public class FeedbackController {
 		return new ResponseEntity<String>("Unable to parse Feedback object",
 										  HttpStatus.BAD_REQUEST);
 	}
-
+	
 	/**
 	 * handles any TransactionSystemExceptions
 	 *

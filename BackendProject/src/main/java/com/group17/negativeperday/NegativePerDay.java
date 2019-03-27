@@ -19,8 +19,8 @@ public class NegativePerDay {
 	private String id;
 	
 	@NotNull(message = "Invalid dashboardId")
-	@Column(name = "dashboardId", columnDefinition = "INT(11)")
-	private int dashboardId;
+	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
+	private String dashboardId;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")

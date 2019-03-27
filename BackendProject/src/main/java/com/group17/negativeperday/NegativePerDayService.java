@@ -20,7 +20,7 @@ public class NegativePerDayService {
 			NegativePerDay existedNegativePerDay = negativePerDayRepository.getOne(date);
 
 			existedNegativePerDay.increaseVolume(increment);
-			NegativePerDay entity = negativePerDayRepository.save(existedNegativePerDay);
+			negativePerDayRepository.save(existedNegativePerDay);
 		} else {
 			// create
 			NegativePerDay negativePerDay = new NegativePerDay(date, 1);

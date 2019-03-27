@@ -1,4 +1,4 @@
-package com.group17.util;
+package com.group17.exception;
 
 /**
  * An exception which carries custom information needed in the handlers.

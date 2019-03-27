@@ -8,13 +8,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
 @Table(name = "dashboard", schema = "hy1xosk6o5taszzw")
 public class Dashboard {
 	@Id
-	@GeneratedValue
-	@Column(name = "id", columnDefinition = "INT(11)")
-	private int id;
+	@GeneratedValue(generator = "uuid2")
+	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "id", columnDefinition = "VARCHAR(36)")
+	private String id;
 
 	@NotNull(message = "Invalid Dashboard Name")
 	@Size(max = 65535)
@@ -28,7 +31,7 @@ public class Dashboard {
 		this.name = name;
 	}
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 	
