@@ -1,5 +1,8 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.DASHBOARD_DEFAULT_ENDPOINTS;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_END;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_START;
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 
 import java.util.HashMap;
@@ -28,7 +31,7 @@ import com.group17.util.LoggerUtil;
 @RestController
 @RequestMapping(value = "/dashboard", produces = "application/hal+json")
 public class DashboardController {
-	
+
 	@Autowired
 	private FeedbackService feedbackService;
 	@Autowired
@@ -36,15 +39,16 @@ public class DashboardController {
 
 	@GetMapping("{/dashboardId}")
 	public ResponseEntity<?> find(@PathVariable int dashboardId) {
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+
 		for(DashboardEndpoint endpoint : DashboardEndpoint.values()) {
 			String key = endpoint.getJsonKey();
-			
+
 			switch(endpoint) {
 			case FEEDBACK:
-				map.put(key, feedbackService.getAllFeedback());
+				map.put(key, feedbackService.getPagedFeedback(DASHBOARD_FEEDBACK_START,
+																  DASHBOARD_FEEDBACK_END));
 				break;
 			case FEEDBACK_COUNT:
 				map.put(key, feedbackService.getCount());
@@ -66,18 +70,18 @@ public class DashboardController {
 				break;
 			}
 		}
-		
+
 		// Return what has been found for debugging, etc.
 		LoggerUtil.log(Level.INFO, "[Root/Dashboard] Returned " + map.size() + " values");
-		
+
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize endpoints", 
+			throw new CommonException("Unable to serialize endpoints",
 									  HttpStatus.NO_CONTENT.value());
 		}
 	}
-	
+
 	/**
 	 * Handles any CommonExceptions thrown.
 	 *

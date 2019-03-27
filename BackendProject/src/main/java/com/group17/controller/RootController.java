@@ -31,6 +31,10 @@ public class RootController {
 			linkTo(methodOn(FeedbackController.class).findAll(-1))
 				.withRel("feedback"),
 				
+			// Add 'feedback_paged'
+			linkTo(methodOn(FeedbackController.class).getPaged(0, 0))
+				.withRel("feedback_paged"),
+				
 			// Add 'feedback_count'
 			linkTo(methodOn(FeedbackController.class).getCount(-1))
 				.withRel("feedback_count"),
@@ -38,7 +42,6 @@ public class RootController {
 			// Add 'feedback_sentiment_count'
 			linkTo(methodOn(FeedbackController.class).getSentimentsCount(-1))
 				.withRel("feedback_sentiment_count"),
-			
 
 			// Add 'feedback_rating_average'
 			linkTo(methodOn(FeedbackController.class).getAverageRating(-1))
@@ -55,7 +58,7 @@ public class RootController {
 			// Add 'feedback_common_phrases'
 			linkTo(methodOn(FeedbackController.class).getCommonPhrases(-1))
 				.withRel("feedback_common_phrases"),
-		
+
 
 			// Add 'dashboard' as self relation - the values don't matter
 			linkTo(methodOn(DashboardController.class).find(-1))

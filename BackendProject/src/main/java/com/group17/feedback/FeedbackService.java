@@ -19,11 +19,14 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -76,6 +79,22 @@ public class FeedbackService {
 		Feedback feedback = feedbackRepo.findById(id)
 				.orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 		return feedbackAssembler.toResource(feedback);
+	}
+
+	public List<Resource<Feedback>> getPagedFeedback(int indexFrom, int indexTo) {
+		EntityManager entityManager = getEntityManager(Feedback.class);
+		
+		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Feedback> cq = qb.createQuery(Feedback.class);
+		cq.from(Feedback.class);
+		
+		List<Feedback> feedback = entityManager
+									.createQuery(cq)
+									.setFirstResult(indexFrom)
+									.setMaxResults(indexTo - indexFrom)
+									.getResultList();
+
+		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
 	}
 
 	/**
@@ -232,5 +251,5 @@ public class FeedbackService {
 	public void setWatsonGateway(WatsonGateway gateway) {
 		this.watsonGateway = gateway;
 	}
-	
+
 }
