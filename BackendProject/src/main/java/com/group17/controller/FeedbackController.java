@@ -109,12 +109,12 @@ public class FeedbackController {
 	 * @return the resource for the page given
 	 */
 	@GetMapping("/paged")
-	public Resources<Resource<Feedback>> getPaged(@PathVariable int indexTo,
-												  @PathVariable int indexFrom)
+	public Resources<Resource<Feedback>> getPaged(@PathVariable int page,
+												  @PathVariable int pageSize)
 	{
-		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(indexTo, indexFrom);
-		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + 25
-				+ "feedbacks on page" + indexFrom);
+		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(page, pageSize);
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + pageSize
+				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(resource);
 	}
 

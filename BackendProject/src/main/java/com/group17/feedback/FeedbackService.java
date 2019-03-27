@@ -81,7 +81,7 @@ public class FeedbackService {
 		return feedbackAssembler.toResource(feedback);
 	}
 
-	public List<Resource<Feedback>> getPagedFeedback(int indexFrom, int indexTo) {
+	public List<Resource<Feedback>> getPagedFeedback(int page, int pageSize) {
 		EntityManager entityManager = getEntityManager(Feedback.class);
 		
 		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
@@ -90,8 +90,8 @@ public class FeedbackService {
 		
 		List<Feedback> feedback = entityManager
 									.createQuery(cq)
-									.setFirstResult(indexFrom)
-									.setMaxResults(indexTo - indexFrom)
+									.setFirstResult(page * pageSize)
+									.setMaxResults(pageSize)
 									.getResultList();
 
 		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
