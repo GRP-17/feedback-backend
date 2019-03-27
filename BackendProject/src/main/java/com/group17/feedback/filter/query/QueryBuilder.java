@@ -17,14 +17,12 @@ public abstract class QueryBuilder {
 	private Set<String> tables;
 	private Map<String, String> whereClauses;
 	
-	protected QueryBuilder(EntityManager entityManager, int dashboardId) {
+	protected QueryBuilder(EntityManager entityManager) {
 		this.entityManager = entityManager;
 		
 		this.selectClauses = new HashSet<String>();
 		this.tables = new HashSet<String>();
 		this.whereClauses = new HashMap<String, String>();
-		
-		addWhereClause("dashboardId", String.valueOf(dashboardId));
 	}
 	
 	public void applyFilter(Filter filter) {

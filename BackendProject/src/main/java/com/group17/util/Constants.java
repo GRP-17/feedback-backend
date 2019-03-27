@@ -17,8 +17,8 @@ public class Constants {
 	
 	public static final int COMMON_PHRASES_AMOUNT = 10;
 	
-	public static final int DASHBOARD_FEEDBACK_START = 0;
-	public static final int DASHBOARD_FEEDBACK_END = 24;
+	public static final int DASHBOARD_FEEDBACK_PAGE = 1;
+	public static final int DASHBOARD_FEEDBACK_PAGE_SIZE = 25;
 	
 	private Constants() {}
 

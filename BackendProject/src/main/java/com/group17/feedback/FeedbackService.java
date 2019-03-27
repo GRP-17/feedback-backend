@@ -35,6 +35,7 @@ import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
 import com.group17.tone.WatsonGateway;
+import com.group17.util.DateUtil;
 import com.group17.util.LoggerUtil;
 
 /**
@@ -201,9 +202,7 @@ public class FeedbackService {
 	}
 	
 	private Collection<?> getCommonPhrasesIds() {
-		Calendar cal = new GregorianCalendar();
-	    cal.add(Calendar.MONTH, -1);
-	    Date lastMonthDate = cal.getTime();   
+		Date lastMonthDate = DateUtil.getLastMonth();
 	    
 	    return getEntityManager(Feedback.class)
 		    		.createQuery(

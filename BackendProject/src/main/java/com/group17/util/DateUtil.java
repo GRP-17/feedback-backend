@@ -9,6 +9,8 @@ import java.util.GregorianCalendar;
  */
 public class DateUtil {
 	
+	private DateUtil() {}
+	
 	/**
 	 * Get the time at 00:00 (midnight) on any day.
 	 * 
@@ -35,4 +37,11 @@ public class DateUtil {
 	public static Date getTodayStart() {
 		return getDayStart(new Date());
 	}
+	
+	public static Date getLastMonth() {
+		Calendar cal = new GregorianCalendar();
+	    cal.add(Calendar.MONTH, -1);
+	    return cal.getTime(); 
+	}
+	
 }

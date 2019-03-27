@@ -1,7 +1,7 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_END;
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_START;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 
 import java.util.HashMap;
@@ -46,8 +46,8 @@ public class DashboardController {
 
 			switch(endpoint) {
 			case FEEDBACK:
-				map.put(key, feedbackService.getPagedFeedback(DASHBOARD_FEEDBACK_START,
-																  DASHBOARD_FEEDBACK_END));
+				map.put(key, feedbackService.getPagedFeedback(DASHBOARD_FEEDBACK_PAGE,
+																  DASHBOARD_FEEDBACK_PAGE_SIZE));
 				break;
 			case FEEDBACK_COUNT:
 				map.put(key, feedbackService.getCount());
