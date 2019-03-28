@@ -29,6 +29,7 @@ import com.group17.feedback.filter.query.FeedbackBuilder;
 import com.group17.feedback.filter.query.FeedbackIdsBuilder;
 import com.group17.feedback.filter.query.QueryBuilder;
 import com.group17.feedback.filter.query.RatingCountBuilder;
+import com.group17.feedback.filter.query.SentimentCountBuilder;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
@@ -155,7 +156,7 @@ public class FeedbackService {
 								.dashboard(dashboardId)
 								.sentiment(Sentiment.valueOf(sentiment.toUpperCase()))
 								.build();
-		QueryBuilder builder = new FeedbackBuilder(getFEntityManager(), filters);
+		QueryBuilder builder = new SentimentCountBuilder(getFEntityManager(), filters);
 		return ((Number) builder.build().getSingleResult()).longValue();
 	}
 

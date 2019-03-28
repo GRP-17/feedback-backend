@@ -39,19 +39,19 @@ public abstract class QueryBuilder {
 			
 			switch(entry.getKey()) {
 			case AGE:
-				buff.append("f.created > ?" + AGE_PARAMETER_INDEX);
+				buff.append("f.created>?" + AGE_PARAMETER_INDEX);
 				break;
 			case DASHBOARD:
 				DashboardFilter df = (DashboardFilter) entry.getValue();
-				buff.append("f.dashboardId = " + df.getDashboardId());
+				buff.append("f.dashboardId='" + df.getDashboardId() + "'");
 				break;
 			case SENTIMENT:
 				SentimentFilter sf = (SentimentFilter) entry.getValue();
-				buff.append("f.sentiment = " + sf.getSentiment());
+				buff.append("f.sentiment='" + sf.getSentiment().toString() + "'");
 				break;
 			case RATING:
 				RatingFilter rf = (RatingFilter) entry.getValue();
-				buff.append("f.rating = " + rf.getRating());
+				buff.append("f.rating=" + rf.getRating());
 				break;
 			case TEXT_CONTAINING:
 				TextFilter tf = (TextFilter) entry.getValue();

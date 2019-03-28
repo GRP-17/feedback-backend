@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
+import org.apache.logging.log4j.Level;
+
 import com.group17.feedback.filter.Filter;
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
@@ -14,9 +16,10 @@ import com.group17.feedback.filter.impl.DashboardFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
+import com.group17.util.LoggerUtil;
 
 public class NegativePerDayBuilder extends QueryBuilder {
-	private static final String BASE_QUERY = "SELECT n FROM Feedback f JOIN NegativePerDay n";
+	private static final String BASE_QUERY = "SELECT DISTINCT(n) FROM Feedback f, NegativePerDay n";
 
 	public NegativePerDayBuilder(EntityManager entityManager, Filters filters) {
 		super(entityManager, filters);
@@ -25,6 +28,9 @@ public class NegativePerDayBuilder extends QueryBuilder {
 	@Override
 	public Query build() {
 		String strQuery = BASE_QUERY.concat(buildWhereForNegativePerDay());
+		
+		LoggerUtil.log(Level.INFO, "Query: " + strQuery);
+		
 		Query query = getEntityManager().createQuery(strQuery);
 		
 		if(getFilters().hasFilter(FilterType.AGE)) {
@@ -51,21 +57,19 @@ public class NegativePerDayBuilder extends QueryBuilder {
 			
 			switch(entry.getKey()) {
 			case AGE:
-				buff.append("f.created > ?" + AGE_PARAMETER_INDEX);
-				buff.append(" AND n.date > ?" + AGE_PARAMETER_INDEX);
+				buff.append("n.date > ?" + AGE_PARAMETER_INDEX);
 				break;
 			case DASHBOARD:
 				DashboardFilter df = (DashboardFilter) entry.getValue();
-				buff.append("f.dashboardId = " + df.getDashboardId());
-				buff.append(" AND n.dashboardId = " + df.getDashboardId());
+				buff.append("n.dashboardId='" + df.getDashboardId() + "'");
 				break;
 			case SENTIMENT:
 				SentimentFilter sf = (SentimentFilter) entry.getValue();
-				buff.append("f.sentiment = " + sf.getSentiment());
+				buff.append("f.sentiment='" + sf.getSentiment() + "'");
 				break;
 			case RATING:
 				RatingFilter rf = (RatingFilter) entry.getValue();
-				buff.append("f.rating = " + rf.getRating());
+				buff.append("f.rating=" + rf.getRating());
 				break;
 			case TEXT_CONTAINING:
 				TextFilter tf = (TextFilter) entry.getValue();

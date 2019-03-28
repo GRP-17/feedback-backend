@@ -4,9 +4,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
+import org.apache.logging.log4j.Level;
+
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.impl.AgeFilter;
+import com.group17.util.LoggerUtil;
 
 public class FeedbackBuilder extends QueryBuilder {
 	private static final String BASE_QUERY = "SELECT f FROM Feedback f";
@@ -21,6 +24,7 @@ public class FeedbackBuilder extends QueryBuilder {
 		String strQuery = BASE_QUERY
 								.concat(buildWhereForFeedback())
 								.concat(ORDER_BY);
+		LoggerUtil.log(Level.INFO, "Query: " + strQuery);
 		Query query = getEntityManager().createQuery(strQuery);
 		
 		if(getFilters().hasFilter(FilterType.AGE)) {

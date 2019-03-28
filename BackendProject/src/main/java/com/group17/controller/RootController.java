@@ -84,6 +84,8 @@ public class RootController {
 		String ref = link.getHref();
 		if(ref.contains("{?")) {
 			return new Link(ref.substring(0, ref.indexOf('{')), link.getRel());
+		} else if(ref.contains("{/")) {
+			return new Link(ref.substring(0, ref.indexOf('{')), link.getRel());	
 		} else {
 			if(ref.contains("?")) {
 				return new Link(ref.substring(0, ref.indexOf('?')), link.getRel());
