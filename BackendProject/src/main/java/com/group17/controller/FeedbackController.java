@@ -57,13 +57,9 @@ public class FeedbackController {
 	/**
 	 * holds the instance of the FeedbackService
 	 */
-	@Autowired
-	private FeedbackService feedbackService;
-	@Autowired
-	private NGramService ngramService;
-
-	@Autowired
-	private NegativePerDayService negativePerDayService;
+	@Autowired private FeedbackService feedbackService;
+	@Autowired private NegativePerDayService negativePerDayService;
+	@Autowired private NGramService ngramService;
 
 	/**
 	 * a sub-mapping for get requests
@@ -168,11 +164,11 @@ public class FeedbackController {
 			throw new NoDashboardIdException(NoDashboardIdException.Type.PARAMETER);
 		}
 		
-		List<Resource<Feedback>> resources = feedbackService.getAllFeedback();
+		List<Resource<Feedback>> resources = feedbackService.getAllFeedback(dashboardId);
 		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size()
-										+ " resources in the repository");
+										+ " matching resources in the repository");
 
-		return new Resources<>(
+		return new Resources<Resource<Feedback>>(
 				resources,
 				linkTo(methodOn(FeedbackController.class).findAll(dashboardId))
 					.withSelfRel(),
@@ -201,10 +197,13 @@ public class FeedbackController {
 	 * @return the resource for the page given
 	 */
 	@GetMapping("/paged")
-	public Resources<Resource<Feedback>> getPaged(@PathVariable int page,
+	public Resources<Resource<Feedback>> getPaged(@RequestParam(value = "dashboardId", 
+																required = true)
+														String dashboardId,
+												  @PathVariable int page,
 												  @PathVariable int pageSize)
 	{
-		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(page, pageSize);
+		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(dashboardId, page, pageSize);
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + pageSize
 				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(resource);
@@ -214,7 +213,7 @@ public class FeedbackController {
 	public ResponseEntity<?> getCount(@RequestParam(value = "dashboardId", 
 													required = true)
 											String dashboardId) throws CommonException {
-		long count = feedbackService.getCount();
+		long count = feedbackService.getFeedbackCount(dashboardId);
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
 
@@ -232,7 +231,7 @@ public class FeedbackController {
 	public ResponseEntity<?> getSentimentsCount(@RequestParam(value = "dashboardId", 
 															  required = true)
 													String dashboardId) throws CommonException {
-		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts();
+		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts(dashboardId);
 
 		try {
 			String countsAsString = new ObjectMapper().writeValueAsString(counts);
@@ -250,7 +249,7 @@ public class FeedbackController {
 	public ResponseEntity<?> getStarRatingCount(@RequestParam(value = "dashboardId", 
 															  required = true)
 													String dashboardId) throws CommonException {
-		Map<Integer, Long> ratings = feedbackService.getRatingCounts();
+		Map<Integer, Long> ratings = feedbackService.getRatingCounts(dashboardId);
 
 		try {
 			String ratingsAsString = new ObjectMapper().writeValueAsString(ratings);
@@ -268,7 +267,7 @@ public class FeedbackController {
 	public ResponseEntity<?> getAverageRating(@RequestParam(value = "dashboardId", 
 															required = true)
 													String dashboardId) throws CommonException {
-		double average = feedbackService.getAverageRating(true);
+		double average = feedbackService.getAverageRating(dashboardId, true);
 		Map<String, Double> map = new HashMap<String, Double>();
 		map.put("average", average);
 
@@ -287,7 +286,7 @@ public class FeedbackController {
 	public ResponseEntity<?> getNegativePerDay(@RequestParam(value = "dashboardId", 
 															 required = true)
 													String dashboardId) throws CommonException {
-		Map<String, Object> map = negativePerDayService.findNegativePerDay();
+		Map<String, Object> map = negativePerDayService.findNegativePerDay(dashboardId);
 
 		LoggerUtil.log(Level.INFO,
 					"[Feedback/RatingNegativePerDay] Returned " + map.size() + " days");

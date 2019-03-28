@@ -5,32 +5,30 @@ import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TemporalType;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.group17.exception.CommonException;
+import com.group17.feedback.filter.Filters;
+import com.group17.feedback.filter.FiltersBuilder;
+import com.group17.feedback.filter.query.CountBuilder;
+import com.group17.feedback.filter.query.FeedbackBuilder;
+import com.group17.feedback.filter.query.FeedbackIdsBuilder;
+import com.group17.feedback.filter.query.QueryBuilder;
+import com.group17.feedback.filter.query.RatingCountBuilder;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
@@ -44,60 +42,15 @@ import com.group17.util.LoggerUtil;
  */
 @Service
 public class FeedbackService {
-	@Autowired
-    private JpaContext jpaContext;
-	/**
-	 * holds the instance of the FeedbackRepository which represents the database
-	 */
-	@Autowired
-	private FeedbackRepository feedbackRepo;
+	@Autowired private JpaContext jpaContext;
+	/** holds the instance of the FeedbackRepository which represents the database */
+	@Autowired private FeedbackRepository feedbackRepo;
 	/** holds the instance of the factory which will make the resources */
-	@Autowired
-	private FeedbackResourceAssembler feedbackAssembler;
+	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 
-	@Autowired
-	private WatsonGateway watsonGateway;
-	@Autowired
-	private NGramService phraseService;
-
-	/**
-	 * Get every {@link Resource} in the database.
-	 *
-	 * @return all of the entries
-	 */
-	public List<Resource<Feedback>> getAllFeedback() {
-		return feedbackRepo.findAll().stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
-	}
-
-	/**
-	 * Get a single {@link Resource} object.
-	 *
-	 * @param id the identifier of the requested entry
-	 * @return the entry
-	 * @throws CommonException if the id isn't valid (no entry with that given id)
-	 */
-	public Resource<Feedback> getFeedbackById(String id) throws CommonException {
-		Feedback feedback = feedbackRepo.findById(id)
-				.orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
-		return feedbackAssembler.toResource(feedback);
-	}
-
-	public List<Resource<Feedback>> getPagedFeedback(int page, int pageSize) {
-		EntityManager entityManager = getEntityManager(Feedback.class);
-		
-		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Feedback> cq = qb.createQuery(Feedback.class);
-		cq.from(Feedback.class);
-		
-		List<Feedback> feedback = entityManager
-									.createQuery(cq)
-									.setFirstResult(page * pageSize)
-									.setMaxResults(pageSize)
-									.getResultList();
-
-		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
-	}
-
+	@Autowired private WatsonGateway watsonGateway;
+	@Autowired private NGramService phraseService;
+	
 	/**
 	 * Save a {@link Feedback} entry to the database.
 	 *
@@ -145,6 +98,49 @@ public class FeedbackService {
 	}
 
 	/**
+	 * Get a single {@link Resource} object.
+	 *
+	 * @param id the identifier of the requested entry
+	 * @return the entry
+	 * @throws CommonException if the id isn't valid (no entry with that given id)
+	 */
+	public Resource<Feedback> getFeedbackById(String id) throws CommonException {
+		Feedback feedback = feedbackRepo.findById(id)
+				.orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
+		return feedbackAssembler.toResource(feedback);
+	}
+
+	/**
+	 * Get every {@link Resource} in the database.
+	 *
+	 * @return all of the entries
+	 */
+	public List<Resource<Feedback>> getAllFeedback(String dashboardId) {
+		Filters filters = FiltersBuilder
+								.newInstance()
+								.dashboard(dashboardId)
+								.build();
+		QueryBuilder builder = new FeedbackBuilder(getFEntityManager(), filters);
+		List<Feedback> feedback = builder.build().getResultList();
+		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
+	}
+	
+	public List<Resource<Feedback>> getPagedFeedback(String dashboardId, int page, int pageSize) {
+		int fromIndex = (page - 1) * pageSize;
+		int toIndex = page * pageSize;
+		return getAllFeedback(dashboardId).subList(fromIndex, toIndex);
+	}
+	
+	public long getFeedbackCount(String dashboardId) {
+		Filters filters = FiltersBuilder
+								.newInstance()
+								.dashboard(dashboardId)
+								.build();
+		QueryBuilder builder = new CountBuilder(getFEntityManager(), filters);
+		return ((Number) builder.build().getSingleResult()).longValue();
+	}
+
+	/**
 	 * Get the total appearances of a given {@link Sentiment} in the JPA
 	 * {@link Feedback} repository.
 	 * <p>
@@ -153,18 +149,25 @@ public class FeedbackService {
 	 * @param sentiment the sentiment search for
 	 * @return the total appearances
 	 */
-	public long getCountBySentiment(String sentiment) {
-		return feedbackRepo.countBySentiment(sentiment);
+	public long getCountBySentiment(String dashboardId, String sentiment) {
+		Filters filters = FiltersBuilder
+								.newInstance()
+								.dashboard(dashboardId)
+								.sentiment(Sentiment.valueOf(sentiment.toUpperCase()))
+								.build();
+		QueryBuilder builder = new FeedbackBuilder(getFEntityManager(), filters);
+		return ((Number) builder.build().getSingleResult()).longValue();
 	}
 
-	public Map<Sentiment, Long> getSentimentCounts() {
+	public Map<Sentiment, Long> getSentimentCounts(String dashboardId) {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
 		for (Sentiment sentiment : Sentiment.values()) {
-			counts.put(sentiment, getCountBySentiment(sentiment.toString()));
+			counts.put(sentiment, getCountBySentiment(dashboardId,
+													  sentiment.toString()));
 		}
 		return counts;
 	}
-
+	
 	/**
 	 * Get the total appearances of a given rating in the JPA {@link Feedback}
 	 * repository.
@@ -172,28 +175,36 @@ public class FeedbackService {
 	 * @param rating the rating being searched for
 	 * @return total appearances of given rating
 	 */
-	public long getCountByRating(int rating) {
-		return feedbackRepo.countByRating(rating);
+	public long getCountByRating(String dashboardId, int rating) {
+		Filters filters = FiltersBuilder
+								.newInstance()
+								.dashboard(dashboardId)
+								.rating(rating)
+								.build();
+		QueryBuilder builder = new RatingCountBuilder(getFEntityManager(), filters);
+		return ((Number) builder.build().getSingleResult()).longValue();
 	}
 
-	public Map<Integer, Long> getRatingCounts() {
+	public Map<Integer, Long> getRatingCounts(String dashboardId) {
 		// Key: the ratings [1..5], Value: The count of this rating
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			ratings.put(rating, getCountByRating(rating));
+			ratings.put(rating, getCountByRating(dashboardId, rating));
 		}
 		return ratings;
 	}
 
-	public double getAverageRating(boolean formatted) {
+	public double getAverageRating(String dashboardId, boolean formatted) {
 		long total = 0;
 		for (int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i++) {
-			total += feedbackRepo.countByRating(Integer.valueOf(i)) * i;
+			total += getCountByRating(dashboardId, i) * i;
 		}
 
 		// The unformatted average - it could have many trailing decimal values
-		double average = (double) total / (double) feedbackRepo.count();
+		double denominator = Math.max(1, (double) getFeedbackCount(dashboardId));
+		double average = (double) total / denominator;
+		LoggerUtil.log(Level.INFO, "Average after: " + average);
 		if (formatted) {
 			return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
 		}
@@ -201,23 +212,17 @@ public class FeedbackService {
 		return average;
 	}
 	
-	private Collection<?> getCommonPhrasesIds() {
-		Date lastMonthDate = DateUtil.getLastMonth();
-	    
-	    return getEntityManager(Feedback.class)
-		    		.createQuery(
-		    				"SELECT f.id from Feedback f WHERE f.created > ?1")
-		    		.setParameter(1, lastMonthDate, TemporalType.DATE)
-		    		.getResultList();
-	}
-
 	public Map<String, Collection<TermVector>> getCommonPhrases(String dashboardId, int amount) {
+		// Get the IDs of the Feedback we're going to send to Elasticsearch using queries
+		Filters filters = FiltersBuilder
+								.newInstance()
+								.dashboard(dashboardId)
+								.age(DateUtil.getLastMonth())
+								.build();
+		QueryBuilder idsBuilder = new FeedbackIdsBuilder(getFEntityManager(), filters);
+		List<String> ids = idsBuilder.build().getResultList();
+		
 		LoggerUtil.log(Level.INFO, "Retrieving common phrases");
-
-		Set<String> ids = new HashSet<String>();
-		for(Object id : getCommonPhrasesIds()) {
-			ids.add((String) id);
-		}
 		
 		Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
 		List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
@@ -235,14 +240,10 @@ public class FeedbackService {
 		return map;
 	}
 	
-	private EntityManager getEntityManager(Class<?> entityClazz) {
-		return jpaContext.getEntityManagerByManagedType(entityClazz);
+	private EntityManager getFEntityManager() {
+		return jpaContext.getEntityManagerByManagedType(Feedback.class);
 	}
-
-	public long getCount() {
-		return feedbackRepo.count();
-	}
-
+	
 	public WatsonGateway getWatsonGateway() {
 		return watsonGateway;
 	}

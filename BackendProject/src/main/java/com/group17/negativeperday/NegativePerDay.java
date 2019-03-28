@@ -46,6 +46,10 @@ public class NegativePerDay {
 	public Date getId() {
 		return date;
 	}
+	
+	public String getDashboardId() {
+		return dashboardId;
+	}
 
 	public Date getDate() {
 		return date;

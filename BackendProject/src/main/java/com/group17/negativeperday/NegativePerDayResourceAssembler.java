@@ -24,7 +24,9 @@ public class NegativePerDayResourceAssembler implements ResourceAssembler<Negati
 	public Resource<NegativePerDay> toResource(NegativePerDay negativePerDay) {
 		return new Resource<>(
 				negativePerDay,
-				linkTo(methodOn(NegativePerDayService.class).findNegativePerDay()).withRel("negative_per_day"));
+				linkTo(methodOn(NegativePerDayService.class)
+							.findNegativePerDay(negativePerDay.getDashboardId()))
+					.withRel("negative_per_day"));
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.group17.feedback.filter;
 
-public class Filter {
+public abstract class Filter {
 	private FilterType type;
 	
 	public Filter(FilterType type) {

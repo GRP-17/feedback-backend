@@ -1,6 +1,9 @@
-package com.group17.feedback.filter;
+package com.group17.feedback.filter.impl;
 
 import java.util.Date;
+
+import com.group17.feedback.filter.Filter;
+import com.group17.feedback.filter.FilterType;
 
 public class AgeFilter extends Filter {
 	private Date sinceWhen;

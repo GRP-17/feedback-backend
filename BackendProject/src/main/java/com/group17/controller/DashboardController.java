@@ -1,8 +1,8 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.group17.dashboard.DashboardEndpoint;
+import com.group17.dashboard.DashboardEndpointType;
+import com.group17.dashboard.DashboardService;
 import com.group17.exception.CommonException;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
@@ -30,39 +31,41 @@ import com.group17.util.LoggerUtil;
 @RestController
 @RequestMapping(value = "/dashboard", produces = "application/hal+json")
 public class DashboardController {
-
-	@Autowired
-	private FeedbackService feedbackService;
-	@Autowired
-	private NegativePerDayService negativePerDayService;
+	@Autowired private DashboardService dashboardService;
+	@Autowired private FeedbackService feedbackService;
+	@Autowired private NegativePerDayService negativePerDayService;
 
 	@GetMapping("{/dashboardId}")
 	public ResponseEntity<?> find(@PathVariable String dashboardId) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		for(DashboardEndpoint endpoint : DashboardEndpoint.values()) {
+		for(DashboardEndpointType endpoint : DashboardEndpointType.values()) {
 			String key = endpoint.getJsonKey();
 
 			switch(endpoint) {
+			case NAME:
+				map.put(key, dashboardService.getDashboardById(dashboardId).getName());
+				break;
 			case FEEDBACK:
-				map.put(key, feedbackService.getPagedFeedback(DASHBOARD_FEEDBACK_PAGE,
-																  DASHBOARD_FEEDBACK_PAGE_SIZE));
+				map.put(key, feedbackService.getPagedFeedback(dashboardId,
+															  DASHBOARD_FEEDBACK_PAGE,
+															  DASHBOARD_FEEDBACK_PAGE_SIZE));
 				break;
 			case FEEDBACK_COUNT:
-				map.put(key, feedbackService.getCount());
+				map.put(key, feedbackService.getFeedbackCount(dashboardId));
 				break;
 			case FEEDBACK_SENTIMENT_COUNT:
-				map.put(key, feedbackService.getSentimentCounts());
-				break;
-			case FEEDBACK_RATING_AVERAGE:
-				map.put(key, feedbackService.getAverageRating(true));
+				map.put(key, feedbackService.getSentimentCounts(dashboardId));
 				break;
 			case FEEDBACK_RATING_COUNT:
-				map.put(key, feedbackService.getRatingCounts());
+				map.put(key, feedbackService.getRatingCounts(dashboardId));
+				break;
+			case FEEDBACK_RATING_AVERAGE:
+				map.put(key, feedbackService.getAverageRating(dashboardId, true));
 				break;
 			case FEEDBACK_RATING_NEGATIVE:
-				map.put(key, negativePerDayService.findNegativePerDay());
+				map.put(key, negativePerDayService.findNegativePerDay(dashboardId));
 				break;
 			case FEEDBACK_COMMON_PHRASES:
 				map.put(key, feedbackService.getCommonPhrases(dashboardId, COMMON_PHRASES_AMOUNT));

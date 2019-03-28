@@ -8,19 +8,16 @@ import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.impl.AgeFilter;
 
-public class FeedbackBuilder extends QueryBuilder {
-	private static final String BASE_QUERY = "SELECT f FROM Feedback f";
-	private static final String ORDER_BY = " ORDER BY f.created DESC";
+public class CountBuilder extends QueryBuilder {
+	private static final String BASE_QUERY = "SELECT COUNT(f) FROM Feedback f";
 
-	public FeedbackBuilder(EntityManager entityManager, Filters filters) {
+	public CountBuilder(EntityManager entityManager, Filters filters) {
 		super(entityManager, filters);
 	}
 
 	@Override
 	public Query build() {
-		String strQuery = BASE_QUERY
-								.concat(buildWhereForFeedback())
-								.concat(ORDER_BY);
+		String strQuery = BASE_QUERY.concat(buildWhereForFeedback());
 		Query query = getEntityManager().createQuery(strQuery);
 		
 		if(getFilters().hasFilter(FilterType.AGE)) {
@@ -33,5 +30,5 @@ public class FeedbackBuilder extends QueryBuilder {
 		
 		return query;
 	}
-	
+
 }
