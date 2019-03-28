@@ -11,20 +11,20 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DashboardControllerTest extends BaseTest {
 	
-	@Test
-	public void testAFeedback() throws Exception {
-		getMockMvc()
-			.perform(get("/dashboard"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.feedback").isArray());
-	}
-	
-	@Test
-	public void testBAverageRating() throws Exception {
-		getMockMvc()
-			.perform(get("/dashboard"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.feedback_rating_average").exists());
-	}
+//	@Test
+//	public void testAFeedback() throws Exception {
+//		getMockMvc()
+//			.perform(get("/dashboard"))
+//			.andExpect(status().isOk())
+//			.andExpect(jsonPath("$.feedback").isArray());
+//	}
+//	
+//	@Test
+//	public void testBAverageRating() throws Exception {
+//		getMockMvc()
+//			.perform(get("/dashboard"))
+//			.andExpect(status().isOk())
+//			.andExpect(jsonPath("$.feedback_rating_average").exists());
+//	}
 	
 }
