@@ -14,6 +14,9 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+
+import static com.group17.util.LinkUtil.removeParameters;
+
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;

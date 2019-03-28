@@ -1,9 +1,9 @@
 package com.group17.controller;
 
+import static com.group17.util.LinkUtil.removeParameters;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,21 +78,6 @@ public class RootController {
 										.find(DASHBOARD_ID))
 								.withRel("dashboard")));
 		return rootResource;
-	}
-	
-	private Link removeParameters(Link link) {
-		String ref = link.getHref();
-		if(ref.contains("{?")) {
-			return new Link(ref.substring(0, ref.indexOf('{')), link.getRel());
-		} else if(ref.contains("{/")) {
-			return new Link(ref.substring(0, ref.indexOf('{')), link.getRel());	
-		} else {
-			if(ref.contains("?")) {
-				return new Link(ref.substring(0, ref.indexOf('?')), link.getRel());
-			} else {
-				return link;
-			}
-		}
 	}
 
 }
