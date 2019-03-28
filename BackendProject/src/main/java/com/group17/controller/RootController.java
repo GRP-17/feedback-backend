@@ -73,10 +73,15 @@ public class RootController {
 										.getCommonPhrases(DASHBOARD_ID))
 								.withRel("feedback_common_phrases")),
 
-			// Add 'dashboard' as self relation - the values don't matter
+			// Add 'dashboard_findall'
+			removeParameters(linkTo(methodOn(DashboardController.class)
+										.findAll())
+								.withRel("dashboard_findall")),
+
+			// Add 'dashboard_find'
 			removeParameters(linkTo(methodOn(DashboardController.class)
 										.find(DASHBOARD_ID))
-								.withRel("dashboard")));
+								.withRel("dashboard_find")));
 		return rootResource;
 	}
 
