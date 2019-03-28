@@ -25,7 +25,7 @@ import com.group17.tone.Sentiment;
  * defines the schema, of the table we want to map to, as a Java object
  */
 @Entity
-@Table(name = "feedback", schema = "dwzrs9bkzcbikv3g")
+@Table(name = "feedback", schema = "hy1xosk6o5taszzw")
 public class Feedback {
 	/**
 	 * The id of the feedback, auto generated using the UUID generator (below).

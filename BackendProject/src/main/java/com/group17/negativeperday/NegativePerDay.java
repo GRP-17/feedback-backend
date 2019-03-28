@@ -10,7 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.Date;
 
 @Entity
-@Table(name = "negative_per_day", schema = "dwzrs9bkzcbikv3g")
+@Table(name = "negative_per_day", schema = "hy1xosk6o5taszzw")
 public class NegativePerDay {
 	@Id
 	@GeneratedValue(generator = "uuid2")

@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "dashboard", schema = "dwzrs9bkzcbikv3g")
+@Table(name = "dashboard", schema = "hy1xosk6o5taszzw")
 public class Dashboard {
 	@Id
 	@GeneratedValue(generator = "uuid2")
