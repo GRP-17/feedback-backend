@@ -1,6 +1,8 @@
 package com.group17.controller;
 
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
+import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -37,8 +39,10 @@ import org.springframework.web.bind.annotation.ValueConstants;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group17.dashboard.DashboardService;
 import com.group17.exception.CommonException;
 import com.group17.exception.NoDashboardIdException;
+import com.group17.feedback.StatType;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
@@ -59,6 +63,7 @@ public class FeedbackController {
 	 */
 	@Autowired private FeedbackService feedbackService;
 	@Autowired private NegativePerDayService negativePerDayService;
+	@Autowired private DashboardService dashboardService;
 	@Autowired private NGramService ngramService;
 
 	/**
@@ -187,6 +192,57 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId))
 					.withRel("common_phrases"));
 	}
+	
+	@GetMapping("/stats")
+	public ResponseEntity<?> stats(@RequestParam(value = "dashboardId", 
+												required = true) 
+										String dashboardId) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		for(StatType endpoint : StatType.values()) {
+			String key = endpoint.getJsonKey();
+
+			switch(endpoint) {
+			case DASHBOARD_NAME:
+				map.put(key, dashboardService.getDashboardById(dashboardId).getName());
+				break;
+			case FEEDBACK_PAGED:
+				map.put(key, feedbackService.getPagedFeedback(dashboardId,
+															  DASHBOARD_FEEDBACK_PAGE,
+															  DASHBOARD_FEEDBACK_PAGE_SIZE));
+				break;
+			case FEEDBACK_COUNT:
+				map.put(key, feedbackService.getFeedbackCount(dashboardId));
+				break;
+			case FEEDBACK_SENTIMENT_COUNT:
+				map.put(key, feedbackService.getSentimentCounts(dashboardId));
+				break;
+			case FEEDBACK_RATING_COUNT:
+				map.put(key, feedbackService.getRatingCounts(dashboardId));
+				break;
+			case FEEDBACK_RATING_AVERAGE:
+				map.put(key, feedbackService.getAverageRating(dashboardId, true));
+				break;
+			case FEEDBACK_RATING_NEGATIVE:
+				map.put(key, negativePerDayService.findNegativePerDay(dashboardId));
+				break;
+			case FEEDBACK_COMMON_PHRASES:
+				map.put(key, feedbackService.getCommonPhrases(dashboardId, COMMON_PHRASES_AMOUNT));
+				break;
+			}
+		}
+
+		// Return what has been found for debugging, etc.
+		LoggerUtil.log(Level.INFO, "[Root/Dashboard] Returned " + map.size() + " values");
+
+		try {
+			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			throw new CommonException("Unable to serialize endpoints",
+									  HttpStatus.NO_CONTENT.value());
+		}
+	}
 
 	/**
 	 * a mapping for get requests
@@ -200,8 +256,8 @@ public class FeedbackController {
 	public Resources<Resource<Feedback>> getPaged(@RequestParam(value = "dashboardId", 
 																required = true)
 														String dashboardId,
-												  @PathVariable int page,
-												  @PathVariable int pageSize)
+												  @RequestParam int page,
+												  @RequestParam int pageSize)
 	{
 		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(dashboardId, page, pageSize);
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + pageSize

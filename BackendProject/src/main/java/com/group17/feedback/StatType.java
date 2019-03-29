@@ -1,8 +1,8 @@
-package com.group17.dashboard;
+package com.group17.feedback;
 
-public enum DashboardEndpointType {
-	NAME("name"),
-	FEEDBACK("feedback"),
+public enum StatType {
+	DASHBOARD_NAME("dashboard_name"),
+	FEEDBACK_PAGED("feedback_paged"),
 	FEEDBACK_COUNT("feedback_count"),
 	FEEDBACK_RATING_AVERAGE("feedback_rating_average"),
 	FEEDBACK_RATING_COUNT("feedback_rating_count"),
@@ -12,7 +12,7 @@ public enum DashboardEndpointType {
 	
 	private String jsonKey;
 	
-	private DashboardEndpointType(String jsonKey) {
+	private StatType(String jsonKey) {
 		this.jsonKey = jsonKey;
 	}
 	

@@ -127,9 +127,18 @@ public class FeedbackService {
 	}
 	
 	public List<Resource<Feedback>> getPagedFeedback(String dashboardId, int page, int pageSize) {
+		if(page < 0) return new ArrayList<Resource<Feedback>>();
+		
 		int fromIndex = (page - 1) * pageSize;
 		int toIndex = page * pageSize;
-		return getAllFeedback(dashboardId).subList(fromIndex, toIndex);
+		
+		List<Resource<Feedback>> feedback = getAllFeedback(dashboardId);
+		if(feedback.isEmpty()) return feedback;
+		if(fromIndex >= feedback.size()) return new ArrayList<Resource<Feedback>>();
+		
+		toIndex = Math.min(feedback.size() - 1, toIndex);
+		
+		return feedback.subList(fromIndex, toIndex);
 	}
 	
 	public long getFeedbackCount(String dashboardId) {

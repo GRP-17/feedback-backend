@@ -37,6 +37,10 @@ public class RootController {
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.findAll(DASHBOARD_ID))
 								.withRel("feedback")),
+			
+			removeParameters(linkTo(methodOn(FeedbackController.class)
+										.stats(DASHBOARD_ID))
+								.withRel("feedback_stats")),
 				
 			// Add 'feedback_paged'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
@@ -74,14 +78,9 @@ public class RootController {
 								.withRel("feedback_common_phrases")),
 
 			// Add 'dashboard_findall'
-			removeParameters(linkTo(methodOn(DashboardController.class)
+			removeParameters(linkTo(methodOn(DashboardsController.class)
 										.findAll())
-								.withRel("dashboard_findall")),
-
-			// Add 'dashboard_find'
-			removeParameters(linkTo(methodOn(DashboardController.class)
-										.find(DASHBOARD_ID))
-								.withRel("dashboard_find")));
+								.withRel("dashboards")));
 		return rootResource;
 	}
 

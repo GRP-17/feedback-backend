@@ -1,16 +1,11 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
-import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,23 +25,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.dashboard.Dashboard;
-import com.group17.dashboard.DashboardEndpointType;
 import com.group17.dashboard.DashboardService;
 import com.group17.exception.CommonException;
-import com.group17.feedback.FeedbackService;
-import com.group17.negativeperday.NegativePerDayService;
 import com.group17.util.LoggerUtil;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/dashboard", produces = "application/hal+json")
-public class DashboardController {
+@RequestMapping(value = "/dashboards", produces = "application/hal+json")
+public class DashboardsController {
 	@Autowired private DashboardService dashboardService;
-	@Autowired private FeedbackService feedbackService;
-	@Autowired private NegativePerDayService negativePerDayService;
 
 	@GetMapping()
 	public Resources<Resource<Dashboard>> findAll() throws CommonException {
@@ -55,10 +43,8 @@ public class DashboardController {
 										+ resources.size() + " dashboards");
 		return new Resources<Resource<Dashboard>>(
 				resources,
-				linkTo(methodOn(DashboardController.class).findAll())
-					.withSelfRel(),
-				linkTo(methodOn(DashboardController.class).find(null))
-					.withRel("find"));
+				linkTo(methodOn(DashboardsController.class).findAll())
+					.withSelfRel());
 	}
 	
 	@PostMapping(headers = "Accept=application/json")
@@ -92,55 +78,6 @@ public class DashboardController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("{/dashboardId}")
-	public ResponseEntity<?> find(@PathVariable String dashboardId) {
-
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		for(DashboardEndpointType endpoint : DashboardEndpointType.values()) {
-			String key = endpoint.getJsonKey();
-
-			switch(endpoint) {
-			case NAME:
-				map.put(key, dashboardService.getDashboardById(dashboardId).getName());
-				break;
-			case FEEDBACK:
-				map.put(key, feedbackService.getPagedFeedback(dashboardId,
-															  DASHBOARD_FEEDBACK_PAGE,
-															  DASHBOARD_FEEDBACK_PAGE_SIZE));
-				break;
-			case FEEDBACK_COUNT:
-				map.put(key, feedbackService.getFeedbackCount(dashboardId));
-				break;
-			case FEEDBACK_SENTIMENT_COUNT:
-				map.put(key, feedbackService.getSentimentCounts(dashboardId));
-				break;
-			case FEEDBACK_RATING_COUNT:
-				map.put(key, feedbackService.getRatingCounts(dashboardId));
-				break;
-			case FEEDBACK_RATING_AVERAGE:
-				map.put(key, feedbackService.getAverageRating(dashboardId, true));
-				break;
-			case FEEDBACK_RATING_NEGATIVE:
-				map.put(key, negativePerDayService.findNegativePerDay(dashboardId));
-				break;
-			case FEEDBACK_COMMON_PHRASES:
-				map.put(key, feedbackService.getCommonPhrases(dashboardId, COMMON_PHRASES_AMOUNT));
-				break;
-			}
-		}
-
-		// Return what has been found for debugging, etc.
-		LoggerUtil.log(Level.INFO, "[Root/Dashboard] Returned " + map.size() + " values");
-
-		try {
-			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
-		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize endpoints",
-									  HttpStatus.NO_CONTENT.value());
-		}
-	}
-
 	/**
 	 * Handles any CommonExceptions thrown.
 	 *
