@@ -248,8 +248,8 @@ public class FeedbackController {
 	 * a mapping for get requests
 	 * will return feedback paginated
 	 *
-	 * @param indexTo
-	 * @param indexFrom
+	 * @param page
+	 * @param pageSize
 	 * @return the resource for the page given
 	 */
 	@GetMapping("/paged")
