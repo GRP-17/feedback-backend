@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,7 @@ import org.springframework.stereotype.Service;
 import com.group17.exception.CommonException;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.FiltersBuilder;
-import com.group17.feedback.filter.query.CountBuilder;
-import com.group17.feedback.filter.query.FeedbackBuilder;
-import com.group17.feedback.filter.query.FeedbackIdsBuilder;
-import com.group17.feedback.filter.query.QueryBuilder;
-import com.group17.feedback.filter.query.RatingCountBuilder;
-import com.group17.feedback.filter.query.SentimentCountBuilder;
+import com.group17.feedback.filter.query.Queries;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.tone.Sentiment;
@@ -116,38 +112,32 @@ public class FeedbackService {
 	 *
 	 * @return all of the entries
 	 */
-	public List<Resource<Feedback>> getAllFeedback(String dashboardId) {
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.build();
-		QueryBuilder builder = new FeedbackBuilder(getFEntityManager(), filters);
-		List<Feedback> feedback = builder.build().getResultList();
+	public List<Resource<Feedback>> getAllFeedback(Filters filters) {
+		Query query = Queries.FEEDBACK.build(getFEntityManager(), filters);
+		List<Feedback> feedback = query.getResultList();
 		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
 	}
 	
-	public List<Resource<Feedback>> getPagedFeedback(String dashboardId, int page, int pageSize) {
+	public List<Resource<Feedback>> getPagedFeedback(Filters filters, int page, int pageSize) {
 		if(page < 0) return new ArrayList<Resource<Feedback>>();
 		
 		int fromIndex = (page - 1) * pageSize;
 		int toIndex = page * pageSize;
 		
-		List<Resource<Feedback>> feedback = getAllFeedback(dashboardId);
+		List<Resource<Feedback>> feedback = getAllFeedback(filters);
 		if(feedback.isEmpty()) return feedback;
 		if(fromIndex >= feedback.size()) return new ArrayList<Resource<Feedback>>();
 		
 		toIndex = Math.min(feedback.size() - 1, toIndex);
 		
+		LoggerUtil.log(Level.INFO, "Getting paged feedback [" + fromIndex + ", " + toIndex + "]");
+		
 		return feedback.subList(fromIndex, toIndex);
 	}
 	
-	public long getFeedbackCount(String dashboardId) {
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.build();
-		QueryBuilder builder = new CountBuilder(getFEntityManager(), filters);
-		return ((Number) builder.build().getSingleResult()).longValue();
+	public long getFeedbackCount(Filters filters) {
+		Query query = Queries.COUNT.build(getFEntityManager(), filters);
+		return ((Number) query.getSingleResult()).longValue();
 	}
 
 	/**
@@ -159,21 +149,26 @@ public class FeedbackService {
 	 * @param sentiment the sentiment search for
 	 * @return the total appearances
 	 */
-	public long getCountBySentiment(String dashboardId, String sentiment) {
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.sentiment(Sentiment.valueOf(sentiment.toUpperCase()))
-								.build();
-		QueryBuilder builder = new SentimentCountBuilder(getFEntityManager(), filters);
-		return ((Number) builder.build().getSingleResult()).longValue();
+	private long getCountBySentiment(Filters filters, Sentiment sentiment) {
+		// We'll create a new Filters and set the sentiment, before merging
+		// it into the pre-existing filters.
+		// 
+		// This is because we want it so if they filter by Sentiment, it'll
+		// only show the count for this Sentiment
+		filters = filters.merge(FiltersBuilder
+									.newInstance()
+									.sentiment(sentiment)
+									.build(),
+								 false);
+		
+		Query query = Queries.SENTIMENT_COUNT.build(getFEntityManager(), filters);
+		return ((Number) query.getSingleResult()).longValue();
 	}
 
-	public Map<Sentiment, Long> getSentimentCounts(String dashboardId) {
+	public Map<Sentiment, Long> getSentimentCounts(Filters filters) {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
 		for (Sentiment sentiment : Sentiment.values()) {
-			counts.put(sentiment, getCountBySentiment(dashboardId,
-													  sentiment.toString()));
+			counts.put(sentiment, getCountBySentiment(filters, sentiment));
 		}
 		return counts;
 	}
@@ -185,36 +180,40 @@ public class FeedbackService {
 	 * @param rating the rating being searched for
 	 * @return total appearances of given rating
 	 */
-	public long getCountByRating(String dashboardId, int rating) {
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.rating(rating)
-								.build();
-		QueryBuilder builder = new RatingCountBuilder(getFEntityManager(), filters);
-		return ((Number) builder.build().getSingleResult()).longValue();
+	private long getCountByRating(Filters filters, int rating) {
+		// Add the rating filters to the current specified filters,
+		// that way we filter based on rating as well as the specified
+		// rating
+		filters = filters.merge(FiltersBuilder
+									.newInstance()
+									.rating(rating)
+									.build(),
+								false);
+		
+		Query query = Queries.RATING_COUNT.build(getFEntityManager(), filters);
+		return ((Number) query.getSingleResult()).longValue();
 	}
 
-	public Map<Integer, Long> getRatingCounts(String dashboardId) {
-		// Key: the ratings [1..5], Value: The count of this rating
+	public Map<Integer, Long> getRatingCounts(Filters filters) {
+		// Key: the ratings [1..5]
+		// Value: the count of this rating (based on filters)
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			ratings.put(rating, getCountByRating(dashboardId, rating));
+			ratings.put(rating, getCountByRating(filters, rating));
 		}
 		return ratings;
 	}
 
-	public double getAverageRating(String dashboardId, boolean formatted) {
+	public double getAverageRating(Filters filters, boolean formatted) {
 		long total = 0;
 		for (int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i++) {
-			total += getCountByRating(dashboardId, i) * i;
+			total += getCountByRating(filters, i) * i;
 		}
 
 		// The unformatted average - it could have many trailing decimal values
-		double denominator = Math.max(1, (double) getFeedbackCount(dashboardId));
+		double denominator = Math.max(1, (double) getFeedbackCount(filters));
 		double average = (double) total / denominator;
-		LoggerUtil.log(Level.INFO, "Average after: " + average);
 		if (formatted) {
 			return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
 		}
@@ -222,31 +221,41 @@ public class FeedbackService {
 		return average;
 	}
 	
-	public Map<String, Collection<TermVector>> getCommonPhrases(String dashboardId, int amount) {
-		// Get the IDs of the Feedback we're going to send to Elasticsearch using queries
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.age(DateUtil.getLastMonth())
-								.build();
-		QueryBuilder idsBuilder = new FeedbackIdsBuilder(getFEntityManager(), filters);
-		List<String> ids = idsBuilder.build().getResultList();
-		
-		LoggerUtil.log(Level.INFO, "Retrieving common phrases");
-		
-		Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-		List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
-		Collections.sort(sortedPhrases);
+	public Map<String, Collection<TermVector>> getCommonPhrases(Filters filters, int amount) {
+		// Add a filter based on the last month, however if they specify a date to find
+		// it by already, then we won't merge
+		filters = filters.merge(FiltersBuilder
+									.newInstance()
+									.age(DateUtil.getLastMonth())
+									.build(),
+								false);
 
-		List<TermVector> toReturn = new ArrayList<TermVector>();
-		for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
-			TermVector vec = sortedPhrases.get(i);
-			vec.getTerm().replace("  ", " "); // Remove any double spacing
-			toReturn.add(vec);
+		// Get the IDs of the Feedback we're going to send to Elasticsearch using queries
+		Query query = Queries.FEEDBACK_IDS.build(getFEntityManager(), filters);
+		List<String> ids = new ArrayList<String>();
+		for(Object obj : query.getResultList()) {
+			ids.add((String) obj);
+		}
+		
+		for(String id : ids) {
+			LoggerUtil.log(Level.INFO, id);
 		}
 		
 		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
+		List<TermVector> toReturn = new ArrayList<TermVector>();
 		map.put("result", toReturn);
+		
+		if(!ids.isEmpty()) {
+			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
+			List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
+			Collections.sort(sortedPhrases);
+
+			for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
+				TermVector vec = sortedPhrases.get(i);
+				vec.getTerm().replace("  ", " "); // Remove any double spacing
+				toReturn.add(vec);
+			}
+		}
 		return map;
 	}
 	

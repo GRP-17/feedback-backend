@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 public class RootController {
-	/**
-	 * A dummy dashboardId that will be trimmed from the links given
-	 * to the frontend.
-	 */
+	/** A dummy dashboardId to be trimmed from the links. */
 	private static final String DASHBOARD_ID = null;
+	/** A dummy query to be trimmed from the links. */
+	private static final String DASHBOARD_QUERY = null;
+	/** A dummy timestamp to be trimmed from the links. */
+	private static final long DASHBOARD_SINCE = Long.MAX_VALUE;
+	/** A dummy sentiment to be trimmed from the links. */
+	private static final String DASHBOARD_SENTIMENT = null;
 
 	/**
 	 * There's only one endpoint, so it will one return the feedback endpoint.
@@ -35,46 +38,55 @@ public class RootController {
 		rootResource.add(
 			// Add 'feedback'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.findAll(DASHBOARD_ID))
+										.findAll(DASHBOARD_ID, DASHBOARD_QUERY, 
+												 DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback")),
 			
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.stats(DASHBOARD_ID))
+										.stats(DASHBOARD_ID, DASHBOARD_QUERY, 
+											   DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_stats")),
 				
 			// Add 'feedback_paged'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getPaged(DASHBOARD_ID, 0, 0))
+										.getPaged(DASHBOARD_ID, 0, 0, DASHBOARD_QUERY, 
+												  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_paged")),
 				
 			// Add 'feedback_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getCount(DASHBOARD_ID))
+										.getCount(DASHBOARD_ID, DASHBOARD_QUERY, 
+												  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_count")),
 			
 			// Add 'feedback_sentiment_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getSentimentsCount(DASHBOARD_ID))
+										.getSentimentsCount(DASHBOARD_ID, DASHBOARD_QUERY, 
+												   			DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_sentiment_count")),
 
 			// Add 'feedback_rating_average'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getAverageRating(DASHBOARD_ID))
+										.getAverageRating(DASHBOARD_ID, DASHBOARD_QUERY, 
+												   		  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_rating_average")),
 				
 			// Add 'feedback_rating_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getStarRatingCount(DASHBOARD_ID))
+										.getStarRatingCount(DASHBOARD_ID, DASHBOARD_QUERY, 
+												   			DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_rating_count")),
 				
 			// Add 'feedback_rating_negative'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getNegativePerDay(DASHBOARD_ID))
+										.getNegativePerDay(DASHBOARD_ID, DASHBOARD_QUERY, 
+												   		   DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_rating_negative")),
 				
 			// Add 'feedback_common_phrases'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getCommonPhrases(DASHBOARD_ID))
+										.getCommonPhrases(DASHBOARD_ID, DASHBOARD_QUERY, 
+												   		 DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_common_phrases")),
 
 			// Add 'dashboard_findall'
