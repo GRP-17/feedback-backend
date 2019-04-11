@@ -15,6 +15,7 @@ public class WatsonGateway {
 	/** The ToneAnalyzer stores the IBM constants and provides endpoint calls. */
     private static ToneAnalyzer toneAnalyzer;
     
+    /** The api key, version and url to use. */
     private String key, version, url;
     
     /**
@@ -30,10 +31,22 @@ public class WatsonGateway {
     	this.url = url;
     }
     
+    /**
+     * Get the analysed {@link Sentiment} for any String.
+     * 
+     * @param text the String to analyse
+     * @return the deduced Sentiment
+     */
     public Sentiment getSentimentByText(String text) {
     	return Sentiment.getByToneAnalysis(analyze(text));
     }
     
+    /**
+     * Analyse the text within a {@link Feedback} object, and set the
+     * {@link Sentiment} within the object.
+     * 
+     * @param feedback the {@link Feedback} to process
+     */
     public void deduceAndSetSentiment(Feedback feedback) { 
     	String text = feedback.getText();
 		// Calculate the sentiment

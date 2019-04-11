@@ -1,3 +1,4 @@
+
 package com.group17.ngram;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class SearchboxGateway {
 	private static final String POST_URL 
 				= "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors";
 	
-	public boolean put(String id, String text) {
+	protected boolean put(String id, String text) {
 		try {
 			delete(id); // Ensure there's no duplicates
 			
@@ -61,7 +62,7 @@ public class SearchboxGateway {
 		}
 	}
 	
-	public boolean delete(String id) {
+	protected boolean delete(String id) {
 		try {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
@@ -77,8 +78,8 @@ public class SearchboxGateway {
 		}
 	}
 	
-	public Map<String, TermVector> getMTermVectors(Collection<String> ids, 
-												   ArrayList<String> fields) {
+	protected Map<String, TermVector> getMTermVectors(Collection<String> ids, 
+												  	  ArrayList<String> fields) {
 		try {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
