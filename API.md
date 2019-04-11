@@ -35,84 +35,108 @@
 ```
 
 
-## Dashboard Controller
-`/dashboard`
+## Find All Dashboards
+`/dashboards`
 
-* Usage: construct a dashboard to display feedbacks and their attributes
+* Usage: List all dashboards
 * Method: Get
-* Request fields:
+* Response body:
 
-Parameter|Data Type|Default|Required|Description
-:-:|:-:|:-:|:-:|:-:
-endpoint|String[]|feedback,feedback_count,feedback_rating_average,feedback_rating_count,feedback_sentiment_count,feedback_rating_negative,feedback_common_phrases|False|endpoints displayed in the dashboard
+```
+{
+    "dashboardList":[  
+         {  
+            "id":"d8dbc176-8ba0-41a7-a777-3734af30f8ca",
+            "name":"MobileAppDashboard"
+         },
+         {  
+            "id":"e99f1a5e-5666-4f35-a08b-190aeeb2d0db",
+            "name":"AppDashboard"
+         }
+      ]
+}
+```
+
+
+## Create A Dashboard
+`/dashboards/`
+
+* Usage: create a dashboard
+* Method: Post
+* Request body:
+
+```
+{
+    "id":"...",
+    "name":"..."
+}
+```
 
 * Response body:
 
 ```
 {
-    "feedback":Array[24],
-    "feedback_rating_average":4.5,
-    "feedback_rating_negative":Object{...},
-    "endpoints_found":Array[7],
-    "endpoints_not_found":Array[0],
-    "feedback_common_phrases":Object{...},
-    "feedback_rating_count":Object{...},
-    "feedback_sentiment_count":Object{...},
-    "feedback_count":24
+    "Created": {
+      "href": "https://feedback-analysis-grp-app.herokuapp.com/dashboards/e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
+    }
 }
 ```
 
 * Possible error:
-   * Code 204, unable to serialize endpoints
+   * Code 400, the reference to store the dashboard could not be found
+   * Code 412, the body of the request is not as expected
 
 
-## Find All Feedbacks
-`/feedback/`
+## Update A Dashboard
+`/dashboards/{dashboardId}`
 
-* Usage: list all feedbacks
-* Method: Get
+* Usage: update a dashboard
+* Method: Put
+* URL parameter: 
+
+Parameter|Data Type|Default|Required|Description
+:-:|:-:|:-:|:-:|:-:
+dashboardId|String| |True|the id of the dashboard to update
+
+* Request body:
+
+{
+    "id":"...",
+    "name":"..."
+}
+
 * Response body:
 
 ```
 {
-    "feedbackList":[
-	{
-      "id":"26fabd71-942e-4eda-8d25-e79c487c9259",
-  	  "created":"2019-03-13T18:47:41.000+0000",
-  	  "rating":4,
-  	  "text":"Great app , can make instant payments , and see clearly the transactions. Down side takes 2 days for payment to show you have made and pending transactions are showing same time as though payment has left from account. Always using and checking the app.",
- 	    "sentiment":"NEUTRAL",
- 	    "stars":"****",
- 	    "sentimentEnum":"NEUTRAL",
-	    "_links":{
- 	       "self":{
-          	  "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback/26fabd71-942e-4eda-8d25-e79c487c9259"
-  	     },
-  	       "feedback":{
-        	    "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback"
-     	     }
-      }
-  }，
-	{
-      "id":"293d7e01-4b80-4434-b73d-c3935367304a",
-      "created":"2019-03-13T18:48:28.000+0000",
-      "rating":1,
-      "text":"Pants!!! won't let me create an account as saying some details are wrong when they are not. Very poor!!!!!",
-      "sentiment":"NEUTRAL",
-      "stars":"*",
-      "sentimentEnum":"NEUTRAL",
-      "_links":{
-         "self":{
-              "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback/293d7e01-4b80-4434-b73d-c3935367304a"
-         },
-           "feedback":{
-              "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback"
-           }
-      }
-  }
-    ]
+      "href": "https://feedback-analysis-grp-app.herokuapp.com/dashboards/e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
 }
 ```
+
+* Possible error:
+   * Code 400, the reference to store the new dashboard could not be found
+   * Code 412, the body of the request is not as expected
+
+
+## Delete A Dashboard
+`/dashboards/{dashboardId}`
+
+* Usage: delete a dashboard
+* Method: Delete
+* URL parameter:
+
+Parameter|Data Type|Default|Required|Description
+:-:|:-:|:-:|:-:|:-:
+id|String| |True|the id of the dashboard to delete
+
+* Response body:
+
+```
+{}
+```
+
+* Possible error:
+   * Code 404, could not find the dashboard of the id
 
 
 ## Find A Feedback
@@ -120,29 +144,30 @@ endpoint|String[]|feedback,feedback_count,feedback_rating_average,feedback_ratin
 
 * Usage: find a particular piece of feedback
 * Method: Get
-* Request fields:
+* URL parameter:
 
 Parameter|Data Type|Default|Required|Description
 :-:|:-:|:-:|:-:|:-:
-id|String| |True|the id of the feedback needed
+id|String| |True|the id of the feedback
 
 * Response body:
 
 ```
 {
-    "id":"26fabd71-942e-4eda-8d25-e79c487c9259",
-    "created":"2019-03-13T18:47:41.000+0000",
-    "rating":4,
-    "text":"Great app , can make instant payments , and see clearly the transactions. Down side takes 2 days for payment to show you have made and pending transactions are showing same time as though payment has left from account. Always using and checking the app.",
-    "sentiment":"NEUTRAL",
-    "sentimentEnum":"NEUTRAL",
-    "stars":"****",
-    "_links":{
-        "self":{
-            "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback/26fabd71-942e-4eda-8d25-e79c487c9259"
+    "id": "d1df6785-b82b-43fd-950a-20771bcf6dcd",
+    "dashboardId": "e99f1a5e-5666-4f35-a08b-190aeeb2d0db",
+    "created": "2019-04-05T07:43:04.000+0000",
+    "rating": 5,
+    "text": "must be simple because I can use it no problem!\n",
+    "sentiment": "NEUTRAL",
+    "stars": "*****",
+    "sentimentEnum": "NEUTRAL",
+    "_links": {
+        "self": {
+            "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback/d1df6785-b82b-43fd-950a-20771bcf6dcd"
         },
-        "feedback":{
-            "href":"https://feedback-analysis-grp-app.herokuapp.com/feedback"
+        "feedback": {
+            "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback?dashboardId=e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
         }
     }
 }
@@ -157,15 +182,15 @@ id|String| |True|the id of the feedback needed
 
 * Usage: create a new feedback
 * Method: Post
-* Request fields:
+* Request body:
 
-Parameter|Data Type|Default|Required|Description
-:-:|:-:|:-:|:-:|:-:
-id|String| |False|the id of the new feedback which can be generated automatically
-created|Date| |False| the time new feedback created
-rating|Integer| |True|the rating of the feedback
-text|String| |False|the comment in the feedback
-sentiment|String|NEUTRAL|False|the sentiment of the feedback
+```
+{
+    "dashboardId":"...",
+    "rating":"..."
+    "text":"..."
+}
+```
 
 * Response body:
 
@@ -178,7 +203,7 @@ sentiment|String|NEUTRAL|False|the sentiment of the feedback
 ```
 
 * Possible error:
-   * Code 400, the reference to store the new feedback could not be found
+   * Code 400, unable to parse the feedback
    * Code 412, the body of the request is not as expected (JSON format with a rating)
 
 
@@ -187,16 +212,21 @@ sentiment|String|NEUTRAL|False|the sentiment of the feedback
 
 * Usage: update a feedback
 * Method: Put
-* Request fields:
+* URL parameter:
 
 Parameter|Data Type|Default|Required|Description
 :-:|:-:|:-:|:-:|:-:
-id|String| |False|the id of the new feedback which can be generated automatically
-created|Date| |False| the time new feedback created
-rating|Integer| |True|the rating of the feedback
-text|String| |False|the comment in the feedback
-sentiment|String|NEUTRAL|False|the sentiment of the feedback
 id|String| |True|the id of the feedback to update
+
+* Request body:
+
+```
+{
+    "dashboardId":"...",
+    "rating":"..."
+    "text":"..."
+}
+```
 
 * Response body:
 
@@ -207,7 +237,7 @@ id|String| |True|the id of the feedback to update
 ```
 
 * Possible error:
-   * Code 400, the reference to store the new feedback could not be found
+   * Code 400, unable to parse the feedback
    * Code 412, the body of the request is not as expected (JSON format with a rating)
 
 
@@ -216,7 +246,7 @@ id|String| |True|the id of the feedback to update
 
 * Usage: delete a feedback
 * Method: Delete
-* Request fields:
+* URL parameter:
 
 Parameter|Data Type|Default|Required|Description
 :-:|:-:|:-:|:-:|:-:
@@ -228,26 +258,162 @@ id|String| |True|the id of the feedback to be deleted
 {}
 ```
 
+* Possible error:
+   * Code 400, the reference to store the new feedback could not be found
+   * Code 404, could not find the feedback of the id
 
-## Get Counts
+
+## Find All Feedback
+`/feedback/`
+
+* Usage: find all feedback of a dashboard
+* Method: Get
+* Query string:
+`/feedback?dashboardId=...`
+
+* Response body:
+
+```
+feedbackList:[
+    {
+        "id": "d1df6785-b82b-43fd-950a-20771bcf6dcd",
+        "dashboardId": "e99f1a5e-5666-4f35-a08b-190aeeb2d0db",
+        "created": "2019-04-05T07:43:04.000+0000",
+        "rating": 5,
+        "text": "must be simple because I can use it no problem!\n",
+        "sentiment": "NEUTRAL",
+        "stars": "*****",
+        "sentimentEnum": "NEUTRAL",
+        "_links": {
+            "self": {
+                "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback/d1df6785-b82b-43fd-950a-20771bcf6dcd"
+            },
+            "feedback": {
+                "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback?dashboardId=e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
+            }
+        }
+    },
+    {
+        "id": "41531f6d-45e9-4870-8067-2114336d6f97",
+        "dashboardId": "e99f1a5e-5666-4f35-a08b-190aeeb2d0db",
+        "created": "2019-04-05T07:41:28.000+0000",
+        "rating": 5,
+        "text": "excellent app easy to use and updated very often to give accurate balances. I love the fingerprint login as I forget my pin numbers. 5 stars",
+        "sentiment": "POSITIVE",
+        "stars": "*****",
+        "sentimentEnum": "POSITIVE",
+        "_links": {
+            "self": {
+                "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback/41531f6d-45e9-4870-8067-2114336d6f97"
+            },
+            "feedback": {
+                "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback?dashboardId=e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
+            }
+        }
+    }
+]
+```
+
+* Possible error:
+   * Code 400, no dashboard id specified
+
+
+## Get Feedback's status
+`/feedback/stats`
+
+* Usage: get a dashboard's feedback's overall status
+* Method: Get
+* Query string:
+`/feedback/stats?dashboardId=...`
+
+* Response body:
+
+```
+{
+    "feedback_paged":Array[1],
+    "feedback_rating_average":5,
+    "dashboard_name":"AppDashboard",
+    "feedback_rating_negative":Object{...},
+    "feedback_common_phrases":Object{...},
+    "feedback_rating_count":Object{...},
+    "feedback_sentiment_count":Object{...},
+    "feedback_count":2
+}
+```
+
+* Possible errors:
+   * Code 204, unable to serialize endpoints
+
+
+## Get Feedback paginated
+`/feedback/paged`
+
+* Usage: get paginated feedback
+* Method: Get
+* Query string:
+`/feedback/paged?dashboardId=...&page=...&pageSize=...`
+
+* Response body:
+
+```
+{
+    "_embedded": {
+        "feedbackList": [
+            {
+                "id": "d1df6785-b82b-43fd-950a-20771bcf6dcd",
+                "dashboardId": "e99f1a5e-5666-4f35-a08b-190aeeb2d0db",
+                "created": "2019-04-05T07:43:04.000+0000",
+                "rating": 5,
+                "text": "must be simple because I can use it no problem!\n",
+                "sentiment": "NEUTRAL",
+                "stars": "*****",
+                "sentimentEnum": "NEUTRAL",
+                "_links": {
+                    "self": {
+                        "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback/d1df6785-b82b-43fd-950a-20771bcf6dcd"
+                    },
+                    "feedback": {
+                        "href": "https://feedback-analysis-grp-app.herokuapp.com/feedback?dashboardId=e99f1a5e-5666-4f35-a08b-190aeeb2d0db"
+                    }
+                }
+            }
+        ]
+    }
+}
+```
+
+* Possible errors:
+   * Code 400, parameters not present
+
+
+## Count Feedback
 `/feedback/count`
 
-* Usage: get the number of feedbacks
+* Usage: count feedback
 * Method: Get
+* Query string:
+`/feedback/count?dashboardId=...`
+
 * Response body:
+
 ```
-{"count":24}
+{
+    "count": 2
+}
 ```
 
-* Possible erroe:
+* Possible errors:
    * Code 204, unable to serialize feedback count
 
 
-## Get Sentiments Counts
+## Count Sentiments
 `/feedback/sentiments/count`
 
 * Usage: get the number of sentiments separately
-* MEthod: Get
+* Method: Get
+* Query string:
+`/feedback/sentiments/count?dashboardId=...`
+
 * Response body:
 
 ```
@@ -258,11 +424,14 @@ id|String| |True|the id of the feedback to be deleted
    * Code 204, unable to serialize sentiment counts
 
 
-## Get Star Ratings Counts
+## Count Star Ratings
 `/feedback/rating/count`
 
 * Usage: get numbers of star ratings
 * Method: Get
+* Query string:
+`/feedback/rating/count?dashboardId=...`
+
 * Response body:
 
 ```
@@ -278,6 +447,9 @@ id|String| |True|the id of the feedback to be deleted
 
 * Usage: get the average star rating of feedbacks
 * Method: Get
+* Query string:
+`/feedback/rating/average?dashboardId=...`
+
 * Response body:
 
 ```
@@ -288,11 +460,14 @@ id|String| |True|the id of the feedback to be deleted
    * Code 204, unable to serialize average rating
 
 
-## Get Negative Rating Counts
+## Count Negative Rating Per Day
 `/feedback/rating/negativeperday`
 
 * Usage: get number of negative ratings per day
 * Method: Get
+* Query string:
+`/feedback/rating/negativeperday?dashboardId=...`
+
 * Reponse body:
 
 ```
@@ -323,6 +498,9 @@ id|String| |True|the id of the feedback to be deleted
 
 * Usage: get common phrases of feedbacks
 * Method: Get
+* Query string:
+`/feedback/commonphrases?dashboardId=...`
+
 * Response body:
 
 ```
