@@ -2,9 +2,12 @@ package com.group17.feedback.filter.query;
 
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.Level;
+
 import com.group17.feedback.filter.Filter;
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
+import com.group17.util.LoggerUtil;
 
 public abstract class FeedbackQuery extends DatabaseQuery {
 
@@ -33,7 +36,7 @@ public abstract class FeedbackQuery extends DatabaseQuery {
 				buff.append("f.sentiment=?" + PARAM_INDEX_SENTIMENT);
 				break;
 			case RATING:
-				buff.append("f.text=?" + PARAM_INDEX_RATING);
+				buff.append("f.rating=?" + PARAM_INDEX_RATING);
 				break;
 			}
 			

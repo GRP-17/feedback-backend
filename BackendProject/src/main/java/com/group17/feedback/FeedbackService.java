@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -23,8 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.group17.exception.CommonException;
+import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.FiltersBuilder;
+import com.group17.feedback.filter.impl.RatingFilter;
+import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.query.Queries;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
@@ -128,7 +132,7 @@ public class FeedbackService {
 		if(feedback.isEmpty()) return feedback;
 		if(fromIndex >= feedback.size()) return new ArrayList<Resource<Feedback>>();
 		
-		toIndex = Math.min(feedback.size() - 1, toIndex);
+		toIndex = Math.min(feedback.size(), toIndex); 
 		
 		LoggerUtil.log(Level.INFO, "Getting paged feedback [" + fromIndex + ", " + toIndex + "]");
 		
@@ -149,27 +153,38 @@ public class FeedbackService {
 	 * @param sentiment the sentiment search for
 	 * @return the total appearances
 	 */
-	private long getCountBySentiment(Filters filters, Sentiment sentiment) {
-		// We'll create a new Filters and set the sentiment, before merging
-		// it into the pre-existing filters.
-		// 
-		// This is because we want it so if they filter by Sentiment, it'll
-		// only show the count for this Sentiment
-		filters = filters.merge(FiltersBuilder
-									.newInstance()
-									.sentiment(sentiment)
-									.build(),
-								 false);
-		
+	private long getCountBySentiment(Filters filters) {
 		Query query = Queries.SENTIMENT_COUNT.build(getFEntityManager(), filters);
 		return ((Number) query.getSingleResult()).longValue();
 	}
 
 	public Map<Sentiment, Long> getSentimentCounts(Filters filters) {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
-		for (Sentiment sentiment : Sentiment.values()) {
-			counts.put(sentiment, getCountBySentiment(filters, sentiment));
+		
+		Sentiment filteredSentiment = null;
+		if(filters.hasFilter(FilterType.SENTIMENT)) {
+			filteredSentiment = ((SentimentFilter) filters.getFilter(FilterType.SENTIMENT))
+										.getSentiment();
 		}
+		
+		for (Sentiment sentiment : Sentiment.values()) {
+			if(filteredSentiment != null) {
+				
+				if(filteredSentiment.equals(sentiment)) {
+					counts.put(sentiment, getCountBySentiment(filters));
+				} else {
+					counts.put(sentiment, 0L);
+				}
+				
+			} else {
+				
+				Filters clone = filters.clone();
+				clone.addFilter(new SentimentFilter(sentiment));
+				counts.put(sentiment, getCountBySentiment(clone));
+				
+			}
+		}
+		
 		return counts;
 	}
 	
@@ -180,16 +195,7 @@ public class FeedbackService {
 	 * @param rating the rating being searched for
 	 * @return total appearances of given rating
 	 */
-	private long getCountByRating(Filters filters, int rating) {
-		// Add the rating filters to the current specified filters,
-		// that way we filter based on rating as well as the specified
-		// rating
-		filters = filters.merge(FiltersBuilder
-									.newInstance()
-									.rating(rating)
-									.build(),
-								false);
-		
+	private long getCountByRating(Filters filters) {
 		Query query = Queries.RATING_COUNT.build(getFEntityManager(), filters);
 		return ((Number) query.getSingleResult()).longValue();
 	}
@@ -199,16 +205,38 @@ public class FeedbackService {
 		// Value: the count of this rating (based on filters)
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
-		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			ratings.put(rating, getCountByRating(filters, rating));
+		int filteredRating = Integer.MIN_VALUE;
+		if(filters.hasFilter(FilterType.RATING)) {
+			filteredRating = ((RatingFilter) filters.getFilter(FilterType.RATING))
+									.getRating();
 		}
+		
+		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
+			
+			if(filteredRating != Integer.MIN_VALUE) {
+				
+				if(filteredRating == rating) {
+					ratings.put(rating, getCountByRating(filters));
+				} else {
+					ratings.put(rating, 0L);
+				}
+				
+			} else {
+				
+				Filters clone = filters.clone();
+				clone.addFilter(new RatingFilter(rating));
+				ratings.put(rating, getCountByRating(clone));
+				
+			}
+		}
+		
 		return ratings;
 	}
 
 	public double getAverageRating(Filters filters, boolean formatted) {
 		long total = 0;
-		for (int i = FEEDBACK_MIN_RATING; i <= FEEDBACK_MAX_RATING; i++) {
-			total += getCountByRating(filters, i) * i;
+		for(Entry<Integer, Long> entry : getRatingCounts(filters).entrySet()) {
+			total += entry.getKey() * entry.getValue();
 		}
 
 		// The unformatted average - it could have many trailing decimal values

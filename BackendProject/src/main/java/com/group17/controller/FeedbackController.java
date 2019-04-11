@@ -275,7 +275,7 @@ public class FeedbackController {
 		
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
 		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(filters, page, pageSize);
-		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + pageSize
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resource.size()
 				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(resource);
 	}

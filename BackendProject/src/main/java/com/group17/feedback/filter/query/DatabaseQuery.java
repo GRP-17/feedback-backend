@@ -51,7 +51,7 @@ public abstract class DatabaseQuery {
 			case RATING:
 				RatingFilter rf = (RatingFilter) entry.getValue();
 				query = query.setParameter(PARAM_INDEX_RATING, 
-										   String.valueOf(rf.getRating()));
+										   rf.getRating());
 				break;
 			}
 		}

@@ -48,16 +48,17 @@ public class Filters implements Cloneable {
 	
 	public static Filters fromParameters(String dashboardId, String query, 
 										 long since, String sentiment) {
-		Filters filters = new Filters();
+
+		// dashboardId is always required
+		Filters filters = new Filters(new DashboardFilter(dashboardId));
 		
-		filters.addFilter(new DashboardFilter(dashboardId));
-		if(query != null) {
+		if(query != null && !query.equals(Constants.PARAM_DEFAULT_STRING)) {
 			filters.addFilter(new TextFilter(query));
 		}
 		if(since != Constants.PARAM_DEFAULT_LONG_VALUE) {
 			filters.addFilter(new AgeFilter(new Date(since)));
 		}
-		if(query != null) {
+		if(sentiment != null && !sentiment.equals(Constants.PARAM_DEFAULT_STRING)) {
 			Sentiment sentimentEnum = Sentiment.valueOf(sentiment);
 			filters.addFilter(new SentimentFilter(sentimentEnum));
 		}
