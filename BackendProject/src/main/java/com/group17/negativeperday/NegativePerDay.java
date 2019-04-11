@@ -30,21 +30,18 @@ public class NegativePerDay {
 	@Column(name = "volume", columnDefinition = "INT(11)")
 	private Integer volume;
 
-	public NegativePerDay(Date date, int volume) {
+	public NegativePerDay(String dashboardId, Date date, int volume) {
 		this.date = DateUtil.getDayStart(date);
+		this.dashboardId = dashboardId;
 		this.volume = volume;
 	}
 
-	public NegativePerDay(Date date) {
-		this(DateUtil.getDayStart(date), 1);
+	public NegativePerDay(String dashboardId, Date date) {
+		this(dashboardId, DateUtil.getDayStart(date), 1);
 	}
 
 	public NegativePerDay() {
-		this(DateUtil.getTodayStart(), 1);
-	}
-
-	public Date getId() {
-		return date;
+		this("", DateUtil.getTodayStart(), 1);
 	}
 	
 	public String getDashboardId() {

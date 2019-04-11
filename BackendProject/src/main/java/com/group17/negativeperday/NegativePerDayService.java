@@ -22,25 +22,24 @@ public class NegativePerDayService {
 	@Autowired private JpaContext jpaContext;
 	@Autowired private NegativePerDayRepository negativePerDayRepository;
 
-	public void increaseNegativeByDate(Date date, int increment) {
+	public void increaseNegativeByDate(String dashboardId, Date date, int increment) {
 		// ensure this is midnight date
 		date = DateUtil.getDayStart(date);
 
-		if (negativePerDayRepository.existsById(date)) {
+		NegativePerDay byDate = negativePerDayRepository.getByDate(date);
+		if (byDate != null) {
 			// update
-			NegativePerDay existedNegativePerDay = negativePerDayRepository.getOne(date);
-
-			existedNegativePerDay.increaseVolume(increment);
-			negativePerDayRepository.save(existedNegativePerDay);
+			byDate.increaseVolume(increment);
+			negativePerDayRepository.save(byDate);
 		} else {
 			// create
-			NegativePerDay negativePerDay = new NegativePerDay(date, 1);
+			NegativePerDay negativePerDay = new NegativePerDay(dashboardId, date, 1);
 			negativePerDayRepository.save(negativePerDay);
 		}
 	}
 
-	public void increaseNegativeByDate(Date date) {
-		increaseNegativeByDate(date, 1);
+	public void increaseNegativeByDate(String dashboardId, Date date) {
+		increaseNegativeByDate(dashboardId, date, 1);
 	}
 
 	public HashMap<String, Object> findNegativePerDay(Filters filters) {

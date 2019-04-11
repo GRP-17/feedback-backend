@@ -235,7 +235,7 @@ public class FeedbackService {
 
 	public double getAverageRating(Filters filters, boolean formatted) {
 		long total = 0;
-		for(Entry<Integer, Long> entry : getRatingCounts(filters).entrySet()) {
+		for(Entry<Integer, Long> entry : getRatingCounts(filters.clone()).entrySet()) {
 			total += entry.getKey() * entry.getValue();
 		}
 

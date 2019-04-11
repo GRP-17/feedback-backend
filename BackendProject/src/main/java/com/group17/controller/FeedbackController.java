@@ -104,7 +104,8 @@ public class FeedbackController {
     										+ newFeedback.getId());
 
 			// Increase negative rating this day
-			negativePerDayService.increaseNegativeByDate(newFeedback.getCreated());
+			negativePerDayService.increaseNegativeByDate(newFeedback.getDashboardId(),
+														 newFeedback.getCreated());
     	}
 		// N-Grams
 		ngramService.onFeedbackCreated(newFeedback);

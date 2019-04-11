@@ -1,10 +1,13 @@
 package com.group17.negativeperday;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Date;
-import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface NegativePerDayRepository extends JpaRepository<NegativePerDay, Date> {
-	List<NegativePerDay> findAllByOrderByDateAsc();
+	
+	@Query("SELECT n FROM NegativePerDay n WHERE n.date=?1")
+	public NegativePerDay getByDate(Date date);
+	
 }
