@@ -71,8 +71,8 @@ public class Queries {
 		}
 		
 	};
-	public static final DatabaseQuery NEGATIVE_PER_DAY = new DatabaseQuery() {
-		final String BASE_QUERY = "SELECT DISTINCT(n) FROM Feedback f, NegativePerDay n";
+	public static final DatabaseQuery NEGATIVE_PER_DAY = new NegativePerDayQuery() {
+		final String BASE_QUERY = "SELECT n FROM Feedback f, NegativePerDay n";
 
 		@Override
 		public Query build(EntityManager entityManager, Filters filters) {
@@ -81,39 +81,15 @@ public class Queries {
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
-		public String buildWhere(Filters filters) {
-			StringBuffer buff = new StringBuffer();
-			int termCount = 0;
-			
-			for(Entry<FilterType, Filter> entry : filters.entrySet()) {
-				if(termCount == 0) {
-					buff.append(" WHERE ");
-				} else if(termCount > 0) {
-					buff.append(" AND ");
-				}
-				
-				switch(entry.getKey()) {
-				case DASHBOARD:
-					buff.append("n.dashboardId=?" + PARAM_INDEX_DASHBOARD);
-					break;
-				case AGE:
-					buff.append("n.date>?" + PARAM_INDEX_AGE);
-					break;
-				case TEXT_CONTAINING:
-					buff.append("f.text LIKE ?" + PARAM_INDEX_TEXT);
-					break;
-				case SENTIMENT:
-					buff.append("f.sentiment=?" + PARAM_INDEX_SENTIMENT);
-					break;
-				case RATING:
-					buff.append("f.rating=?" + PARAM_INDEX_RATING);
-					break;
-				}
-				
-				termCount ++;
-			}
-			
-			return buff.toString();
+	};
+	public static final DatabaseQuery NEGATIVE_PER_DAY_COUNT = new NegativePerDayQuery() {
+		final String BASE_QUERY = "SELECT DISTINCT(n) FROM Feedback f, NegativePerDay n";
+
+		@Override
+		public Query build(EntityManager entityManager, Filters filters) {
+			String strQuery = BASE_QUERY.concat(buildWhere(filters));
+			LoggerUtil.log(Level.INFO, "Prepared NEGATIVE_PER_DAY_COUNT query: " + strQuery);
+			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
 	};

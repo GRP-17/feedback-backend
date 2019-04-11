@@ -1,10 +1,12 @@
 package com.group17.negativeperday;
 
 import com.group17.util.DateUtil;
+import com.group17.util.LoggerUtil;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import org.apache.logging.log4j.Level;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
@@ -31,13 +33,12 @@ public class NegativePerDay {
 	private Integer volume;
 
 	public NegativePerDay(String dashboardId, Date date, int volume) {
-		this.date = DateUtil.getDayStart(date);
+		this.date = date;
+		
+		LoggerUtil.log(Level.INFO, "Date set as " + date.toLocaleString());
+		
 		this.dashboardId = dashboardId;
 		this.volume = volume;
-	}
-
-	public NegativePerDay(String dashboardId, Date date) {
-		this(dashboardId, DateUtil.getDayStart(date), 1);
 	}
 
 	public NegativePerDay() {
@@ -47,7 +48,11 @@ public class NegativePerDay {
 	public String getDashboardId() {
 		return dashboardId;
 	}
-
+	
+	public String getId() {
+		return id;
+	}
+	
 	public Date getDate() {
 		return date;
 	}

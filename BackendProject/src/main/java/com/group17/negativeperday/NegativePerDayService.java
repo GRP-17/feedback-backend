@@ -9,13 +9,16 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Service;
 
 import com.group17.feedback.filter.Filters;
+import com.group17.feedback.filter.FiltersBuilder;
 import com.group17.feedback.filter.query.Queries;
 import com.group17.util.DateUtil;
+import com.group17.util.LoggerUtil;
 
 @Service
 public class NegativePerDayService {
@@ -24,17 +27,35 @@ public class NegativePerDayService {
 
 	public void increaseNegativeByDate(String dashboardId, Date date, int increment) {
 		// ensure this is midnight date
-		date = DateUtil.getDayStart(date);
-
-		NegativePerDay byDate = negativePerDayRepository.getEntity(dashboardId, date);
+		date.setTime(DateUtil.getDayStart(date).getTime());
+		
+		Filters filters = FiltersBuilder.newInstance().dashboard(dashboardId).build();
+		
+		NegativePerDay byDate = null;
+		for(Object obj : Queries.NEGATIVE_PER_DAY.build(getNPDEntityManager(), filters)
+							.getResultList()) {
+			NegativePerDay day = (NegativePerDay) obj;
+			if(day.getDashboardId().equals(dashboardId)) {
+				byDate = day;
+			}
+		}
+		
 		if (byDate != null) {
 			// update
 			byDate.increaseVolume(increment);
 			negativePerDayRepository.save(byDate);
+			
+			LoggerUtil.log(Level.INFO, "--------------");
+			LoggerUtil.log(Level.INFO, "used date " + byDate.getDate() + " (" + byDate.getVolume() + ")");
+			LoggerUtil.log(Level.INFO, "--------------");
 		} else {
 			// create
 			NegativePerDay negativePerDay = new NegativePerDay(dashboardId, date, 1);
 			negativePerDayRepository.save(negativePerDay);
+			
+			LoggerUtil.log(Level.INFO, "--------------");
+			LoggerUtil.log(Level.INFO, "created date " + negativePerDay.getDate().toLocaleString() + " (" + negativePerDay.getVolume() + ")");
+			LoggerUtil.log(Level.INFO, "--------------");
 		}
 	}
 
