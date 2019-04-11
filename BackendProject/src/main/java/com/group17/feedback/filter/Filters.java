@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.springframework.lang.Nullable;
+
+import com.group17.controller.FeedbackController;
 import com.group17.feedback.filter.impl.AgeFilter;
 import com.group17.feedback.filter.impl.DashboardFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
@@ -15,9 +18,15 @@ import com.group17.feedback.tone.Sentiment;
 import com.group17.util.Constants;
 
 public class Filters implements Cloneable {
+	/** The {@link Filter}s this instance contains. */
 	private Map<FilterType, Filter> filterMap;
 	
-	public Filters(Filter... filters) {
+	/**
+	 * Constructor.
+	 * 
+	 * @param filters the pre-set filters
+	 */
+	protected Filters(Filter... filters) {
 		filterMap = new HashMap<FilterType, Filter>();
 		
 		for(Filter filter : filters) {
@@ -25,6 +34,13 @@ public class Filters implements Cloneable {
 		}
 	}
 	
+	/**
+	 * Merge another Filters object into this instance.
+	 * 
+	 * @param toMerge the other Filters object to merge into this
+	 * @param useNew if they both contain the same filter type, shall we overwrite?
+	 * @return this (merged) Filters instance
+	 */
 	public Filters merge(Filters toMerge, boolean useNew) {
 		Filters old = clone();
 		
@@ -38,9 +54,17 @@ public class Filters implements Cloneable {
 		return old;
 	}
 	
+	/**
+	 * Clone this Filters instance; creating all new copies of the variables
+	 * inside.
+	 */
 	@Override
 	public Filters clone() {
 		Filters filters = new Filters();
+		
+		// Copy all of the filters inside to the new Map.
+		// We don't want to reuse the same Map, as this won't
+		// mean that we're cloning.
 		for(Entry<FilterType, Filter> entry : filterMap.entrySet())
 		{
 			switch(entry.getKey()) {
@@ -69,8 +93,20 @@ public class Filters implements Cloneable {
 		return filters;
 	}
 	
-	public static Filters fromParameters(String dashboardId, String query, 
-										 long since, String sentiment) {
+	/**
+	 * Get a {@link Filters} object from {@link FeedbackController} endpoint 
+	 * parameters.
+	 * 
+	 * @param dashboardId the id of the {@link Dashboard} - required
+	 * @param query the text filter to apply - nullable
+	 * @param since the earliest date filter to apply - nullable
+	 * @param sentiment the sentiment filter to apply - nullable
+	 * @return the {@link Filters} object
+	 */
+	public static Filters fromParameters(String dashboardId,  
+										 @Nullable String query, 
+										 @Nullable long since,  
+										 @Nullable String sentiment) {
 
 		// dashboardId is always required
 		Filters filters = new Filters(new DashboardFilter(dashboardId));
