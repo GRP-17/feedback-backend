@@ -26,7 +26,7 @@ public class NegativePerDayService {
 		// ensure this is midnight date
 		date = DateUtil.getDayStart(date);
 
-		NegativePerDay byDate = negativePerDayRepository.getByDate(date);
+		NegativePerDay byDate = negativePerDayRepository.getEntity(dashboardId, date);
 		if (byDate != null) {
 			// update
 			byDate.increaseVolume(increment);
