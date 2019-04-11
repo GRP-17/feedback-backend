@@ -17,10 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackRepository;
 import com.group17.feedback.FeedbackService;
+import com.group17.feedback.tone.Sentiment;
 import com.group17.mocking.MockSearchboxGateway;
 import com.group17.mocking.MockWatsonGateway;
 import com.group17.ngram.NGramService;
-import com.group17.tone.Sentiment;
 
 import java.util.List;
 

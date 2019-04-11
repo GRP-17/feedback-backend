@@ -8,15 +8,15 @@ import java.util.Map;
 
 public class MultiTermVectorsResponseObject {
 
-    // for storing all the terms and there frequency
+	/** Stores the terms and their frequency. */
     private Map<String, TermVector> terms = new HashMap<String, TermVector>();
 
-    // Jackson method for converting the JSON docs property to what I want...
-    // which is all the terms from each document
-    // Map<String, Object> is used for JSON objects (with different typed values
-    //      e.g. int, string, or another JSON object)
-    //
-    // List<Map<String, Object>> is for a list/ array of JSON objects
+    /**
+     * A Jackson method for converting the JSON docs property to all the
+     * terms from each document.
+     * 
+     * @param docs a list/ array of JSON objects
+     */
     @SuppressWarnings("unchecked")
     @JsonProperty("docs")
     private void unpackNested(List<Map<String, Object>> docs) {

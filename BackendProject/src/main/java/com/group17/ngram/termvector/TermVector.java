@@ -1,5 +1,9 @@
 package com.group17.ngram.termvector;
 
+/**
+ * A simple tuple object to store an n-gram term against
+ * it's frequency used.
+ */
 public class TermVector implements Comparable<TermVector> {
     private final String term;
     private final int frequency;

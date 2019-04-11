@@ -11,7 +11,7 @@ import com.group17.feedback.filter.impl.DashboardFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
-import com.group17.tone.Sentiment;
+import com.group17.feedback.tone.Sentiment;
 import com.group17.util.Constants;
 
 public class Filters implements Cloneable {
