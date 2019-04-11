@@ -7,15 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Service;
 
 import com.group17.feedback.filter.Filters;
-import com.group17.feedback.filter.FiltersBuilder;
-import com.group17.feedback.filter.query.NegativePerDayBuilder;
-import com.group17.feedback.filter.query.QueryBuilder;
+import com.group17.feedback.filter.query.Queries;
 import com.group17.util.DateUtil;
 
 @Service
@@ -44,18 +43,11 @@ public class NegativePerDayService {
 		increaseNegativeByDate(date, 1);
 	}
 
-	public HashMap<String, Object> findNegativePerDay(String dashboardId) {
+	public HashMap<String, Object> findNegativePerDay(Filters filters) {
 		List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
 		
-		Filters filters = FiltersBuilder
-								.newInstance()
-								.dashboard(dashboardId)
-								.build();
-		// TODO: Only return limited dates
-		
-		QueryBuilder builder = new NegativePerDayBuilder(getNPDEntityManager(), 
-														 filters);
-		for(Object object : builder.build().getResultList()) {
+		Query query = Queries.NEGATIVE_PER_DAY.build(getNPDEntityManager(), filters);
+		for(Object object : query.getResultList()) {
 			NegativePerDay npd = (NegativePerDay) object;
 			maps.add(new HashMap<String, Object>() {{
 				put("date", npd.getDate());
