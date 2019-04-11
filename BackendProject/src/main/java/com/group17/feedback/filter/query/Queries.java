@@ -72,23 +72,12 @@ public class Queries {
 		
 	};
 	public static final DatabaseQuery NEGATIVE_PER_DAY = new NegativePerDayQuery() {
-		final String BASE_QUERY = "SELECT n FROM Feedback f, NegativePerDay n";
-
-		@Override
-		public Query build(EntityManager entityManager, Filters filters) {
-			String strQuery = BASE_QUERY.concat(buildWhere(filters));
-			LoggerUtil.log(Level.INFO, "Prepared NEGATIVE_PER_DAY query: " + strQuery);
-			return setParameters(entityManager.createQuery(strQuery), filters);
-		}
-		
-	};
-	public static final DatabaseQuery NEGATIVE_PER_DAY_COUNT = new NegativePerDayQuery() {
 		final String BASE_QUERY = "SELECT DISTINCT(n) FROM Feedback f, NegativePerDay n";
 
 		@Override
 		public Query build(EntityManager entityManager, Filters filters) {
 			String strQuery = BASE_QUERY.concat(buildWhere(filters));
-			LoggerUtil.log(Level.INFO, "Prepared NEGATIVE_PER_DAY_COUNT query: " + strQuery);
+			LoggerUtil.log(Level.INFO, "Prepared NEGATIVE_PER_DAY query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
