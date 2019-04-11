@@ -26,16 +26,14 @@ public class NegativePerDayService {
 	@Autowired private NegativePerDayRepository negativePerDayRepository;
 
 	public void increaseNegativeByDate(String dashboardId, Date date, int increment) {
-		// ensure this is midnight date
-		date.setTime(DateUtil.getDayStart(date).getTime());
-		
 		Filters filters = FiltersBuilder.newInstance().dashboard(dashboardId).build();
 		
 		NegativePerDay byDate = null;
 		for(Object obj : Queries.NEGATIVE_PER_DAY.build(getNPDEntityManager(), filters)
 							.getResultList()) {
 			NegativePerDay day = (NegativePerDay) obj;
-			if(day.getDashboardId().equals(dashboardId)) {
+			if(day.getDashboardId().equals(dashboardId) 
+					&& DateUtil.getDayStart(day.getDate()).equals(DateUtil.getDayStart(date))) {
 				byDate = day;
 			}
 		}
