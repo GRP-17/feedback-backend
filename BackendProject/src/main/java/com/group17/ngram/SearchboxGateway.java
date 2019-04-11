@@ -22,17 +22,27 @@ import com.group17.ngram.termvector.MultiTermVectorsResponseObject;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.util.LoggerUtil;
 
-@Component
+@Component  // for spring bean autowiring (dependency injection)
 public class SearchboxGateway {
+	/** The content type we're sending. */
 	private static final String CONTENT_TYPE = "application/json";
-	
-	private static final String PUT_URL
-				= "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/";
+
+	/** The base URL that all other request URLs derive from. */
+	private static final String BASE_URL = "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/";
+	/** The URL to do put requests to. */
+	private static final String PUT_URL = BASE_URL + "master-test/doc/";
+	/** The URL to do POST requests to. */
+	private static final String POST_URL  = BASE_URL + "master-test/doc/_mtermvectors";
+	/** The URL to do DELETE requests to. */
 	private static final String DELETE_URL = PUT_URL;
 	
-	private static final String POST_URL 
-				= "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors";
-	
+	/**
+	 * Insert a {@link Feedback} into the Searchbox database through a request.
+	 * 
+	 * @param id the identifier of the {@link Feedback}
+	 * @param text the text of the {@link Feedback}
+	 * @return whether it was successful
+	 */
 	protected boolean put(String id, String text) {
 		try {
 			delete(id); // Ensure there's no duplicates
@@ -62,6 +72,12 @@ public class SearchboxGateway {
 		}
 	}
 	
+	/**
+	 * Delete a {@link Feedback} from the Searchbox database through a request.
+	 * 
+	 * @param id the identifier of the {@link Feedback}
+	 * @return whether it was successful
+	 */
 	protected boolean delete(String id) {
 		try {
 			HttpClient httpClient = HttpClientBuilder.create().build();
@@ -78,6 +94,13 @@ public class SearchboxGateway {
 		}
 	}
 	
+	/**
+	 * Get the mTermVectors from the Searchbox database through a request.
+	 * 
+	 * @param ids the identifiers of the {@link Feedback} objects
+	 * @param fields the fields of the mTermVectors to include
+	 * @return a map of terms against their frequency
+	 */
 	protected Map<String, TermVector> getMTermVectors(Collection<String> ids, 
 												  	  ArrayList<String> fields) {
 		try {
@@ -88,7 +111,7 @@ public class SearchboxGateway {
 
 			// build the data to send
 			// attach ids
-			JsonObject body = buildBody(ids, fields);
+			JsonObject body = buildMTermVectorsBody(ids, fields);
 			
 			//convert the json to a string entity ready to send in the request
 			StringEntity data = new StringEntity(body.toString());
@@ -111,7 +134,14 @@ public class SearchboxGateway {
 		}
 	}
 	
-	private JsonObject buildBody(Collection<String> ids, Collection<String> fields) {
+	/**
+	 * Build the body for requesting term vectors.
+	 * 
+	 * @param ids the identifiers of the {@link Feedback} objects
+	 * @param fields the fields of the mTermVectors to include
+	 * @return the body
+	 */
+	private JsonObject buildMTermVectorsBody(Collection<String> ids, Collection<String> fields) {
 		JsonObject json = new JsonObject();
 		JsonArray idJArray = new JsonArray();
 		for(String id : ids) {

@@ -1,4 +1,4 @@
-package com.group17.tone;
+package com.group17.feedback.tone;
 
 import org.apache.logging.log4j.Level;
 import org.springframework.stereotype.Component;

@@ -17,8 +17,7 @@ import com.group17.ngram.termvector.TermVector;
 @Service
 public class NGramService {
 
-	@Autowired
-	private SearchboxGateway gateway;
+	@Autowired private SearchboxGateway gateway;
 	
 	/**
 	 * Register a {@link Feedback} object being created with Searchbox.
@@ -52,7 +51,7 @@ public class NGramService {
 	 * {@link Feedback ids}.
 	 * 
 	 * @param ids the {@link Feedback} ids to get the {@link TermVector}s of
-	 * @return a map of ids against shared term vectors
+	 * @return a map of terms against their frequency
 	 */
 	public Map<String, TermVector> getCommonPhrases(Collection<String> ids) {
 

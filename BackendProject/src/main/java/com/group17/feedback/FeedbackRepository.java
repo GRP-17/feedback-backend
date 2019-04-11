@@ -3,6 +3,6 @@ package com.group17.feedback;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Used to represent the database using Jpa
+ * Represents the {@link Feedback}  database using JPA.
  */
 public interface FeedbackRepository extends JpaRepository<Feedback, String> {}

@@ -3,8 +3,8 @@ package com.group17;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.group17.feedback.tone.WatsonGateway;
 import com.group17.ngram.SearchboxGateway;
-import com.group17.tone.WatsonGateway;
 
 /**
  * The {@link org.springframework.context.annotation.Configuration} 
@@ -20,10 +20,10 @@ import com.group17.tone.WatsonGateway;
 public class Configuration {
 	
 	/**
-	 * Creates a new instance of the {@link com.group17.tone.WatsonGateway}, with the
+	 * Creates a new instance of the {@link com.group17.feedback.tone.WatsonGateway}, with the
 	 * API keys included.
 	 * 
-	 * @return the {@link com.group17.tone.WatsonGateway} instance
+	 * @return the {@link com.group17.feedback.tone.WatsonGateway} instance
 	 */
 	@Bean
 	public WatsonGateway watsonGateway() {

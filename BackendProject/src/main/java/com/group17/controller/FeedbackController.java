@@ -41,16 +41,16 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.dashboard.DashboardService;
-import com.group17.exception.CommonException;
 import com.group17.feedback.StatType;
 import com.group17.feedback.filter.Filters;
+import com.group17.feedback.tone.Sentiment;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
-import com.group17.tone.Sentiment;
 import com.group17.util.LoggerUtil;
+import com.group17.util.exception.CommonException;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -104,7 +104,7 @@ public class FeedbackController {
     										+ newFeedback.getId());
 
 			// Increase negative rating this day
-			negativePerDayService.increaseNegativeByDate(newFeedback.getDashboardId(),
+			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
 														 newFeedback.getCreated());
     	}
 		// N-Grams

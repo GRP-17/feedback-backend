@@ -1,4 +1,4 @@
-package com.group17.exception;
+package com.group17.util.exception;
 
 /**
  * An exception which carries custom information needed in the handlers.
@@ -38,4 +38,5 @@ public class CommonException extends RuntimeException {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
+	
 }
