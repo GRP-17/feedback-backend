@@ -1,6 +1,8 @@
 package com.group17.util;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import org.springframework.web.bind.annotation.ValueConstants;
 
@@ -15,7 +17,8 @@ public class Constants {
 	
 	/** The {@link java.text.DecimalFormat} of the average rating */
 	public static final DecimalFormat AVERAGE_RATING_FORMAT 
-											= new DecimalFormat("#.##");
+											= new DecimalFormat("#.##", 
+																new DecimalFormatSymbols(Locale.US));
 	
 	public static final int COMMON_PHRASES_AMOUNT = 10;
 	

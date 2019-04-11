@@ -234,14 +234,16 @@ public class FeedbackService {
 	}
 
 	public double getAverageRating(Filters filters, boolean formatted) {
-		long total = 0;
-		for(Entry<Integer, Long> entry : getRatingCounts(filters.clone()).entrySet()) {
+		double total = 0;
+		int rowCount = 0;
+		for(Entry<Integer, Long> entry : getRatingCounts(filters).entrySet()) {
+			rowCount += entry.getValue();
 			total += entry.getKey() * entry.getValue();
 		}
-
+		
 		// The unformatted average - it could have many trailing decimal values
-		double denominator = Math.max(1, (double) getFeedbackCount(filters));
-		double average = (double) total / denominator;
+		double denominator = Math.max(1, rowCount);
+		double average = total / denominator;
 		if (formatted) {
 			return average = Double.valueOf(AVERAGE_RATING_FORMAT.format(average));
 		}
@@ -275,13 +277,15 @@ public class FeedbackService {
 		
 		if(!ids.isEmpty()) {
 			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-			List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
-			Collections.sort(sortedPhrases);
+			if(phrases != null) {
+				List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
+				Collections.sort(sortedPhrases);
 
-			for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
-				TermVector vec = sortedPhrases.get(i);
-				vec.getTerm().replace("  ", " "); // Remove any double spacing
-				toReturn.add(vec);
+				for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
+					TermVector vec = sortedPhrases.get(i);
+					vec.getTerm().replace("  ", " "); // Remove any double spacing
+					toReturn.add(vec);
+				}
 			}
 		}
 		return map;
