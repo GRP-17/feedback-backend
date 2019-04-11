@@ -254,7 +254,7 @@ public class FeedbackService {
 	public Map<String, Collection<TermVector>> getCommonPhrases(Filters filters, int amount) {
 		// Add a filter based on the last month, however if they specify a date to find
 		// it by already, then we won't merge
-		filters = filters.merge(FiltersBuilder
+		filters = filters.clone().merge(FiltersBuilder
 									.newInstance()
 									.age(DateUtil.getLastMonth())
 									.build(),

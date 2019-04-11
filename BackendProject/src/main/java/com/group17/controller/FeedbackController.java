@@ -216,27 +216,28 @@ public class FeedbackController {
 				map.put(key, dashboardService.getDashboardById(dashboardId).getName());
 				break;
 			case FEEDBACK_PAGED:
-				map.put(key, feedbackService.getPagedFeedback(filters,
+				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
 															  DASHBOARD_FEEDBACK_PAGE,
 															  DASHBOARD_FEEDBACK_PAGE_SIZE));
 				break;
 			case FEEDBACK_COUNT:
-				map.put(key, feedbackService.getFeedbackCount(filters));
+				map.put(key, feedbackService.getFeedbackCount(filters.clone()));
 				break;
 			case FEEDBACK_SENTIMENT_COUNT:
-				map.put(key, feedbackService.getSentimentCounts(filters));
+				map.put(key, feedbackService.getSentimentCounts(filters.clone()));
 				break;
 			case FEEDBACK_RATING_COUNT:
-				map.put(key, feedbackService.getRatingCounts(filters));
+				map.put(key, feedbackService.getRatingCounts(filters.clone()));
 				break;
 			case FEEDBACK_RATING_AVERAGE:
-				map.put(key, feedbackService.getAverageRating(filters, true));
+				map.put(key, feedbackService.getAverageRating(filters.clone(), true));
 				break;
 			case FEEDBACK_RATING_NEGATIVE:
-				map.put(key, negativePerDayService.findNegativePerDay(filters));
+				map.put(key, negativePerDayService.findNegativePerDay(filters.clone()));
 				break;
 			case FEEDBACK_COMMON_PHRASES:
-				map.put(key, feedbackService.getCommonPhrases(filters, COMMON_PHRASES_AMOUNT));
+				map.put(key, feedbackService.getCommonPhrases(filters.clone(), 
+															  COMMON_PHRASES_AMOUNT));
 				break;
 			}
 		}

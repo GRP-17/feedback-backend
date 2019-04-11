@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.group17.feedback.filter.impl.AgeFilter;
 import com.group17.feedback.filter.impl.DashboardFilter;
+import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
 import com.group17.tone.Sentiment;
@@ -24,15 +25,6 @@ public class Filters implements Cloneable {
 		}
 	}
 	
-	@Override
-	public Filters clone() {
-		try {
-			return (Filters) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	public Filters merge(Filters toMerge, boolean useNew) {
 		Filters old = clone();
 		
@@ -44,6 +36,37 @@ public class Filters implements Cloneable {
 			old.filterMap.put(type, toMerge.getFilter(type));
 		}
 		return old;
+	}
+	
+	@Override
+	public Filters clone() {
+		Filters filters = new Filters();
+		for(Entry<FilterType, Filter> entry : filterMap.entrySet())
+		{
+			switch(entry.getKey()) {
+			case AGE:
+				AgeFilter af = (AgeFilter) entry.getValue();
+				filters.addFilter(new AgeFilter(af.getSinceWhen()));
+				break;
+			case DASHBOARD:
+				DashboardFilter df = (DashboardFilter) entry.getValue();
+				filters.addFilter(new DashboardFilter(df.getDashboardId()));
+				break;
+			case RATING:
+				RatingFilter rf = (RatingFilter) entry.getValue();
+				filters.addFilter(new RatingFilter(rf.getRating()));
+				break;
+			case SENTIMENT:
+				SentimentFilter sf = (SentimentFilter) entry.getValue();
+				filters.addFilter(new SentimentFilter(sf.getSentiment()));
+				break;
+			case TEXT_CONTAINING:
+				TextFilter tf = (TextFilter) entry.getValue();
+				filters.addFilter(new TextFilter(tf.getText()));
+				break;
+			}
+		}
+		return filters;
 	}
 	
 	public static Filters fromParameters(String dashboardId, String query, 
