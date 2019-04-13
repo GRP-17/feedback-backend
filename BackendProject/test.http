@@ -10,7 +10,7 @@ curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searc
             "text_field" 
         ], 
         "term_statistics": true,
-        "field_statistics": true,
+        "field_statistics": false,
         "filter": {
             "max_num_terms" : 10,
             "min_term_freq" : 1,
@@ -23,10 +23,12 @@ curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searc
 ###
 
 curl -XPUT 
-'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/a' -d ' 
+'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/fcab11c5-4a17-4612-be05-09dcd3883d9f' -d ' 
 { 
-    "text_field" : "the credit page is crap" 
+    "text_field" : "After update becomes available the app didnt let me to use the version Ive use from long time. I dont want to update and I am happy to use the previous version but now have to update... Instead of that I will delete the app and will contact customer service for everything that usually I can use the app... Really cant stand to apps that force you to update or cant use them anymore... Now I have to call customer service every time I need to check my balance or something like..." 
 }' 
+
+###
 
 curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
 {
@@ -84,7 +86,7 @@ curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchl
    }
  }' 
 
- ###
+###
 
 curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
 {
