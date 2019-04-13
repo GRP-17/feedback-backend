@@ -106,10 +106,8 @@ public class FeedbackController {
 			// Increase negative rating this day
 			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
 														 newFeedback.getCreated());
-    	}
-		// N-Grams
-		ngramService.onFeedbackCreated(newFeedback);
-
+		}
+		
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
