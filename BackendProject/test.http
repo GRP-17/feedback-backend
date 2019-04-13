@@ -1,148 +1,164 @@
-# curl "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc" 
+curl "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc" 
+
+###
 
 curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors' -d ' 
 { 
-    "ids" : ["a", "b"], 
+    "ids" : ["2b4d9f9e-86f0-4997-bbf6-e6047f41484a", "41bab947-1c08-4d19-80d8-ff1311bb058c", "b319d6a8-5567-4878-ad94-b9d762b1e49b", "d199c9b8-ad50-411e-b5eb-a5a662b5d265", "fcab11c5-4a17-4612-be05-09dcd3883d9f"], 
     "parameters": { 
         "fields": [ 
             "text_field" 
         ], 
-    "term_statistics": true,
-    "field_statistics": false 
+        "term_statistics": true,
+        "field_statistics": false,
+        "filter": {
+            "max_num_terms" : 10,
+            "min_term_freq" : 1,
+            "min_doc_freq" : 1,
+            "min_word_length" : 10
+        } 
     } 
 }'
 
-# curl -XPUT 
-# 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/a' -d ' 
-# { 
-#     "text_field" : "the credit page is crap" 
-# }' 
+###
 
-# curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
-# {
-#    "settings":{
-#       "number_of_shards":1,
-#       "analysis":{
-#          "filter":{
-#             "custom_stop":{
-#                "type":"stop",
-#                "stopwords":"_english_",
-#                "enable_position_increment":"false"
-#             },
-#             "custom_shingle":{
-#                "type":"shingle",
-#                "min_shingle_size":"3",
-#                "max_shingle_size":"4",
-#                "output_unigrams": "false",
-#                "filler_token": ""
-#             }
-#          },
-#          "char_filter": {
-#             "my_char_filter": {
-#                 "type": "pattern_replace",
-#                 "pattern": "\\s+",
-#                 "replacement": " "
-#             }
-#          },   
-#          "analyzer":{
-#             "ngram_tokenizer_analyzer":{
-#                "tokenizer":"standard",
-#                "filter":[
-#                   "standard",
-#                   "lowercase",
-#                   "custom_stop",
-#                   "custom_shingle",
-#                   "trim"
-#                ],
-#                 "char_filter": [
-#                    "my_char_filter"
-#                ]
-#             }
-#          }
-#       }
-#    },
-#    "mappings":{
-#       "doc":{
-#          "properties":{
-#             "text_field":{
-#                "type":"text",
-#                "term_vector":"yes",
-#                "analyzer":"ngram_tokenizer_analyzer"
-#             }
-#          }
-#       }
-#    }
-#  }' 
+curl -XPUT 
+'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/fcab11c5-4a17-4612-be05-09dcd3883d9f' -d ' 
+{ 
+    "text_field" : "After update becomes available the app didnt let me to use the version Ive use from long time. I dont want to update and I am happy to use the previous version but now have to update... Instead of that I will delete the app and will contact customer service for everything that usually I can use the app... Really cant stand to apps that force you to update or cant use them anymore... Now I have to call customer service every time I need to check my balance or something like..." 
+}' 
 
-# curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
-# {
-#    "settings":{
-#       "number_of_shards":1,
-#       "analysis":{
-#          "filter":{
-#             "custom_stop":{
-#                "type":"stop",
-#                "stopwords":"_english_",
-#                "enable_position_increment":"false"
-#             },
-#             "custom_shingle":{
-#                "type":"shingle",
-#                "min_shingle_size":"2",
-#                "max_shingle_size":"3"
-#             }
-#          },
-#          "analyzer":{
-#             "ngram_tokenizer_analyzer":{
-#                "tokenizer":"standard",
-#                "filter":[
-#                   "standard",
-#                   "lowercase",
-#                   "custom_stop",
-#                   "custom_shingle"
-#                ]
-#             }
-#          }
-#       }
-#    },
-#    "mappings":{
-#       "doc":{
-#          "properties":{
-#             "text_field":{
-#                "type":"text",
-#                "term_vector":"yes",
-#                "analyzer":"ngram_tokenizer_analyzer"
-#             }
-#          }
-#       }
-#    }
-# }' 
+###
 
-# curl -X PUT "localhost:9200/my_index" -H 'Content-Type: application/json' -d'
-# {
-#   "settings": {
-#     "analysis": {
-#       "analyzer": {
-#         "my_analyzer": {
-#           "tokenizer": "standard",
-#           "char_filter": [
-#             "my_char_filter"
-#           ]
-#         }
-#       },
-#       "char_filter": {
-#         "my_char_filter": {
-#           "type": "pattern_replace",
-#           "pattern": "(\\d+)-(?=\\d)",
-#           "replacement": "$1_"
-#         }
-#       }
-#     }
-#   }
-# }
-# '
-# curl -X POST "localhost:9200/my_index/_analyze" -H 'Content-Type: application/json' -d'
-# {
-#   "analyzer": "my_analyzer",
-#   "text": "My credit card is 123-456-789"
-# }
-# '
+curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
+{
+   "settings":{
+      "number_of_shards":1,
+      "analysis":{
+         "filter":{
+            "custom_stop":{
+               "type":"stop",
+               "stopwords":"_english_",
+               "enable_position_increment":"false"
+            },
+            "custom_shingle":{
+               "type":"shingle",
+               "min_shingle_size":"3",
+               "max_shingle_size":"4",
+               "output_unigrams": "false",
+               "filler_token": ""
+            }
+         },
+         "char_filter": {
+            "my_char_filter": {
+                "type": "pattern_replace",
+                "pattern": "\\s+",
+                "replacement": " "
+            }
+         },   
+         "analyzer":{
+            "ngram_tokenizer_analyzer":{
+               "tokenizer":"standard",
+               "filter":[
+                  "standard",
+                  "lowercase",
+                  "custom_stop",
+                  "custom_shingle",
+                  "trim"
+               ],
+                "char_filter": [
+                   "my_char_filter"
+               ]
+            }
+         }
+      }
+   },
+   "mappings":{
+      "doc":{
+         "properties":{
+            "text_field":{
+               "type":"text",
+               "term_vector":"yes",
+               "analyzer":"ngram_tokenizer_analyzer"
+            }
+         }
+      }
+   }
+ }' 
+
+###
+
+curl -XPUT 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test' -d ' 
+{
+   "settings":{
+      "number_of_shards":1,
+      "analysis":{
+         "filter":{
+            "custom_stop":{
+               "type":"stop",
+               "stopwords":"_english_",
+               "enable_position_increment":"false"
+            },
+            "custom_shingle":{
+               "type":"shingle",
+               "min_shingle_size":"2",
+               "max_shingle_size":"3"
+            }
+         },
+         "analyzer":{
+            "ngram_tokenizer_analyzer":{
+               "tokenizer":"standard",
+               "filter":[
+                  "standard",
+                  "lowercase",
+                  "custom_stop",
+                  "custom_shingle"
+               ]
+            }
+         }
+      }
+   },
+   "mappings":{
+      "doc":{
+         "properties":{
+            "text_field":{
+               "type":"text",
+               "term_vector":"yes",
+               "analyzer":"ngram_tokenizer_analyzer"
+            }
+         }
+      }
+   }
+}' 
+
+curl -X PUT "localhost:9200/my_index" -H 'Content-Type: application/json' -d'
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_analyzer": {
+          "tokenizer": "standard",
+          "char_filter": [
+            "my_char_filter"
+          ]
+        }
+      },
+      "char_filter": {
+        "my_char_filter": {
+          "type": "pattern_replace",
+          "pattern": "(\\d+)-(?=\\d)",
+          "replacement": "$1_"
+        }
+      }
+    }
+  }
+}'
+
+###
+
+curl -X POST "localhost:9200/my_index/_analyze" -H 'Content-Type: application/json' -d'
+{
+  "analyzer": "my_analyzer",
+  "text": "My credit card is 123-456-789"
+}
+'

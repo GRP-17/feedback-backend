@@ -32,8 +32,11 @@ public class MultiTermVectorsResponseObject {
                     Integer doc_freq = (Integer) (
                             (Map<String, Object>) entry.getValue()
                     ).get("doc_freq");
+                    Double score = (Double) (
+                        (Map<String, Object>) entry.getValue()
+                    ).get("score");
 
-                    this.terms.put(term, new TermVector(term, doc_freq));
+                    this.terms.put(term, new TermVector(term, doc_freq, score));
                 }
             }
         }

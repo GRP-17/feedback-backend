@@ -162,6 +162,13 @@ public class SearchboxGateway {
 		JsonPrimitive field_statistics = new JsonPrimitive(false);
 		parameters.add("term_statistics", term_stats);
 		parameters.add("field_statistics", field_statistics);
+
+		JsonObject filter = new JsonObject();
+		filter.add("max_num_terms", new JsonPrimitive(10));
+		filter.add("min_term_freq", new JsonPrimitive(1));
+		filter.add("min_doc_freq", new JsonPrimitive(1));
+		filter.add("min_word_length", new JsonPrimitive(10));
+		parameters.add("filter", filter);
 		json.add("parameters", parameters);
 		
 		return json;
