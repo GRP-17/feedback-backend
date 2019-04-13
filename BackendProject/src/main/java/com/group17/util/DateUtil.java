@@ -4,7 +4,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+/**
+ * The time utility class.
+ */
 public class DateUtil {
+	
+	private DateUtil() {}
+	
+	/**
+	 * Get the time at 00:00 (midnight) on any day.
+	 * 
+	 * @param date the date of the day to convert to midnight
+	 * @return midnight of the specified day / {@link java.util.Date}
+	 */
 	public static Date getDayStart(Date date) {
 		// Get the time at midnight today by a given date
 		Calendar calendar = new GregorianCalendar();
@@ -17,8 +29,24 @@ public class DateUtil {
 		return calendar.getTime();
 	}
 
+	/**
+	 * Get the time at 00:00 (midnight) today.
+	 * 
+	 * @return the {@link java.util.Date} object for at 00:00 today
+	 */
 	public static Date getTodayStart() {
-		// Get the time at midnight today by today
 		return getDayStart(new Date());
 	}
+	
+	/**
+	 * Get the {@link java.util.Date} exactly a month ago from this time.
+	 * 
+	 * @return the {@link java.util.Date} value
+	 */
+	public static Date getLastMonth() {
+		Calendar cal = new GregorianCalendar();
+	    cal.add(Calendar.MONTH, -1);
+	    return cal.getTime(); 
+	}
+	
 }

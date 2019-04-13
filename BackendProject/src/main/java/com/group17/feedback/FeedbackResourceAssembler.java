@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.group17.controller.FeedbackController;
 
 /**
- * Used as a factory for the Resources
+ * Used as a factory for the {@link Resource}s.
  */
 @Component
 public class FeedbackResourceAssembler implements ResourceAssembler<Feedback, Resource<Feedback>> {
@@ -24,7 +24,9 @@ public class FeedbackResourceAssembler implements ResourceAssembler<Feedback, Re
 	public Resource<Feedback> toResource(Feedback feedback) {
 		return new Resource<>(
 				feedback,
-				linkTo(methodOn(FeedbackController.class).findOne(feedback.getId())).withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).findAll()).withRel("feedback"));
+				linkTo(methodOn(FeedbackController.class)
+							.findOne(feedback.getId()))
+					.withSelfRel());
 	}
+	
 }
