@@ -76,16 +76,11 @@ public class FeedbackService {
 	 */
 	public Resource<Feedback> updateFeedback(String id, Feedback newFeedback) throws CommonException {
 		Feedback updatedFeedback = feedbackRepo.findById(id).map(feedback -> {
-			Integer newRating = newFeedback.getRating();
-			String newText = newFeedback.getText();
-			if (newRating != null) {
-				feedback.setRating(newRating);
-			}
-			if (newText != null) {
-				feedback.setText(newText);
-
-				watsonGateway.deduceAndSetSentiment(feedback);
-			}
+			feedback.setDashboardId(newFeedback.getDashboardId());
+			feedback.setRating(newFeedback.getRating());
+			feedback.setText(newFeedback.getText());
+			feedback.setSentiment(newFeedback.getSentiment());
+			feedback.setPinned(newFeedback.isPinned());
 			return feedbackRepo.save(feedback);
 		}).orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 		return feedbackAssembler.toResource(updatedFeedback);
