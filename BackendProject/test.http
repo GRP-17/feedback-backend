@@ -4,7 +4,11 @@ curl "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/
 
 curl -X POST 'http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/master-test/doc/_mtermvectors' -d ' 
 { 
-    "ids" : ["2b4d9f9e-86f0-4997-bbf6-e6047f41484a", "41bab947-1c08-4d19-80d8-ff1311bb058c", "b319d6a8-5567-4878-ad94-b9d762b1e49b", "d199c9b8-ad50-411e-b5eb-a5a662b5d265", "fcab11c5-4a17-4612-be05-09dcd3883d9f"], 
+    "ids" : [
+      "585f4c2b-ba98-44a9-9ba9-add749f86224",
+      "8280ba11-49bc-439f-a1aa-5dbf444533bd",
+      "82e24c63-1a85-46a2-865b-1fbe04cea9a7"
+      ], 
     "parameters": { 
         "fields": [ 
             "text_field" 
