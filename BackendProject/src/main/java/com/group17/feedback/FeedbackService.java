@@ -318,8 +318,19 @@ public class FeedbackService {
 		
 		if(!ids.isEmpty()) {
 			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
+			LoggerUtil.log(Level.INFO, "Size before filtering: " + phrases.size());
 			if(phrases != null) {
-				List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
+				// filter out single word phrases (by searching for a space in the term)
+				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
+				for(Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
+					if(phrase.getValue().getTerm().contains(" ")) {
+						filteredPhrases.put(phrase.getKey(), phrase.getValue());
+					}
+				}
+				LoggerUtil.log(Level.INFO, "Size after filtering: " + filteredPhrases.size());
+
+				// sort based on score - get *amount* with highest score
+				List<TermVector> sortedPhrases = new ArrayList<TermVector>(filteredPhrases.values());
 				Collections.sort(sortedPhrases);
 
 				for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {

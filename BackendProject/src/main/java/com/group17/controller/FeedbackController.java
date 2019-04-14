@@ -423,12 +423,12 @@ public class FeedbackController {
 						= feedbackService.getCommonPhrases(filters,
 														   COMMON_PHRASES_AMOUNT);
 		LoggerUtil.log(Level.INFO,
-					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
+					   "[Feedback/CommonPhrases] Returned " + map.get("result").size() + " phrases");
 
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize average rating",
+			throw new CommonException("Unable to serialize common phrases",
 									HttpStatus.NO_CONTENT.value());
 		}
 	}
