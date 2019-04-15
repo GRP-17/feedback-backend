@@ -313,9 +313,8 @@ public class FeedbackService {
 		
 		if(!ids.isEmpty()) {
 			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-			LoggerUtil.log(Level.INFO, "Size before filtering : " + phrases.size());
 			if(phrases != null) {
-				
+				LoggerUtil.log(Level.INFO, "Size before filtering : " + phrases.size());
 				// filter out single word phrases (by searching for a space in the term)
 				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
 				for(Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
