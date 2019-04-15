@@ -2,12 +2,9 @@ package com.group17.feedback.filter.query;
 
 import java.util.Map.Entry;
 
-import org.apache.logging.log4j.Level;
-
 import com.group17.feedback.filter.Filter;
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
-import com.group17.util.LoggerUtil;
 
 public abstract class FeedbackQuery extends DatabaseQuery {
 
@@ -44,6 +41,10 @@ public abstract class FeedbackQuery extends DatabaseQuery {
 		}
 		
 		return buff.toString();
+	}
+	
+	public String buildOrderByPinned() {
+		return " ORDER BY f.pinned DESC";
 	}
 	
 }
