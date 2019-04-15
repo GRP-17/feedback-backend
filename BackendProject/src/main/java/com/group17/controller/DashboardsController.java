@@ -46,6 +46,13 @@ public class DashboardsController {
 				linkTo(methodOn(DashboardsController.class).findAll())
 					.withSelfRel());
 	}
+
+	@GetMapping()
+	public Resource<Dashboard> findOne(String id) throws CommonException {
+		Resource<Dashboard> resource = dashboardService.getDashboardById(id);
+		LoggerUtil.log(Level.INFO, "[Dashboard/Retrieve] Retrieved: dashboard " + id);
+		return resource;
+	}
 	
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Dashboard newDashboard)

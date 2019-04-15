@@ -20,10 +20,10 @@ public class DashboardService {
 	@Autowired private DashboardRepository repository;
 	/** Holds the instance of the factory which will make the resources. */
 	@Autowired private DashboardResourceAssembler assembler;
-	
+
 	/**
 	 * Get every {@link Dashboard} in the repository.
-	 * 
+	 *
 	 * @return all of the entries
 	 */
 	public List<Resource<Dashboard>> getAllDashboards() {
@@ -41,18 +41,12 @@ public class DashboardService {
 	public Resource<Dashboard> createDashboard(Dashboard dashboard) {
 		return assembler.toResource(repository.save(dashboard));
 	}
-	
-	/**
-	 * Get a single {@link Dashboard} by it's identifier.
-	 * 
-	 * @param dashboardId the id to retrieve
-	 * @throws CommonException if the id isn't valid (no entry with that given id)
-	 */
-	public Dashboard getDashboardById(String dashboardId) throws CommonException{
+
+	public Resource<Dashboard> getDashboardById(String dashboardId) {
 		Dashboard dashboard = repository.findById(dashboardId)
-				.orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId, 
+				.orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId,
 													   HttpStatus.NOT_FOUND.value()));
-		return dashboard;
+		return assembler.toResource(dashboard);
 	}
 
 	/**
@@ -64,15 +58,15 @@ public class DashboardService {
 	 * @throws CommonException if the id isn't valid (no entry with that given id)
 	 */
 	public Resource<Dashboard> updateDashboard(String dashboardId, Dashboard newDashboard) throws CommonException {
-		
+
 		Dashboard updatedDashboard = repository.findById(dashboardId).map(dashboard -> {
 			dashboard.setName(newDashboard.getName());
 			return repository.save(dashboard);
-		}).orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId, 
+		}).orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId,
 												 HttpStatus.NOT_FOUND.value()));
 		return assembler.toResource(updatedDashboard);
 	}
-	
+
 	/**
 	 * Delete a {@link Dashboard} entry in the database.
 	 *
