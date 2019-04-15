@@ -47,7 +47,7 @@ public class DashboardsController {
 					.withSelfRel());
 	}
 
-	@GetMapping()
+	@GetMapping("/{id}")
 	public Resource<Dashboard> findOne(String id) throws CommonException {
 		Resource<Dashboard> resource = dashboardService.getDashboardById(id);
 		LoggerUtil.log(Level.INFO, "[Dashboard/Retrieve] Retrieved: dashboard " + id);
