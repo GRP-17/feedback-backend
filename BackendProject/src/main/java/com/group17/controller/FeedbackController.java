@@ -4,6 +4,8 @@ import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -140,7 +142,9 @@ public class FeedbackController {
 		if(dashboardId != null && !dashboardId.equals(Constants.PARAM_DEFAULT_STRING)) {
 			newFeedback.setDashboardId(dashboardId);
 		}
-		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE) {
+		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE
+				&& rating >= FEEDBACK_MIN_RATING 
+				&& rating <= FEEDBACK_MAX_RATING) {
 			newFeedback.setRating(rating);
 		}
 		if(text != null && !text.equals(Constants.PARAM_DEFAULT_STRING)) {
