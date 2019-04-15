@@ -30,6 +30,10 @@ public class Constants {
 
 	/** The value passed in for any optional String endpoint parameter.  */
 	public static final String PARAM_DEFAULT_STRING = ValueConstants.DEFAULT_NONE; // This will be read in as null
+	/** The value passed in for any optional integer endpoint parameter.  */
+	public static final String PARAM_DEFAULT_INTEGER = "-100";
+	/** The numerical value of {@link PARAM_DEFAULT_INTEGER} for non-String comparisons.  */
+	public static final int PARAM_DEFAULT_INTEGER_VALUE = -100;
 	/** The value passed in for any optional long endpoint parameter.  */
 	public static final String PARAM_DEFAULT_LONG = "-100";
 	/** The numerical value of {@link PARAM_DEFAUL_LONG} for non-String comparisons.  */

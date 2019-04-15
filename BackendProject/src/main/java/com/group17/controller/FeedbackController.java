@@ -4,6 +4,7 @@ import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
+import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -49,6 +50,7 @@ import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
+import com.group17.util.Constants;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
 
@@ -123,9 +125,33 @@ public class FeedbackController {
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id)
+	public ResponseEntity<?> update(@PathVariable String id,
+			 						@RequestParam(value = "dashboardId", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String dashboardId,
+			 						@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+											int rating,
+			 						@RequestParam(value = "text", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String text,
+			 						@RequestParam(value = "pinned", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String pinned)
 			throws URISyntaxException, TransactionSystemException {
 
+		Feedback newFeedback = feedbackService.getFeedbackById(id).getContent();
+		if(dashboardId != null && !dashboardId.equals(Constants.PARAM_DEFAULT_STRING)) {
+			newFeedback.setDashboardId(dashboardId);
+		}
+		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE) {
+			newFeedback.setRating(rating);
+		}
+		if(text != null && !text.equals(Constants.PARAM_DEFAULT_STRING)) {
+			newFeedback.setText(text);
+			feedbackService.getWatsonGateway().deduceAndSetSentiment(newFeedback);
+		}
+		if(pinned != null && !pinned.equals(Constants.PARAM_DEFAULT_STRING)) {
+			boolean booleanValue = Boolean.valueOf(pinned);
+			newFeedback.setPinned(booleanValue);
+		}
+		
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
 		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + id
 										+ ". Object: " + newFeedback.toString());
