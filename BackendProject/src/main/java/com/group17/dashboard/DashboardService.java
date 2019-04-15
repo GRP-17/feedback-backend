@@ -25,11 +25,11 @@ public class DashboardService {
 		return assembler.toResource(repository.save(dashboard));
 	}
 	
-	public Dashboard getDashboardById(String dashboardId) {
+	public Resource<Dashboard> getDashboardById(String dashboardId) {
 		Dashboard dashboard = repository.findById(dashboardId)
 				.orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId, 
 													   HttpStatus.NOT_FOUND.value()));
-		return dashboard;
+		return assembler.toResource(dashboard);
 	}
 
 	public Resource<Dashboard> updateDashboard(String dashboardId, Dashboard newDashboard) {

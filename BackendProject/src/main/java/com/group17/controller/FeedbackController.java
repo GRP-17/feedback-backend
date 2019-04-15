@@ -213,7 +213,7 @@ public class FeedbackController {
 
 			switch(endpoint) {
 			case DASHBOARD_NAME:
-				map.put(key, dashboardService.getDashboardById(dashboardId).getName());
+				map.put(key, dashboardService.getDashboardById(dashboardId).getContent().getName());
 				break;
 			case FEEDBACK_PAGED:
 				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
