@@ -26,7 +26,7 @@ public class Constants {
 	/** The default page to show for paged feedback.  */
 	public static final int DASHBOARD_FEEDBACK_PAGE 	 = 1;
 	/** The default page size to show for paged feedback.  */
-	public static final int DASHBOARD_FEEDBACK_PAGE_SIZE = 25;
+	public static final int DASHBOARD_FEEDBACK_PAGE_SIZE = 20;
 
 	/** The value passed in for any optional String endpoint parameter.  */
 	public static final String PARAM_DEFAULT_STRING = ValueConstants.DEFAULT_NONE; // This will be read in as null
