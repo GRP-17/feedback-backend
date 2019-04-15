@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.dashboard.Dashboard;
 import com.group17.dashboard.DashboardService;
-import com.group17.exception.CommonException;
 import com.group17.util.LoggerUtil;
+import com.group17.util.exception.CommonException;
 
 @CrossOrigin
 @RestController

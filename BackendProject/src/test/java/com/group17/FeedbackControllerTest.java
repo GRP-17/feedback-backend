@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.springframework.http.MediaType;
 
-import com.group17.tone.Sentiment;
+import com.group17.feedback.tone.Sentiment;
 import com.jayway.jsonpath.JsonPath;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

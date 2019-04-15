@@ -38,6 +38,11 @@ public class DateUtil {
 		return getDayStart(new Date());
 	}
 	
+	/**
+	 * Get the {@link java.util.Date} exactly a month ago from this time.
+	 * 
+	 * @return the {@link java.util.Date} value
+	 */
 	public static Date getLastMonth() {
 		Calendar cal = new GregorianCalendar();
 	    cal.add(Calendar.MONTH, -1);

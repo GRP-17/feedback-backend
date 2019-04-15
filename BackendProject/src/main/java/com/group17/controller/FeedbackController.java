@@ -4,6 +4,7 @@ import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
+import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -41,16 +42,17 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.dashboard.DashboardService;
-import com.group17.exception.CommonException;
 import com.group17.feedback.StatType;
 import com.group17.feedback.filter.Filters;
+import com.group17.feedback.tone.Sentiment;
 import com.group17.feedback.Feedback;
 import com.group17.feedback.FeedbackService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
-import com.group17.tone.Sentiment;
+import com.group17.util.Constants;
 import com.group17.util.LoggerUtil;
+import com.group17.util.exception.CommonException;
 
 /**
  * Handles the feedback endpoint and any child/sub endpoints of it
@@ -104,12 +106,10 @@ public class FeedbackController {
     										+ newFeedback.getId());
 
 			// Increase negative rating this day
-			negativePerDayService.increaseNegativeByDate(newFeedback.getDashboardId(),
+			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
 														 newFeedback.getCreated());
-    	}
-		// N-Grams
-		ngramService.onFeedbackCreated(newFeedback);
-
+		}
+		
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
@@ -125,9 +125,33 @@ public class FeedbackController {
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@RequestBody Feedback newFeedback, @PathVariable String id)
+	public ResponseEntity<?> update(@PathVariable String id,
+			 						@RequestParam(value = "dashboardId", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String dashboardId,
+			 						@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+											int rating,
+			 						@RequestParam(value = "text", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String text,
+			 						@RequestParam(value = "pinned", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String pinned)
 			throws URISyntaxException, TransactionSystemException {
 
+		Feedback newFeedback = feedbackService.getFeedbackById(id).getContent();
+		if(dashboardId != null && !dashboardId.equals(Constants.PARAM_DEFAULT_STRING)) {
+			newFeedback.setDashboardId(dashboardId);
+		}
+		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE) {
+			newFeedback.setRating(rating);
+		}
+		if(text != null && !text.equals(Constants.PARAM_DEFAULT_STRING)) {
+			newFeedback.setText(text);
+			feedbackService.getWatsonGateway().deduceAndSetSentiment(newFeedback);
+		}
+		if(pinned != null && !pinned.equals(Constants.PARAM_DEFAULT_STRING)) {
+			boolean booleanValue = Boolean.valueOf(pinned);
+			newFeedback.setPinned(booleanValue);
+		}
+		
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
 		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + id
 										+ ". Object: " + newFeedback.toString());
@@ -425,12 +449,12 @@ public class FeedbackController {
 						= feedbackService.getCommonPhrases(filters,
 														   COMMON_PHRASES_AMOUNT);
 		LoggerUtil.log(Level.INFO,
-					   "[Feedback/RatingAverage] Returned " + map.size() + " phrases");
+					   "[Feedback/CommonPhrases] Returned " + map.get("result").size() + " phrases");
 
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
-			throw new CommonException("Unable to serialize average rating",
+			throw new CommonException("Unable to serialize common phrases",
 									HttpStatus.NO_CONTENT.value());
 		}
 	}

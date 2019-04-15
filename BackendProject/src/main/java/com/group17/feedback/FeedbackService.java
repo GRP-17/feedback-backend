@@ -23,33 +23,36 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.group17.exception.CommonException;
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.FiltersBuilder;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.query.Queries;
+import com.group17.feedback.tone.Sentiment;
+import com.group17.feedback.tone.WatsonGateway;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
-import com.group17.tone.Sentiment;
-import com.group17.tone.WatsonGateway;
 import com.group17.util.DateUtil;
 import com.group17.util.LoggerUtil;
+import com.group17.util.exception.CommonException;
 
 /**
- * Defines the service that will handle sending the text to a IBM ToneAnalyser
- * for analysing
+ * The {@link org.springframework.stereotype.Service} that will handle any retrieval
+ * of {@link Feedback} related data.
  */
 @Service
 public class FeedbackService {
+	/** Holds the JpaContext instance for entity managers. */
 	@Autowired private JpaContext jpaContext;
-	/** holds the instance of the FeedbackRepository which represents the database */
+	/** Holds the instance of the FeedbackRepository which represents the database. */
 	@Autowired private FeedbackRepository feedbackRepo;
-	/** holds the instance of the factory which will make the resources */
+	/** Holds the instance of the factory which will make the resources. */
 	@Autowired private FeedbackResourceAssembler feedbackAssembler;
 
+	/** Stores the gateway for IBM watson.  */
 	@Autowired private WatsonGateway watsonGateway;
+	/** Stores the service for finding ngrams & common phrases.  */
 	@Autowired private NGramService phraseService;
 	
 	/**
@@ -73,16 +76,11 @@ public class FeedbackService {
 	 */
 	public Resource<Feedback> updateFeedback(String id, Feedback newFeedback) throws CommonException {
 		Feedback updatedFeedback = feedbackRepo.findById(id).map(feedback -> {
-			Integer newRating = newFeedback.getRating();
-			String newText = newFeedback.getText();
-			if (newRating != null) {
-				feedback.setRating(newRating);
-			}
-			if (newText != null) {
-				feedback.setText(newText);
-
-				watsonGateway.deduceAndSetSentiment(feedback);
-			}
+			feedback.setDashboardId(newFeedback.getDashboardId());
+			feedback.setRating(newFeedback.getRating());
+			feedback.setText(newFeedback.getText());
+			feedback.setSentiment(newFeedback.getSentiment());
+			feedback.setPinned(newFeedback.isPinned());
 			return feedbackRepo.save(feedback);
 		}).orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 		return feedbackAssembler.toResource(updatedFeedback);
@@ -112,8 +110,9 @@ public class FeedbackService {
 	}
 
 	/**
-	 * Get every {@link Resource} in the database.
+	 * Get every {@link Resource} in the repository.
 	 *
+	 * @param filters the {@link Filters} to apply
 	 * @return all of the entries
 	 */
 	public List<Resource<Feedback>> getAllFeedback(Filters filters) {
@@ -122,6 +121,14 @@ public class FeedbackService {
 		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
 	}
 	
+	/**
+	 * Get paged {@link Resource}s in the repository.
+	 * 
+	 * @param filters the {@link Filters} to apply
+	 * @param page the page (starting from 1) to get
+	 * @param pageSize the size of each page
+	 * @return the entries
+	 */
 	public List<Resource<Feedback>> getPagedFeedback(Filters filters, int page, int pageSize) {
 		if(page < 0) return new ArrayList<Resource<Feedback>>();
 		
@@ -139,6 +146,12 @@ public class FeedbackService {
 		return feedback.subList(fromIndex, toIndex);
 	}
 	
+	/**
+	 * Get the number of rows in the repository.
+	 * 
+	 * @param filters the {@link Filters} to apply
+	 * @return the row count
+	 */
 	public long getFeedbackCount(Filters filters) {
 		Query query = Queries.COUNT.build(getFEntityManager(), filters);
 		return ((Number) query.getSingleResult()).longValue();
@@ -148,10 +161,10 @@ public class FeedbackService {
 	 * Get the total appearances of a given {@link Sentiment} in the JPA
 	 * {@link Feedback} repository.
 	 * <p>
-	 * This is not case sensitive.
+	 * The {@link Sentiment} should be included within the {@link Filters}.
 	 *
-	 * @param sentiment the sentiment search for
-	 * @return the total appearances
+	 * @param filters the {@link Filters} to apply
+	 * @return the total appearances of this {@link Sentiment}
 	 */
 	private long getCountBySentiment(Filters filters) {
 		Query query = Queries.SENTIMENT_COUNT.build(getFEntityManager(), filters);
@@ -189,17 +202,26 @@ public class FeedbackService {
 	}
 	
 	/**
-	 * Get the total appearances of a given rating in the JPA {@link Feedback}
-	 * repository.
+	 * Get the total appearances of a given rating in the JPA
+	 * {@link Feedback} repository.
+	 * <p>
+	 * The {rating should be included within the {@link Filters}.
 	 *
-	 * @param rating the rating being searched for
-	 * @return total appearances of given rating
+	 * @param filters the {@link Filters} to apply
+	 * @return the total appearances of this rating
 	 */
 	private long getCountByRating(Filters filters) {
 		Query query = Queries.RATING_COUNT.build(getFEntityManager(), filters);
 		return ((Number) query.getSingleResult()).longValue();
 	}
 
+	/**
+	 * Get a {@link java.util.Map} of all the ratings against their number
+	 * of appearances within the repository.
+	 * 
+	 * @param filters the {@link Filters} to apply
+	 * @return the resultant Map
+	 */
 	public Map<Integer, Long> getRatingCounts(Filters filters) {
 		// Key: the ratings [1..5]
 		// Value: the count of this rating (based on filters)
@@ -233,6 +255,13 @@ public class FeedbackService {
 		return ratings;
 	}
 
+	/**
+	 * Get the average numerical rating for the database.
+	 * 
+	 * @param filters the {@link Filters} to apply
+	 * @param formatted whether to neatly format the decimal
+	 * @return the average rating
+	 */
 	public double getAverageRating(Filters filters, boolean formatted) {
 		double total = 0;
 		int rowCount = 0;
@@ -251,6 +280,13 @@ public class FeedbackService {
 		return average;
 	}
 	
+	/**
+	 * Get the common phrases in the (Searchbox) database.
+	 * 
+	 * @param filters the {@link Filter}s to apply
+	 * @param amount the maximum number of common phrases to retrieve
+	 * @return the common phrases against their term vectors
+	 */
 	public Map<String, Collection<TermVector>> getCommonPhrases(Filters filters, int amount) {
 		// Add a filter based on the last month, however if they specify a date to find
 		// it by already, then we won't merge
@@ -278,7 +314,20 @@ public class FeedbackService {
 		if(!ids.isEmpty()) {
 			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
 			if(phrases != null) {
-				List<TermVector> sortedPhrases = new ArrayList<TermVector>(phrases.values());
+				LoggerUtil.log(Level.INFO, "Size before filtering : " + phrases.size());
+				// filter out single word phrases (by searching for a space in the term)
+				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
+				for(Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
+					if(phrase.getValue().getTerm().contains(" ")) {
+						filteredPhrases.put(phrase.getKey(), phrase.getValue());
+					} else {
+						LoggerUtil.log(Level.INFO, "filtering out : " + phrase.getKey());
+					}
+				}
+				LoggerUtil.log(Level.INFO, "Size after filtering : " + filteredPhrases.size());
+
+				// sort based on score - get *amount* with highest score
+				List<TermVector> sortedPhrases = new ArrayList<TermVector>(filteredPhrases.values());
 				Collections.sort(sortedPhrases);
 
 				for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
@@ -291,6 +340,11 @@ public class FeedbackService {
 		return map;
 	}
 	
+	/**
+	 * Get the {@link javax.persistence.EntityManager} for the {@link Feedback} entity.
+	 * 
+	 * @return the {@link javax.persistence.EntityManager}
+	 */
 	private EntityManager getFEntityManager() {
 		return jpaContext.getEntityManagerByManagedType(Feedback.class);
 	}

@@ -19,29 +19,35 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
 
-import com.group17.tone.Sentiment;
+import com.group17.feedback.tone.Sentiment;
 
 /**
- * defines the schema, of the table we want to map to, as a Java object
+ * The Java Object; defining the schema, of the table we want to map to.
  */
 @Entity
 @Table(name = "feedback", schema = "hy1xosk6o5taszzw")
 public class Feedback {
 	/**
 	 * The id of the feedback, auto generated using the UUID generator (below).
-	 * Hence it is always 36 characters long.
-	 * Maps onto the id column.
-	 * */
+	 * <p>
+	 * It is always 36 characters long.
+	 */
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
 	private String id;
 	
+	/**
+	 * The {@link Dashboard} this feedback belongs to.
+	 */
 	@NotNull(message = "Invalid dashboardId")
 	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
 	private String dashboardId;
 	
+	/**
+	 * When this feedback was created.
+	 */
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = false, columnDefinition = "TIMESTAMP")
     private Date created;
@@ -77,6 +83,9 @@ public class Feedback {
 	@Size(max = 65535)
 	@Column(name = "sentiment", columnDefinition = "sentiment")
 	private String sentiment;
+	
+	@Column(name="pinned")
+	private boolean pinned;
 
 	/**
 	 * the default constructor
@@ -95,6 +104,7 @@ public class Feedback {
 		this.dashboardId = dashboardId;
 		this.rating = rating;
 		this.text = text;
+		this.pinned = false;
 	}
 	
 	@PrePersist
@@ -108,6 +118,10 @@ public class Feedback {
 	
 	public String getDashboardId() {
 		return dashboardId;
+	}
+	
+	public void setDashboardId(String dashboardId) {
+		this.dashboardId = dashboardId;
 	}
 	
 	public Date getCreated() {
@@ -145,22 +159,13 @@ public class Feedback {
 	public void setSentiment(Sentiment sentiment) {
 		setSentiment(sentiment.toString());
 	}
-
-	/**
-	 * @return the rating as a number of stars
-	 */
-	public String getStars() {
-		String stars = "";
-		for (int i = 0; i < rating; i++) stars += "*";
-		return stars;
+	
+	public boolean isPinned() {
+		return pinned;
+	}
+	
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
 	}
 
-	/**
-	 * @return a formatted string containing all the information about this feedback
-	 */
-	@Override
-	public String toString() {
-		return String.format("Feedback [id=%s, dashboardId=%s, created=%s, rating=%s, text=%s, sentiment=%s]\n", 
-							 id, dashboardId, created.toString(), rating, text, sentiment);
-	}
 }
