@@ -182,14 +182,21 @@ public class FeedbackController {
 	}
 	
 	/**
-	 * the default mapping for a get request to the feedback endpoint
+	 * a mapping for get requests
+	 * will return feedback paginated
 	 *
-	 * @return all feedback from the database, returned as resources
+	 * @param page
+	 * @param pageSize
+	 * @return the resource for the page given
 	 */
 	@GetMapping()
-	public Resources<Resource<Feedback>> findAll(
+	public Resources<Resource<Feedback>> findFeedback(
 				 @RequestParam(value = "dashboardId") 
 						String dashboardId,
+				 @RequestParam(value = "page", required = false, defaultValue = "1") 
+				 		int page,
+				 @RequestParam(value = "pageSize", required = false, defaultValue = "10") 
+				 		int pageSize,
 				 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 						String query,
 				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
@@ -198,18 +205,15 @@ public class FeedbackController {
 						String sentiment) {
 		
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
-		List<Resource<Feedback>> resources = feedbackService.getAllFeedback(filters);
-		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size()
-										+ " matching resources in the repository");
-
+		List<Resource<Feedback>> resources = feedbackService.getPagedFeedback(filters, page, pageSize);
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resources.size()
+				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(
 				resources,
-				linkTo(methodOn(FeedbackController.class).findAll(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment))
 					.withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment))
 					.withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getPaged(dashboardId, -1, -1, query, since, sentiment))
-					.withRel("paged"),
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment))
 					.withRel("sentiment_count"),
 				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment))
@@ -243,7 +247,7 @@ public class FeedbackController {
 			case DASHBOARD_NAME:
 				map.put(key, dashboardService.getDashboardById(dashboardId).getContent().getName());
 				break;
-			case FEEDBACK_PAGED:
+			case FEEDBACK:
 				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
 															  DASHBOARD_FEEDBACK_PAGE,
 															  DASHBOARD_FEEDBACK_PAGE_SIZE));
@@ -278,36 +282,6 @@ public class FeedbackController {
 			throw new CommonException("Unable to serialize endpoints",
 									  HttpStatus.NO_CONTENT.value());
 		}
-	}
-
-	/**
-	 * a mapping for get requests
-	 * will return feedback paginated
-	 *
-	 * @param page
-	 * @param pageSize
-	 * @return the resource for the page given
-	 */
-	@GetMapping("/paged")
-	public Resources<Resource<Feedback>> getPaged(
-				 @RequestParam(value = "dashboardId") 
-						String dashboardId,
-				 @RequestParam(value = "page") 
-				 		int page,
-				 @RequestParam(value = "pageSize") 
-				 		int pageSize,
-				 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String query,
-				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-						long since,
-				 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String sentiment) {
-		
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
-		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(filters, page, pageSize);
-		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resource.size()
-				+ " elements on page " + page);
-		return new Resources<Resource<Feedback>>(resource);
 	}
 
 	@GetMapping("/count")
