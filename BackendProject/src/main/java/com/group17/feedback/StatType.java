@@ -7,7 +7,7 @@ public enum StatType {
 	/** The name of the {@link Dashboard}. */
 	DASHBOARD_NAME("dashboard_name"),
 	/** The paged {@link Feedback}. */
-	FEEDBACK_PAGED("feedback_paged"),
+	FEEDBACK("feedback_paged"),
 	/** The {@link Feedback} count. */
 	FEEDBACK_COUNT("feedback_count"),
 	/** The {@link Feedback} average rating. */
