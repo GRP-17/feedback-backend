@@ -4,11 +4,18 @@ import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -19,7 +26,9 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
 
+import com.group17.dashboard.Dashboard;
 import com.group17.feedback.tone.Sentiment;
+import com.group17.label.Label;
 
 /**
  * The Java Object; defining the schema, of the table we want to map to.
@@ -81,12 +90,22 @@ public class Feedback {
 	 * 
 	 */
 	@Size(max = 65535)
-	@Column(name = "sentiment", columnDefinition = "sentiment")
+	@Column(name = "sentiment")
 	private String sentiment;
 	
 	@Column(name="pinned")
 	private boolean pinned;
-
+	
+	/**
+	 * This is specifying a table to be needed, where it is a composite primary key of the
+	 * feedback id & label name.
+	 */
+	@ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "feedback_label",
+        joinColumns =  @JoinColumn(name = "feedback_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "label_id", referencedColumnName = "id"))
+	private Set<Label> labels;
+	
 	/**
 	 * the default constructor
 	 * sets the text to a default value of nothing if it's not included in the request JSON body
@@ -100,11 +119,14 @@ public class Feedback {
 	 * @param rating the rating of the feedback
 	 * @param text the comment left with the feedback
 	 */
-	public Feedback(String dashboardId, Integer rating, String text) {
+	public Feedback(String dashboardId, Integer rating, String text, Label... labels) {
 		this.dashboardId = dashboardId;
 		this.rating = rating;
 		this.text = text;
 		this.pinned = false;
+		
+		this.labels = Stream.of(labels).collect(Collectors.toSet());
+		this.labels.forEach(x -> x.getFeedback().add(this));
 	}
 	
 	@PrePersist
@@ -167,5 +189,9 @@ public class Feedback {
 	public void setPinned(boolean pinned) {
 		this.pinned = pinned;
 	}
-
+	
+	public Set<Label> getLabels() {
+		return labels;
+	}
+	
 }

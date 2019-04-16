@@ -89,10 +89,15 @@ public class RootController {
 												   		 DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_common_phrases")),
 
-			// Add 'dashboard_findall'
+			// Add 'dashboards'
 			removeParameters(linkTo(methodOn(DashboardsController.class)
 										.findAll())
-								.withRel("dashboards")));
+								.withRel("dashboards")),
+
+			// Add 'labels'
+			removeParameters(linkTo(methodOn(LabelsController.class)
+										.findAll())
+								.withRel("labels")));
 		return rootResource;
 	}
 
