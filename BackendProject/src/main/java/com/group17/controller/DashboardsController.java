@@ -1,5 +1,6 @@
 package com.group17.controller;
 
+import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -23,10 +24,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.dashboard.Dashboard;
 import com.group17.dashboard.DashboardService;
+import com.group17.util.Constants;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
 
@@ -64,11 +67,17 @@ public class DashboardsController {
 	}
 	
 	@PutMapping("/{dashboardId}")
-	public ResponseEntity<?> update(@RequestBody Dashboard newDashboard, @PathVariable String dashboardId)
+	public ResponseEntity<?> update(@PathVariable String dashboardId, 
+									@RequestParam(value = "name", required = false, defaultValue = PARAM_DEFAULT_STRING)
+											String name)
 			throws URISyntaxException, TransactionSystemException {
 
+		Dashboard newDashboard = dashboardService.getDashboardById(dashboardId).getContent();
+		if(name != null && !name.equals(Constants.PARAM_DEFAULT_STRING)) {
+			newDashboard.setName(name);
+		}
 		Resource<Dashboard> resource = dashboardService.updateDashboard(dashboardId, newDashboard);
-		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + dashboardId
+		LoggerUtil.log(Level.INFO, "[Dashboard/Update] Updated: " + dashboardId
 										+ ". Object: " + newDashboard.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
