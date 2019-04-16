@@ -46,6 +46,7 @@ bin/
 .metadata
 bin/
 tmp/
+RemoteSystemsTempFiles/
 *.tmp
 *.bak
 *.swp

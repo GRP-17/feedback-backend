@@ -72,7 +72,7 @@ public class FeedbackController {
 	@Autowired private NegativePerDayService negativePerDayService;
 	@Autowired private DashboardService dashboardService;
 	@Autowired private LabelService labelService;
-	
+
 	@Autowired private NGramService ngramService;
 
 	/**
@@ -90,7 +90,7 @@ public class FeedbackController {
 										+ ". Object: " + resource.getContent().toString());
 		return resource;
 	}
-	
+
 	/**
 	 * default mapping for a post request to the feedback endpoint
 	 *
@@ -115,7 +115,7 @@ public class FeedbackController {
 			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
 														 newFeedback.getCreated());
 		}
-		
+
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
@@ -149,7 +149,7 @@ public class FeedbackController {
 			newFeedback.setDashboardId(dashboardId);
 		}
 		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE
-				&& rating >= FEEDBACK_MIN_RATING 
+				&& rating >= FEEDBACK_MIN_RATING
 				&& rating <= FEEDBACK_MAX_RATING) {
 			newFeedback.setRating(rating);
 		}
@@ -166,23 +166,23 @@ public class FeedbackController {
 			for(Label existingLabel : newFeedback.getLabels()) {
 				newFeedback.getLabels().remove(existingLabel);
 				labelService.saveLabel(existingLabel);
-				
+
 				// Save the label otherwise this change won't be stored
 				labelService.saveLabel(existingLabel);
 			}
-			
+
 			// Now, to add the existing labels
 			for(String newLabelId : labelId) {
 				// Labels can have duplicate names
 				Label newLabel = labelService.getLabelById(newLabelId).getContent();
 				newFeedback.getLabels().add(newLabel);
 				newLabel.getFeedback().add(newFeedback);
-				
+
 				// Save the label otherwise this change won't be stored
 				labelService.saveLabel(newLabel);
 			}
 		}
-		
+
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
 		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + id
 										+ ". Object: " + newFeedback.toString());
@@ -207,36 +207,40 @@ public class FeedbackController {
 
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	/**
-	 * the default mapping for a get request to the feedback endpoint
+	 * a mapping for get requests
+	 * will return feedback paginated
 	 *
-	 * @return all feedback from the database, returned as resources
+	 * @param page
+	 * @param pageSize
+	 * @return the resource for the page given
 	 */
 	@GetMapping()
-	public Resources<Resource<Feedback>> findAll(
-				 @RequestParam(value = "dashboardId") 
+	public Resources<Resource<Feedback>> findFeedback(
+				 @RequestParam(value = "dashboardId")
 						String dashboardId,
+				 @RequestParam(value = "page", required = false, defaultValue = "1")
+				 		int page,
+				 @RequestParam(value = "pageSize", required = false, defaultValue = "10")
+				 		int pageSize,
 				 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 						String query,
 				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 						long since,
 				 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
 						String sentiment) {
-		
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
-		List<Resource<Feedback>> resources = feedbackService.getAllFeedback(filters);
-		LoggerUtil.log(Level.INFO, "[Feedback/Browse] Found " + resources.size()
-										+ " matching resources in the repository");
 
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		List<Resource<Feedback>> resources = feedbackService.getPagedFeedback(filters, page, pageSize);
+		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resources.size()
+				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(
 				resources,
-				linkTo(methodOn(FeedbackController.class).findAll(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment))
 					.withSelfRel(),
 				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment))
 					.withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getPaged(dashboardId, -1, -1, query, since, sentiment))
-					.withRel("paged"),
 				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment))
 					.withRel("sentiment_count"),
 				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment))
@@ -248,10 +252,10 @@ public class FeedbackController {
 				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId, query, since, sentiment))
 					.withRel("common_phrases"));
 	}
-	
+
 	@GetMapping("/stats")
 	public ResponseEntity<?> stats(
-			 @RequestParam(value = "dashboardId") 
+			 @RequestParam(value = "dashboardId")
 					String dashboardId,
 			 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
@@ -273,7 +277,7 @@ public class FeedbackController {
 			case DASHBOARD_LABELS:
 				map.put(key, labelService.getLabelsByDashboardId(dashboardId));
 				break;
-			case FEEDBACK_PAGED:
+			case FEEDBACK:
 				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
 															  DASHBOARD_FEEDBACK_PAGE,
 															  DASHBOARD_FEEDBACK_PAGE_SIZE));
@@ -294,7 +298,7 @@ public class FeedbackController {
 				map.put(key, negativePerDayService.findNegativePerDay(filters.clone()));
 				break;
 			case FEEDBACK_COMMON_PHRASES:
-				map.put(key, feedbackService.getCommonPhrases(filters.clone(), 
+				map.put(key, feedbackService.getCommonPhrases(filters.clone(),
 															  COMMON_PHRASES_AMOUNT));
 				break;
 			}
@@ -310,39 +314,9 @@ public class FeedbackController {
 		}
 	}
 
-	/**
-	 * a mapping for get requests
-	 * will return feedback paginated
-	 *
-	 * @param page
-	 * @param pageSize
-	 * @return the resource for the page given
-	 */
-	@GetMapping("/paged")
-	public Resources<Resource<Feedback>> getPaged(
-				 @RequestParam(value = "dashboardId") 
-						String dashboardId,
-				 @RequestParam(value = "page") 
-				 		int page,
-				 @RequestParam(value = "pageSize") 
-				 		int pageSize,
-				 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String query,
-				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-						long since,
-				 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String sentiment) {
-		
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
-		List<Resource<Feedback>> resource = feedbackService.getPagedFeedback(filters, page, pageSize);
-		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resource.size()
-				+ " elements on page " + page);
-		return new Resources<Resource<Feedback>>(resource);
-	}
-
 	@GetMapping("/count")
 	public ResponseEntity<?> getCount(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 			 		String dashboardId,
 				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 			 		String query,
@@ -368,7 +342,7 @@ public class FeedbackController {
 
 	@GetMapping("/sentiments/count")
 	public ResponseEntity<?> getSentimentsCount(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 		 			String dashboardId,
 		 		@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 		 			String query,
@@ -394,7 +368,7 @@ public class FeedbackController {
 
 	@GetMapping("/rating/count")
 	public ResponseEntity<?> getStarRatingCount(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 	 				String dashboardId,
 	 			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 	 				String query,
@@ -402,7 +376,7 @@ public class FeedbackController {
 	 				long since,
 	 			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
 	 				String sentiment) throws CommonException {
-		
+
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts(filters);
 
@@ -420,7 +394,7 @@ public class FeedbackController {
 
 	@GetMapping("/rating/average")
 	public ResponseEntity<?> getAverageRating(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 					String dashboardId,
 				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
@@ -445,7 +419,7 @@ public class FeedbackController {
 
 	@GetMapping("/rating/negativeperday")
 	public ResponseEntity<?> getNegativePerDay(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 					String dashboardId,
 				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
@@ -453,10 +427,10 @@ public class FeedbackController {
 					long since,
 				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String sentiment) throws CommonException {
-		
+
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
 		Map<String, Object> map = negativePerDayService.findNegativePerDay(filters);
-		LoggerUtil.log(Level.INFO, "[Feedback/RatingNegativePerDay] Returned " 
+		LoggerUtil.log(Level.INFO, "[Feedback/RatingNegativePerDay] Returned "
 											+ map.size() + " days");
 
 		try {
@@ -469,7 +443,7 @@ public class FeedbackController {
 
 	@GetMapping("/commonphrases")
 	public ResponseEntity<?> getCommonPhrases(
-			 	@RequestParam(value = "dashboardId") 
+			 	@RequestParam(value = "dashboardId")
 					String dashboardId,
 				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
@@ -502,7 +476,7 @@ public class FeedbackController {
 	@ExceptionHandler(CommonException.class)
 	public ResponseEntity<String> exceptionHandlerCommon(CommonException ex) {
 		LoggerUtil.logException(ex);
-		return new ResponseEntity<String>(ex.getMessage(), 
+		return new ResponseEntity<String>(ex.getMessage(),
 										  HttpStatus.valueOf(ex.getErrorCode()));
 	}
 
@@ -512,7 +486,7 @@ public class FeedbackController {
 		return new ResponseEntity<String>("Unable to parse Feedback object",
 										  HttpStatus.BAD_REQUEST);
 	}
-	
+
 	/**
 	 * handles any TransactionSystemExceptions
 	 *

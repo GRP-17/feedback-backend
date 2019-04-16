@@ -38,20 +38,14 @@ public class RootController {
 		rootResource.add(
 			// Add 'feedback'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.findAll(DASHBOARD_ID, DASHBOARD_QUERY, 
-												 DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
-								.withRel("feedback")),
+										.findFeedback(DASHBOARD_ID, 0, 0, DASHBOARD_QUERY, 
+												  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
+								.withRel("feedback_paged")),
 			
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.stats(DASHBOARD_ID, DASHBOARD_QUERY, 
 											   DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
 								.withRel("feedback_stats")),
-				
-			// Add 'feedback_paged'
-			removeParameters(linkTo(methodOn(FeedbackController.class)
-										.getPaged(DASHBOARD_ID, 0, 0, DASHBOARD_QUERY, 
-												  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
-								.withRel("feedback_paged")),
 				
 			// Add 'feedback_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
