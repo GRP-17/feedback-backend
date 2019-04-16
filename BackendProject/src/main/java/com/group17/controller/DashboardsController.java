@@ -50,10 +50,10 @@ public class DashboardsController {
 					.withSelfRel());
 	}
 
-	@GetMapping("/{id}")
-	public Resource<Dashboard> findOne(String id) throws CommonException {
-		Resource<Dashboard> resource = dashboardService.getDashboardById(id);
-		LoggerUtil.log(Level.INFO, "[Dashboard/Retrieve] Retrieved: dashboard " + id);
+	@GetMapping("/{dashboardId}")
+	public Resource<Dashboard> findOne(@PathVariable String dashboardId) throws CommonException {
+		Resource<Dashboard> resource = dashboardService.getDashboardById(dashboardId);
+		LoggerUtil.log(Level.INFO, "[Dashboard/Retrieve] Retrieved: dashboard " + dashboardId);
 		return resource;
 	}
 	
@@ -63,7 +63,7 @@ public class DashboardsController {
 		Resource<Dashboard> resource = dashboardService.createDashboard(newDashboard);
 
 		LoggerUtil.log(Level.INFO, "[Dashboard/Create] Created: " + newDashboard.getId());
-		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
+		return ResponseEntity.created(new URI(resource.getId().expand(newDashboard.getId()).getHref())).body(resource);
 	}
 	
 	@PutMapping("/{dashboardId}")
@@ -79,7 +79,7 @@ public class DashboardsController {
 		Resource<Dashboard> resource = dashboardService.updateDashboard(dashboardId, newDashboard);
 		LoggerUtil.log(Level.INFO, "[Dashboard/Update] Updated: " + dashboardId
 										+ ". Object: " + newDashboard.toString());
-		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
+		return ResponseEntity.created(new URI(resource.getId().expand(newDashboard.getId()).getHref())).body(resource);
 	}
 
 	@DeleteMapping("/{dashboardId}")
