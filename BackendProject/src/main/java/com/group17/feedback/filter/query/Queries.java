@@ -19,7 +19,7 @@ public class Queries {
 									.concat(buildWhere(filters))
 //									.concat(buildOrderByPinned()) // We need ORDER BY created, too
 									.concat(ORDER_BY);
-			LoggerUtil.log(Level.INFO, "Prepared FEEDBACK query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared FEEDBACK query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
@@ -32,7 +32,7 @@ public class Queries {
 			String strQuery = BASE_QUERY
 									.concat(buildWhere(filters))
 									.concat(buildOrderByPinned());
-			LoggerUtil.log(Level.INFO, "Prepared FEEDBACK_IDS query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared FEEDBACK_IDS query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
@@ -45,7 +45,7 @@ public class Queries {
 			String strQuery = BASE_QUERY
 									.concat(buildWhere(filters))
 									.concat(buildOrderByPinned());
-			LoggerUtil.log(Level.INFO, "Prepared COUNT query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared COUNT query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
@@ -58,7 +58,7 @@ public class Queries {
 			String strQuery = BASE_QUERY
 									.concat(buildWhere(filters))
 									.concat(buildOrderByPinned());
-			LoggerUtil.log(Level.INFO, "Prepared RATING_COUNT query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared RATING_COUNT query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
@@ -71,7 +71,7 @@ public class Queries {
 			String strQuery = BASE_QUERY
 									.concat(buildWhere(filters))
 									.concat(buildOrderByPinned());
-			LoggerUtil.log(Level.INFO, "Prepared SENTIMENT_COUNT query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared SENTIMENT_COUNT query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		
@@ -85,7 +85,7 @@ public class Queries {
 			String strQuery = BASE_QUERY
 									.concat(buildWhere(filters))
 									.concat(ORDER_BY);
-			LoggerUtil.log(Level.INFO, "Prepared NEGATIVE_PER_DAY query: " + strQuery);
+			LoggerUtil.log(Level.DEBUG, "Prepared NEGATIVE_PER_DAY query: " + strQuery);
 			return setParameters(entityManager.createQuery(strQuery), filters);
 		}
 		

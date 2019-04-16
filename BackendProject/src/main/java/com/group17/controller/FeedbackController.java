@@ -2,12 +2,12 @@ package com.group17.controller;
 
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
-import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
-import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
-import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
-import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
-import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
+import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
+import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
+import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
+import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
+import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -44,11 +44,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group17.dashboard.DashboardService;
+import com.group17.feedback.Feedback;
+import com.group17.feedback.FeedbackService;
 import com.group17.feedback.StatType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.tone.Sentiment;
-import com.group17.feedback.Feedback;
-import com.group17.feedback.FeedbackService;
+import com.group17.label.Label;
+import com.group17.label.LabelService;
 import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
@@ -69,6 +71,8 @@ public class FeedbackController {
 	@Autowired private FeedbackService feedbackService;
 	@Autowired private NegativePerDayService negativePerDayService;
 	@Autowired private DashboardService dashboardService;
+	@Autowired private LabelService labelService;
+	
 	@Autowired private NGramService ngramService;
 
 	/**
@@ -135,7 +139,9 @@ public class FeedbackController {
 			 						@RequestParam(value = "text", required = false, defaultValue = PARAM_DEFAULT_STRING)
 											String text,
 			 						@RequestParam(value = "pinned", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String pinned)
+											String pinned,
+									@RequestParam(value = "labelId", required = false)
+											List<String> labelId)
 			throws URISyntaxException, TransactionSystemException {
 
 		Feedback newFeedback = feedbackService.getFeedbackById(id).getContent();
@@ -154,6 +160,27 @@ public class FeedbackController {
 		if(pinned != null && !pinned.equals(Constants.PARAM_DEFAULT_STRING)) {
 			boolean booleanValue = Boolean.valueOf(pinned);
 			newFeedback.setPinned(booleanValue);
+		}
+		if(labelId != null) {
+			// Check if the Feedback has any pre-existing Labels; removing them if they do
+			for(Label existingLabel : newFeedback.getLabels()) {
+				newFeedback.getLabels().remove(existingLabel);
+				labelService.saveLabel(existingLabel);
+				
+				// Save the label otherwise this change won't be stored
+				labelService.saveLabel(existingLabel);
+			}
+			
+			// Now, to add the existing labels
+			for(String newLabelId : labelId) {
+				// Labels can have duplicate names
+				Label newLabel = labelService.getLabelById(newLabelId).getContent();
+				newFeedback.getLabels().add(newLabel);
+				newLabel.getFeedback().add(newFeedback);
+				
+				// Save the label otherwise this change won't be stored
+				labelService.saveLabel(newLabel);
+			}
 		}
 		
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
@@ -242,6 +269,9 @@ public class FeedbackController {
 			switch(endpoint) {
 			case DASHBOARD_NAME:
 				map.put(key, dashboardService.getDashboardById(dashboardId).getContent().getName());
+				break;
+			case DASHBOARD_LABELS:
+				map.put(key, labelService.getLabelsByDashboardId(dashboardId));
 				break;
 			case FEEDBACK_PAGED:
 				map.put(key, feedbackService.getPagedFeedback(filters.clone(),

@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.group17.dashboard.Dashboard;
 import com.group17.feedback.Feedback;
 
@@ -48,6 +49,7 @@ public class Label {
 	@Column(name = "color", columnDefinition = "VARCHAR(7)")
 	private String color = "#28AF61"; // Default value of #28AF61 (green)
 	
+	@JsonIgnore // This has to be ignored as there is a circular dependency inside Feedback
 	@ManyToMany(mappedBy = "labels")
     private Set<Feedback> feedback = new HashSet<Feedback>();
 	

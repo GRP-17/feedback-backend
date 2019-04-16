@@ -303,10 +303,6 @@ public class FeedbackService {
 			ids.add((String) obj);
 		}
 		
-		for(String id : ids) {
-			LoggerUtil.log(Level.INFO, id);
-		}
-		
 		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
 		List<TermVector> toReturn = new ArrayList<TermVector>();
 		map.put("result", toReturn);
@@ -318,10 +314,10 @@ public class FeedbackService {
 				// filter out single word phrases (by searching for a space in the term)
 				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
 				for(Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
-					if(phrase.getValue().getTerm().contains(" ")) {
+					if(phrase.getValue().getTerm().contains(" ")) { // Filter anything out any 1-grams
 						filteredPhrases.put(phrase.getKey(), phrase.getValue());
 					} else {
-						LoggerUtil.log(Level.INFO, "filtering out : " + phrase.getKey());
+						LoggerUtil.log(Level.INFO, "Filtering out 1-gram: " + phrase.getKey());
 					}
 				}
 				LoggerUtil.log(Level.INFO, "Size after filtering : " + filteredPhrases.size());

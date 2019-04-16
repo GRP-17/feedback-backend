@@ -31,6 +31,17 @@ public class LabelService {
 										.map(assembler::toResource)
 										.collect(Collectors.toList());
 	}
+	
+	public List<Resource<Label>> getLabelsByDashboardId(String dashboardId) {
+		return repository.findLabelsByDashboardId(dashboardId)
+										.stream()
+										.map(assembler::toResource)
+										.collect(Collectors.toList());
+	}
+	
+	public Label saveLabel(Label label) {
+		return repository.save(label);
+	}
 
 	/**
 	 * Save a {@link Label} entry to the database.
@@ -39,7 +50,7 @@ public class LabelService {
 	 * @return the newly saved resource
 	 */
 	public Resource<Label> createLabel(Label label) {
-		return assembler.toResource(repository.save(label));
+		return assembler.toResource(saveLabel(label));
 	}
 
 	public Resource<Label> getLabelById(String labelId) {
@@ -48,7 +59,7 @@ public class LabelService {
 																   HttpStatus.NOT_FOUND.value()));
 		return assembler.toResource(label);
 	}
-
+	
 	/**
 	 * Update a {@link Label} entry in the database.
 	 *
@@ -63,7 +74,7 @@ public class LabelService {
 			label.setDashboardId(newLabel.getDashboardId());
 			label.setName(newLabel.getName());
 			label.setColor(newLabel.getColor());
-			return repository.save(label);
+			return saveLabel(label);
 		}).orElseThrow(() -> new CommonException("Could not find label: " + labelId,
 												 HttpStatus.NOT_FOUND.value()));
 		return assembler.toResource(updatedLabel);
