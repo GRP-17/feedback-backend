@@ -31,7 +31,7 @@ public class Dashboard {
 	 * The name of this Dashboard.
 	 */
 	@NotNull(message = "Invalid Dashboard Name")
-	@Size(max = 65535)
+	@Size(min = 1, max = 65535)
 	@Column(name = "name", columnDefinition = "text")
 	private String name;	
 
