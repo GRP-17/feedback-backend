@@ -7,6 +7,7 @@ import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -332,6 +333,17 @@ public class FeedbackService {
 					toReturn.add(vec);
 				}
 			}
+			
+			// Sort the TermVectors so the highest frequency is first
+			toReturn.sort(new Comparator<TermVector>() 
+			{
+
+				@Override
+				public int compare(TermVector o1, TermVector o2) {
+					return -o1.getFrequency().compareTo(o2.getFrequency());
+				}
+				
+			});
 		}
 		return map;
 	}
