@@ -6,6 +6,7 @@ import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
 import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
 import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
+import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER_VALUE;
 import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
 import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -257,6 +258,10 @@ public class FeedbackController {
 	public ResponseEntity<?> stats(
 			 @RequestParam(value = "dashboardId")
 					String dashboardId,
+			 @RequestParam(value = "page", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int page,
+			 @RequestParam(value = "pageSize", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int pageSize,
 			 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
 			 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
@@ -266,6 +271,13 @@ public class FeedbackController {
 
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
 		Map<String, Object> map = new HashMap<String, Object>();
+
+		if(page == PARAM_DEFAULT_INTEGER_VALUE) {
+			page = DASHBOARD_FEEDBACK_PAGE;
+		}
+		if(pageSize == PARAM_DEFAULT_INTEGER_VALUE) {
+			pageSize = DASHBOARD_FEEDBACK_PAGE_SIZE;
+		}
 
 		for(StatType endpoint : StatType.values()) {
 			String key = endpoint.getJsonKey();
@@ -279,8 +291,7 @@ public class FeedbackController {
 				break;
 			case FEEDBACK:
 				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
-															  DASHBOARD_FEEDBACK_PAGE,
-															  DASHBOARD_FEEDBACK_PAGE_SIZE));
+															  page, pageSize));
 				break;
 			case FEEDBACK_COUNT:
 				map.put(key, feedbackService.getFeedbackCount(filters.clone()));
