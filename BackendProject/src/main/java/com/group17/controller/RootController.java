@@ -40,7 +40,7 @@ public class RootController {
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.findFeedback(DASHBOARD_ID, 0, 0, DASHBOARD_QUERY, 
 												  DASHBOARD_SINCE, DASHBOARD_SENTIMENT))
-								.withRel("feedback_paged")),
+								.withRel("feedback")),
 			
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.stats(DASHBOARD_ID, DASHBOARD_QUERY, 
