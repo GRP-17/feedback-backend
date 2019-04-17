@@ -6,8 +6,10 @@ package com.group17.feedback;
 public enum StatType {
 	/** The name of the {@link Dashboard}. */
 	DASHBOARD_NAME("dashboard_name"),
+	/** The set of all {@link Label}s for this dashboard */
+	DASHBOARD_LABELS("dashboard_labels"),
 	/** The paged {@link Feedback}. */
-	FEEDBACK("feedback_paged"),
+	FEEDBACK("feedback"),
 	/** The {@link Feedback} count. */
 	FEEDBACK_COUNT("feedback_count"),
 	/** The {@link Feedback} average rating. */

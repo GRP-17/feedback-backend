@@ -1,13 +1,10 @@
 package com.group17.ngram.termvector;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group17.util.LoggerUtil;
-import org.apache.logging.log4j.Level;
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MultiTermVectorsResponseObject {
 
@@ -26,7 +23,6 @@ public class MultiTermVectorsResponseObject {
         for (Map<String, Object> doc : docs) {
             
             // check if the doc has any terms
-            LoggerUtil.log(Level.INFO, doc.get("_id") + "Has terms : " + ( ( (Map<String, Object>) doc.get("term_vectors") ).get("text_field") != null) );
             if( ( (Boolean) doc.get("found") ) && ( ( (Map<String, Object>) doc.get("term_vectors") ).get("text_field") != null) ) {
                 Map<String, Object> terms = (Map<String, Object>)(
                         (Map<String, Object>) (
