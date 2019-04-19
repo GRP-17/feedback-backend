@@ -1,5 +1,7 @@
 package com.group17.feedback.filter.query;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -42,6 +44,12 @@ public abstract class DatabaseQuery {
 	 * @return the query to be executed
 	 */
 	public abstract Query build(EntityManager entityManager, Filters filters);
+	
+	public abstract String buildWhere(Filters filters, List<String> whereClauses);
+	
+	public String buildWhere(Filters filters, String... whereClauses) {
+		return buildWhere(filters, Arrays.asList(whereClauses));
+	}
 	
 	/**
 	 * Set the {@link javax.persistence.Query} parameters based on filters.
@@ -91,6 +99,5 @@ public abstract class DatabaseQuery {
 		}
 		return query;
 	}
-	
 	
 }

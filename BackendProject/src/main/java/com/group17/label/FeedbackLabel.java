@@ -12,15 +12,15 @@ import javax.persistence.Table;
 @Table(name = "feedback_label", schema = "hy1xosk6o5taszzw")
 public class FeedbackLabel {
 	@EmbeddedId
-	private FeedbackLabelKey id;
+	private FeedbackLabelKey feedbackLabelId;
 	
 	@Embeddable
 	public static class FeedbackLabelKey implements Serializable {
 	 
-	    @Column(name = "feedback_id")
+	    @Column
 	    String feedbackId;
 	 
-	    @Column(name = "label_id")
+	    @Column
 	    String labelId;
 	 
 	}

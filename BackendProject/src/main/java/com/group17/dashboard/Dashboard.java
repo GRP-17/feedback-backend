@@ -24,15 +24,15 @@ public class Dashboard {
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	@Column(columnDefinition = "VARCHAR(36)")
+	private String dashboardId;
 
 	/**
 	 * The name of this Dashboard.
 	 */
 	@NotNull(message = "Invalid Dashboard Name")
 	@Size(min = 1, max = 65535)
-	@Column(name = "name", columnDefinition = "text")
+	@Column(columnDefinition = "TEXT")
 	private String name;	
 
 	public Dashboard() {
@@ -43,7 +43,7 @@ public class Dashboard {
 	}
 	
 	public String getId() {
-		return id;
+		return dashboardId;
 	}
 	
 	public String getName() {

@@ -117,8 +117,9 @@ public class Filters implements Cloneable {
 	 */
 	public static Filters fromParameters(String dashboardId,  
 										 @Nullable String query, 
-										 @Nullable long since,  
+										 @Nullable Long since,
 										 @Nullable String sentiment,
+										 @Nullable Integer rating,
 										 @Nullable List<String> labelId) {
 
 		// dashboardId is always required
@@ -133,6 +134,9 @@ public class Filters implements Cloneable {
 		if(sentiment != null && !sentiment.equals(Constants.PARAM_DEFAULT_STRING)) {
 			Sentiment sentimentEnum = Sentiment.valueOf(sentiment);
 			filters.addFilter(new SentimentFilter(sentimentEnum));
+		}
+		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE) {
+			filters.addFilter(new RatingFilter(rating));
 		}
 		if(labelId != null) {
 			filters.addFilter(new LabelFilter(labelId));

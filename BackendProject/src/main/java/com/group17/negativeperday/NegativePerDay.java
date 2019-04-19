@@ -29,21 +29,21 @@ public class NegativePerDay {
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	@Column(columnDefinition = "VARCHAR(36)")
+	private String negativePerDayId;
 	
 	/**
 	 * The {@link Dashboard} this feedback belongs to.
 	 */
 	@NotNull(message = "Invalid dashboardId")
-	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
+	@Column(columnDefinition = "VARCHAR(36)")
 	private String dashboardId;
 	
 	/**
 	 * When this negative per day was created / the date it represents.
 	 */
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+	@Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
 	private Date date;
 
 	/**
@@ -51,7 +51,7 @@ public class NegativePerDay {
 	 * this {@link #dashboardId}.
 	 */
 	@NotNull(message = "Needs a negative sentiment count")
-	@Column(name = "volume", columnDefinition = "INT(11)")
+	@Column(columnDefinition = "INT(11)")
 	private Integer volume;
 
 	public NegativePerDay(String dashboardId, Date date, int volume) {
@@ -70,7 +70,7 @@ public class NegativePerDay {
 	}
 	
 	public String getId() {
-		return id;
+		return negativePerDayId;
 	}
 	
 	public Date getDate() {

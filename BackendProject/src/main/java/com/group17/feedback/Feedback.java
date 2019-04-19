@@ -44,21 +44,21 @@ public class Feedback {
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	@Column(columnDefinition = "VARCHAR(36)")
+	private String feedbackId;
 	
 	/**
 	 * The {@link Dashboard} this feedback belongs to.
 	 */
 	@NotNull(message = "Invalid dashboardId")
-	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
+	@Column(columnDefinition = "VARCHAR(36)")
 	private String dashboardId;
 	
 	/**
 	 * When this feedback was created.
 	 */
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false, columnDefinition = "TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private Date created;
 
 	/**
@@ -69,7 +69,7 @@ public class Feedback {
 	@NotNull(message = "Bad Feedback Format")
 	@Range(min = FEEDBACK_MIN_RATING, max = FEEDBACK_MAX_RATING, 
 		   message = "The range of rating is {min} ~ {max}.")
-	@Column(name = "rating", columnDefinition = "INT(11)")
+	@Column(columnDefinition = "INT(11)")
 	private Integer rating;
 
 	/**
@@ -78,7 +78,7 @@ public class Feedback {
 	 * maps onto the text column.
 	 */
 	@Size(max = 65535)
-	@Column(name = "text", columnDefinition = "text")
+	@Column(columnDefinition = "text")
 	private String text;
 
 	/**
@@ -90,10 +90,10 @@ public class Feedback {
 	 * 
 	 */
 	@Size(max = 65535)
-	@Column(name = "sentiment")
+	@Column(columnDefinition="VARCHAR(32)")
 	private String sentiment;
 	
-	@Column(name="pinned")
+	@Column(columnDefinition="TINYINT(1)")
 	private boolean pinned;
 	
 	/**
@@ -102,8 +102,8 @@ public class Feedback {
 	 */
 	@ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "feedback_label",
-        joinColumns =  @JoinColumn(name = "feedback_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "label_id", referencedColumnName = "id"))
+        joinColumns =  @JoinColumn(name = "feedback_id"),
+        inverseJoinColumns = @JoinColumn(name = "label_id"))
 	private Set<Label> labels;
 	
 	/**
@@ -135,7 +135,7 @@ public class Feedback {
 	}
 	
 	public String getId() {
-		return id;
+		return feedbackId;
 	}
 	
 	public String getDashboardId() {
