@@ -11,6 +11,7 @@ import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.impl.AgeFilter;
 import com.group17.feedback.filter.impl.DashboardFilter;
+import com.group17.feedback.filter.impl.LabelFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
@@ -26,6 +27,11 @@ public abstract class DatabaseQuery {
 	public static int PARAM_INDEX_SENTIMENT = 4;
 	/** The query parameter for {@link FilterType#RATING}. */
 	public static int PARAM_INDEX_RATING    = 5;
+	/** The query parameter for {@link FilterType#LABEL}. 
+	 *  <p>
+	 *  
+	 */
+	public static int PARAM_INDEX_LABEL     = 100;
 
 	/**
 	 * Build a {@link javax.persistence.Query}, for this DatabaseQuery
@@ -72,6 +78,14 @@ public abstract class DatabaseQuery {
 				RatingFilter rf = (RatingFilter) entry.getValue();
 				query = query.setParameter(PARAM_INDEX_RATING, 
 										   rf.getRating());
+				break;
+			case LABEL:
+				LabelFilter lf = (LabelFilter) entry.getValue();
+				int offset = 0;
+				for(String labelId : lf.getLabelIds()) {
+					int index = PARAM_INDEX_LABEL + offset++;
+					query = query.setParameter(index, labelId);
+				}
 				break;
 			}
 		}

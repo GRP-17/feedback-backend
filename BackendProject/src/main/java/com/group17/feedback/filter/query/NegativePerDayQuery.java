@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import com.group17.feedback.filter.Filter;
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
+import com.group17.feedback.filter.impl.LabelFilter;
 
 public abstract class NegativePerDayQuery extends DatabaseQuery {
 
@@ -34,6 +35,20 @@ public abstract class NegativePerDayQuery extends DatabaseQuery {
 				break;
 			case RATING:
 				buff.append("f.rating=?" + PARAM_INDEX_RATING);
+				break;
+			case LABEL:
+				LabelFilter lf = (LabelFilter) entry.getValue();
+				StringBuilder sb = new StringBuilder();
+				
+				for(int offset = 0; offset < lf.getLabelIds().size(); offset ++) {
+					int index = PARAM_INDEX_LABEL + offset;
+					if(offset > 0) {
+						sb.append(" AND ");
+					}
+					sb.append("l.id.labelId=?" + index);
+					offset ++;
+				}
+				buff.append(sb);
 				break;
 			}
 			

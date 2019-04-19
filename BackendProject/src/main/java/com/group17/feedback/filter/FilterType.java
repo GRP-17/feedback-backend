@@ -13,6 +13,8 @@ public enum FilterType {
 	/** Which rating would we like to see? */
 	RATING,
 	/** Only show if the feedback contains certain text */
-	TEXT_CONTAINING;
+	TEXT_CONTAINING,
+	/** Only show if the feedback has been assigned certain labels */
+	LABEL;
 	
 }

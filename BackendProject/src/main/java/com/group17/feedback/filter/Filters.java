@@ -2,6 +2,8 @@ package com.group17.feedback.filter;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -9,8 +11,10 @@ import java.util.Set;
 import org.springframework.lang.Nullable;
 
 import com.group17.controller.FeedbackController;
+import com.group17.dashboard.Dashboard;
 import com.group17.feedback.filter.impl.AgeFilter;
 import com.group17.feedback.filter.impl.DashboardFilter;
+import com.group17.feedback.filter.impl.LabelFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
@@ -88,6 +92,14 @@ public class Filters implements Cloneable {
 				TextFilter tf = (TextFilter) entry.getValue();
 				filters.addFilter(new TextFilter(tf.getText()));
 				break;
+			case LABEL:
+				LabelFilter lf = (LabelFilter) entry.getValue();
+				LinkedList<String> labelIds = new LinkedList<String>();
+				for(String id : lf.getLabelIds()) {
+					labelIds.add(id);
+				}
+				filters.addFilter(new LabelFilter(labelIds));
+				break;
 			}
 		}
 		return filters;
@@ -106,7 +118,8 @@ public class Filters implements Cloneable {
 	public static Filters fromParameters(String dashboardId,  
 										 @Nullable String query, 
 										 @Nullable long since,  
-										 @Nullable String sentiment) {
+										 @Nullable String sentiment,
+										 @Nullable List<String> labelId) {
 
 		// dashboardId is always required
 		Filters filters = new Filters(new DashboardFilter(dashboardId));
@@ -120,6 +133,9 @@ public class Filters implements Cloneable {
 		if(sentiment != null && !sentiment.equals(Constants.PARAM_DEFAULT_STRING)) {
 			Sentiment sentimentEnum = Sentiment.valueOf(sentiment);
 			filters.addFilter(new SentimentFilter(sentimentEnum));
+		}
+		if(labelId != null) {
+			filters.addFilter(new LabelFilter(labelId));
 		}
 		
 		return filters;

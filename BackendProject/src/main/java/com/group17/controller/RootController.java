@@ -4,6 +4,8 @@ import static com.group17.util.LinkUtil.removeParameters;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.List;
+
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ public class RootController {
 	private static final long DUMMY_SINCE = Long.MAX_VALUE;
 	/** A dummy sentiment to be trimmed from the links. */
 	private static final String DUMMY_SENTIMENT = null;
+	private static final List<String> DUMMY_LABELID = null;
 	
 	private static final int DUMMY_PAGE = 0;
 	private static final int DUMMY_PAGE_SIZE = 0;
@@ -43,49 +46,57 @@ public class RootController {
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.findFeedback(DUMMY_ID, DUMMY_PAGE, 
 													  DUMMY_PAGE_SIZE, DUMMY_QUERY,  
-													  DUMMY_SINCE, DUMMY_SENTIMENT))
+													  DUMMY_SINCE, DUMMY_SENTIMENT,
+													  DUMMY_LABELID))
 								.withRel("feedback")),
 			
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.stats(DUMMY_ID, DUMMY_PAGE, 
 											   DUMMY_PAGE_SIZE, DUMMY_QUERY, 
-											   DUMMY_SINCE, DUMMY_SENTIMENT))
+											   DUMMY_SINCE, DUMMY_SENTIMENT,
+											   DUMMY_LABELID))
 								.withRel("feedback_stats")),
 				
 			// Add 'feedback_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getCount(DUMMY_ID, DUMMY_QUERY, 
-												  DUMMY_SINCE, DUMMY_SENTIMENT))
+												  DUMMY_SINCE, DUMMY_SENTIMENT,
+												  DUMMY_LABELID))
 								.withRel("feedback_count")),
 			
 			// Add 'feedback_sentiment_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getSentimentsCount(DUMMY_ID, DUMMY_QUERY, 
-												   			DUMMY_SINCE, DUMMY_SENTIMENT))
+												   			DUMMY_SINCE, DUMMY_SENTIMENT,
+												   			DUMMY_LABELID))
 								.withRel("feedback_sentiment_count")),
 
 			// Add 'feedback_rating_average'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getAverageRating(DUMMY_ID, DUMMY_QUERY, 
-												   		  DUMMY_SINCE, DUMMY_SENTIMENT))
+												   		  DUMMY_SINCE, DUMMY_SENTIMENT,
+												   		  DUMMY_LABELID))
 								.withRel("feedback_rating_average")),
 				
 			// Add 'feedback_rating_count'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getStarRatingCount(DUMMY_ID, DUMMY_QUERY, 
-												   			DUMMY_SINCE, DUMMY_SENTIMENT))
+												   			DUMMY_SINCE, DUMMY_SENTIMENT,
+												   			DUMMY_LABELID))
 								.withRel("feedback_rating_count")),
 				
 			// Add 'feedback_rating_negative'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getNegativePerDay(DUMMY_ID, DUMMY_QUERY, 
-												   		   DUMMY_SINCE, DUMMY_SENTIMENT))
+												   		   DUMMY_SINCE, DUMMY_SENTIMENT,
+												   		   DUMMY_LABELID))
 								.withRel("feedback_rating_negative")),
 				
 			// Add 'feedback_common_phrases'
 			removeParameters(linkTo(methodOn(FeedbackController.class)
 										.getCommonPhrases(DUMMY_ID, DUMMY_QUERY, 
-												   		 DUMMY_SINCE, DUMMY_SENTIMENT))
+												   		 DUMMY_SINCE, DUMMY_SENTIMENT,
+												   		 DUMMY_LABELID))
 								.withRel("feedback_common_phrases")),
 
 			// Add 'dashboards'

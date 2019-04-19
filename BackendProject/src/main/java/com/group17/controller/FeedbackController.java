@@ -230,27 +230,29 @@ public class FeedbackController {
 				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 						long since,
 				 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String sentiment) {
+						String sentiment,
+				 @RequestParam(value = "labelId", required = false)
+				 		List<String> labelId) {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		List<Resource<Feedback>> resources = feedbackService.getPagedFeedback(filters, page, pageSize);
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resources.size()
 				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(
 				resources,
-				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment, labelId))
 					.withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment, labelId))
 					.withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment, labelId))
 					.withRel("sentiment_count"),
-				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment, labelId))
 					.withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId, query, since, sentiment, labelId))
 					.withRel("rating_count"),
-				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId, query, since, sentiment, labelId))
 					.withRel("rating_negative"),
-				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId, query, since, sentiment))
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId, query, since, sentiment, labelId))
 					.withRel("common_phrases"));
 	}
 
@@ -267,9 +269,11 @@ public class FeedbackController {
 			 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
 			 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+					String sentiment,
+		 	@RequestParam(value = "labelId", required = false)
+		 		List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		Map<String, Object> map = new HashMap<String, Object>();
 
 		if(page == PARAM_DEFAULT_INTEGER_VALUE) {
@@ -334,9 +338,11 @@ public class FeedbackController {
 				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 			 		long since,
 				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-			 		String sentiment) throws CommonException {
+			 		String sentiment,
+		 		@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		long count = feedbackService.getFeedbackCount(filters);
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
@@ -360,9 +366,11 @@ public class FeedbackController {
 		 		@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 		 			long since,
 		 		@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-		 			String sentiment) throws CommonException {
+		 			String sentiment,
+	 			@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts(filters);
 
 		try {
@@ -386,9 +394,11 @@ public class FeedbackController {
 	 			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 	 				long since,
 	 			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-	 				String sentiment) throws CommonException {
+	 				String sentiment,
+ 				@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts(filters);
 
 		try {
@@ -412,10 +422,12 @@ public class FeedbackController {
 				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
 				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+					String sentiment,
+				@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
 		Map<String, Double> map = new HashMap<String, Double>();
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		map.put("average", feedbackService.getAverageRating(filters, true));
 
 		LoggerUtil.log(Level.INFO, "[Feedback/RatingAverage] Calculated Average");
@@ -437,9 +449,11 @@ public class FeedbackController {
 				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
 				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+					String sentiment,
+				@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		Map<String, Object> map = negativePerDayService.findNegativePerDay(filters);
 		LoggerUtil.log(Level.INFO, "[Feedback/RatingNegativePerDay] Returned "
 											+ map.size() + " days");
@@ -461,9 +475,11 @@ public class FeedbackController {
 				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
 				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+					String sentiment,
+				@RequestParam(value = "labelId", required = false)
+		 			List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, labelId);
 		Map<String, Collection<TermVector>> map
 						= feedbackService.getCommonPhrases(filters,
 														   COMMON_PHRASES_AMOUNT);
