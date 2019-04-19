@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -346,6 +347,54 @@ public class FeedbackService {
 			});
 		}
 		return map;
+	}
+	
+	public HashMap<String, Object> getNegativePerDay(Filters filters) {
+		// Key: json key ("date", "volume")
+		// Value: json value (the date, the volume)
+		List<Map<String, Object>> days = new ArrayList<Map<String, Object>>();
+		
+		boolean shouldQuery = true;
+		if(filters.hasFilter(FilterType.SENTIMENT)) {
+			SentimentFilter sf = (SentimentFilter) filters.getFilter(FilterType.SENTIMENT);
+			// There's no point in querying if the sentiment is negative
+			if(!sf.getSentiment().equals(Sentiment.NEGATIVE))
+				shouldQuery = false;
+		}
+		
+		if(shouldQuery) {
+			// Ensure we only find NEGATIVE Feedback
+			filters = filters.merge(FiltersBuilder
+											.newInstance()
+											.sentiment(Sentiment.NEGATIVE)
+											.build(), 
+									true);
+			
+			// Query all the relevant Feedback and process it
+			Query query = Queries.FEEDBACK.build(getFEntityManager(), filters);
+			List<Feedback> result = query.getResultList();
+			
+			Map<Date, Integer> negativeDays = new HashMap<Date, Integer>();
+			for(Feedback feedback : result) {
+				Date date = DateUtil.getDayStart(feedback.getCreated());
+				if(negativeDays.containsKey(date)) {
+					negativeDays.put(date, negativeDays.get(date) + 1);
+				} else {
+					negativeDays.put(date, 1);
+				}
+			}
+
+			for(Entry<Date, Integer> negativeDay : negativeDays.entrySet()) {
+				days.add(new HashMap<String, Object>() {{
+					put("date", negativeDay.getKey());
+					put("volume", negativeDay.getValue());
+				}});
+			}
+		}
+		
+		return new HashMap<String, Object>() {{
+			put("result", days);
+		}};
 	}
 	
 	/**

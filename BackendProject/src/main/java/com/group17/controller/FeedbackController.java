@@ -52,7 +52,6 @@ import com.group17.feedback.filter.Filters;
 import com.group17.feedback.tone.Sentiment;
 import com.group17.label.Label;
 import com.group17.label.LabelService;
-import com.group17.negativeperday.NegativePerDayService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.util.Constants;
@@ -70,7 +69,6 @@ public class FeedbackController {
 	 * holds the instance of the FeedbackService
 	 */
 	@Autowired private FeedbackService feedbackService;
-	@Autowired private NegativePerDayService negativePerDayService;
 	@Autowired private DashboardService dashboardService;
 	@Autowired private LabelService labelService;
 
@@ -103,19 +101,10 @@ public class FeedbackController {
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
+		
 		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
-
 		// N-Grams
 		ngramService.onFeedbackCreated(newFeedback);
-
-    	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
-    		LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id "
-    										+ newFeedback.getId());
-
-			// Increase negative rating this day
-			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
-														 newFeedback.getCreated());
-		}
 
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
 										+ ". Object: " + newFeedback.toString());
@@ -314,7 +303,7 @@ public class FeedbackController {
 				map.put(key, feedbackService.getAverageRating(filters.clone(), true));
 				break;
 			case FEEDBACK_RATING_NEGATIVE:
-				map.put(key, negativePerDayService.findNegativePerDay(filters.clone()));
+				map.put(key, feedbackService.getNegativePerDay(filters.clone()));
 				break;
 			case FEEDBACK_COMMON_PHRASES:
 				map.put(key, feedbackService.getCommonPhrases(filters.clone(),
@@ -468,7 +457,7 @@ public class FeedbackController {
 		 			List<String> labelId) throws CommonException {
 
 		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
-		Map<String, Object> map = negativePerDayService.findNegativePerDay(filters);
+		Map<String, Object> map = feedbackService.getNegativePerDay(filters);
 		LoggerUtil.log(Level.INFO, "[Feedback/RatingNegativePerDay] Returned "
 											+ map.size() + " days");
 
