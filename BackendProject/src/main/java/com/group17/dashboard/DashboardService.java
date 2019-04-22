@@ -60,7 +60,9 @@ public class DashboardService {
 	public Resource<Dashboard> updateDashboard(String dashboardId, Dashboard newDashboard) throws CommonException {
 
 		Dashboard updatedDashboard = repository.findById(dashboardId).map(dashboard -> {
-			dashboard.setName(newDashboard.getName());
+			if(newDashboard.getName() != null) {
+				dashboard.setName();
+			}
 			return repository.save(dashboard);
 		}).orElseThrow(() -> new CommonException("Could not find dashboard: " + dashboardId,
 												 HttpStatus.NOT_FOUND.value()));
