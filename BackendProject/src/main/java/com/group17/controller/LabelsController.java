@@ -1,6 +1,5 @@
 package com.group17.controller;
 
-import static com.group17.util.Constants.PARAM_DEFAULT_STRING;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -24,12 +23,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.label.Label;
 import com.group17.label.LabelService;
-import com.group17.util.Constants;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
 
@@ -62,8 +59,8 @@ public class LabelsController {
 				throws URISyntaxException, TransactionSystemException {
 
 		Resource<Label> resource = labelService.createLabel(newLabel);
-		LoggerUtil.log(Level.INFO, "[Label/Create] Created: " + newLabel.getId());
-		return ResponseEntity.created(new URI(resource.getId().expand(newLabel.getId()).getHref())).body(resource);
+		LoggerUtil.log(Level.INFO, "[Label/Create] Created: " + newLabel.getLabelId());
+		return ResponseEntity.created(new URI(resource.getId().expand(newLabel.getLabelId()).getHref())).body(resource);
 	}
 
 	@PutMapping("/{labelId}")
@@ -73,7 +70,7 @@ public class LabelsController {
 		Resource<Label> resource = labelService.updateLabel(labelId, newLabel);
 		LoggerUtil.log(Level.INFO, "[Label/Update] Updated: " + labelId
 										+ ". Object: " + newLabel.toString());
-		return ResponseEntity.created(new URI(resource.getId().expand(newLabel.getId()).getHref())).body(resource);
+		return ResponseEntity.created(new URI(resource.getId().expand(newLabel.getLabelId()).getHref())).body(resource);
 	}
 
 	@DeleteMapping("/{labelId}")
