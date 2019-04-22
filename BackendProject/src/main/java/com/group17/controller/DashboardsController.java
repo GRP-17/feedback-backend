@@ -67,15 +67,9 @@ public class DashboardsController {
 	}
 	
 	@PutMapping("/{dashboardId}")
-	public ResponseEntity<?> update(@PathVariable String dashboardId, 
-									@RequestParam(value = "name", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String name)
+	public ResponseEntity<?> update(@PathVariable String dashboardId, @RequestBody Dashboard newDashboard)
 			throws URISyntaxException, TransactionSystemException {
 
-		Dashboard newDashboard = dashboardService.getDashboardById(dashboardId).getContent();
-		if(name != null && !name.equals(Constants.PARAM_DEFAULT_STRING)) {
-			newDashboard.setName(name);
-		}
 		Resource<Dashboard> resource = dashboardService.updateDashboard(dashboardId, newDashboard);
 		LoggerUtil.log(Level.INFO, "[Dashboard/Update] Updated: " + dashboardId
 										+ ". Object: " + newDashboard.toString());
