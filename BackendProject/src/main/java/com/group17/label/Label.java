@@ -52,17 +52,20 @@ public class Label {
 	@JsonIgnore // This has to be ignored as there is a circular dependency inside Feedback
 	@ManyToMany(mappedBy = "labels")
     private Set<Feedback> feedback = new HashSet<Feedback>();
-	
-	public Label() {
-	}
-	
+
+	public Label() {}
+
 	public Label(String dashboardId, String name, String color) {
 		this.dashboardId = dashboardId;
 		this.name = name;
 		this.color = color;
 	}
-	
-	public String getId() {
+
+	public void setLabelId(String labelId) {
+		this.labelId = labelId;
+	}
+
+	public String getLabelId() {
 		return labelId;
 	}
 	

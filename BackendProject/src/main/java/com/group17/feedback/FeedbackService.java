@@ -1,30 +1,5 @@
 package com.group17.feedback;
 
-import static com.group17.util.Constants.AVERAGE_RATING_FORMAT;
-import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
-import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
-import org.apache.logging.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaContext;
-import org.springframework.hateoas.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.FiltersBuilder;
@@ -33,11 +8,29 @@ import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.query.Queries;
 import com.group17.feedback.tone.Sentiment;
 import com.group17.feedback.tone.WatsonGateway;
+import com.group17.label.Label;
+import com.group17.label.LabelRepository;
+import com.group17.label.LabelService;
 import com.group17.ngram.NGramService;
 import com.group17.ngram.termvector.TermVector;
 import com.group17.util.DateUtil;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.logging.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaContext;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static com.group17.util.Constants.*;
 
 /**
  * The {@link org.springframework.stereotype.Service} that will handle any retrieval
@@ -45,18 +38,43 @@ import com.group17.util.exception.CommonException;
  */
 @Service
 public class FeedbackService {
-	/** Holds the JpaContext instance for entity managers. */
-	@Autowired private JpaContext jpaContext;
-	/** Holds the instance of the FeedbackRepository which represents the database. */
-	@Autowired private FeedbackRepository feedbackRepo;
-	/** Holds the instance of the factory which will make the resources. */
-	@Autowired private FeedbackResourceAssembler feedbackAssembler;
+	/**
+	 * Holds the JpaContext instance for entity managers.
+	 */
+	@Autowired
+	private JpaContext jpaContext;
+	/**
+	 * Holds the instance of the FeedbackRepository which represents the database.
+	 */
+	@Autowired
+	private FeedbackRepository feedbackRepo;
+	/**
+	 * Holds the instance of the FeedbackRepository which represents the database.
+	 */
+	@Autowired
+	private LabelRepository labelRepo;
+	/**
+	 * Holds the instance of the factory which will make the resources.
+	 */
+	@Autowired
+	private FeedbackResourceAssembler feedbackAssembler;
 
-	/** Stores the gateway for IBM watson.  */
-	@Autowired private WatsonGateway watsonGateway;
-	/** Stores the service for finding ngrams & common phrases.  */
-	@Autowired private NGramService phraseService;
-	
+	/**
+	 * Stores the gateway for IBM watson.
+	 */
+	@Autowired
+	private WatsonGateway watsonGateway;
+	/**
+	 * Stores the service for finding ngrams & common phrases.
+	 */
+	@Autowired
+	private NGramService phraseService;
+	/**
+	 * Stores the service for feedback labelling.
+	 */
+	@Autowired
+	private LabelService labelService;
+
 	/**
 	 * Save a {@link Feedback} entry to the database.
 	 *
@@ -78,11 +96,47 @@ public class FeedbackService {
 	 */
 	public Resource<Feedback> updateFeedback(String id, Feedback newFeedback) throws CommonException {
 		Feedback updatedFeedback = feedbackRepo.findById(id).map(feedback -> {
-			feedback.setDashboardId(newFeedback.getDashboardId());
-			feedback.setRating(newFeedback.getRating());
-			feedback.setText(newFeedback.getText());
-			feedback.setSentiment(newFeedback.getSentiment());
-			feedback.setPinned(newFeedback.isPinned());
+			if (newFeedback.getDashboardId() != null) {
+				feedback.setDashboardId(newFeedback.getDashboardId());
+			}
+			if (newFeedback.getRating() != null) {
+				feedback.setRating(newFeedback.getRating());
+			}
+			if (newFeedback.getText() != null) {
+				feedback.setText(newFeedback.getText());
+				getWatsonGateway().deduceAndSetSentiment(newFeedback);
+			}
+			if (newFeedback.getSentiment() != null) {
+				feedback.setSentiment(newFeedback.getSentiment());
+			}
+			if (newFeedback.isPinned() != null) {
+				feedback.setPinned(newFeedback.isPinned());
+			}
+			if (newFeedback.getLabels() != null) {
+				// Check if the Feedback has any pre-existing Labels; removing them if they do
+				for (Label existingLabel : feedback.getLabels()) {
+					feedback.getLabels().remove(existingLabel);
+
+					// Save the label otherwise this change won't be stored
+					labelService.saveLabel(existingLabel);
+				}
+
+				// Now, to add the existing labels
+				for (Label newLabel : newFeedback.getLabels()) {
+					// find the label
+					System.out.println(ReflectionToStringBuilder.toString(newLabel));
+					Label label = labelRepo.findById(newLabel.getLabelId())
+							.orElseThrow(() -> new CommonException("Could not find label: " + newLabel.getLabelId(),
+									HttpStatus.NOT_FOUND.value()));
+
+					feedback.getLabels().add(label);
+					label.getFeedback().add(newFeedback);
+
+					// Save the label otherwise this change won't be stored
+					labelService.saveLabel(label);
+				}
+			}
+
 			return feedbackRepo.save(feedback);
 		}).orElseThrow(() -> new CommonException("Could not find feedback: " + id, HttpStatus.NOT_FOUND.value()));
 		return feedbackAssembler.toResource(updatedFeedback);
@@ -122,35 +176,35 @@ public class FeedbackService {
 		List<Feedback> feedback = query.getResultList();
 		return feedback.stream().map(feedbackAssembler::toResource).collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * Get paged {@link Resource}s in the repository.
-	 * 
-	 * @param filters the {@link Filters} to apply
-	 * @param page the page (starting from 1) to get
+	 *
+	 * @param filters  the {@link Filters} to apply
+	 * @param page     the page (starting from 1) to get
 	 * @param pageSize the size of each page
 	 * @return the entries
 	 */
 	public List<Resource<Feedback>> getPagedFeedback(Filters filters, int page, int pageSize) {
-		if(page < 0) return new ArrayList<Resource<Feedback>>();
-		
+		if (page < 0) return new ArrayList<Resource<Feedback>>();
+
 		int fromIndex = (page - 1) * pageSize;
 		int toIndex = page * pageSize;
-		
+
 		List<Resource<Feedback>> feedback = getAllFeedback(filters);
-		if(feedback.isEmpty()) return feedback;
-		if(fromIndex >= feedback.size()) return new ArrayList<Resource<Feedback>>();
-		
-		toIndex = Math.min(feedback.size(), toIndex); 
-		
+		if (feedback.isEmpty()) return feedback;
+		if (fromIndex >= feedback.size()) return new ArrayList<Resource<Feedback>>();
+
+		toIndex = Math.min(feedback.size(), toIndex);
+
 		LoggerUtil.log(Level.INFO, "Getting paged feedback [" + fromIndex + ", " + toIndex + "]");
-		
+
 		return feedback.subList(fromIndex, toIndex);
 	}
-	
+
 	/**
 	 * Get the number of rows in the repository.
-	 * 
+	 *
 	 * @param filters the {@link Filters} to apply
 	 * @return the row count
 	 */
@@ -175,34 +229,34 @@ public class FeedbackService {
 
 	public Map<Sentiment, Long> getSentimentCounts(Filters filters) {
 		Map<Sentiment, Long> counts = new HashMap<Sentiment, Long>();
-		
+
 		Sentiment filteredSentiment = null;
-		if(filters.hasFilter(FilterType.SENTIMENT)) {
+		if (filters.hasFilter(FilterType.SENTIMENT)) {
 			filteredSentiment = ((SentimentFilter) filters.getFilter(FilterType.SENTIMENT))
-										.getSentiment();
+					.getSentiment();
 		}
-		
+
 		for (Sentiment sentiment : Sentiment.values()) {
-			if(filteredSentiment != null) {
-				
-				if(filteredSentiment.equals(sentiment)) {
+			if (filteredSentiment != null) {
+
+				if (filteredSentiment.equals(sentiment)) {
 					counts.put(sentiment, getCountBySentiment(filters));
 				} else {
 					counts.put(sentiment, 0L);
 				}
-				
+
 			} else {
-				
+
 				Filters clone = filters.clone();
 				clone.addFilter(new SentimentFilter(sentiment));
 				counts.put(sentiment, getCountBySentiment(clone));
-				
+
 			}
 		}
-		
+
 		return counts;
 	}
-	
+
 	/**
 	 * Get the total appearances of a given rating in the JPA
 	 * {@link Feedback} repository.
@@ -220,7 +274,7 @@ public class FeedbackService {
 	/**
 	 * Get a {@link java.util.Map} of all the ratings against their number
 	 * of appearances within the repository.
-	 * 
+	 *
 	 * @param filters the {@link Filters} to apply
 	 * @return the resultant Map
 	 */
@@ -230,48 +284,48 @@ public class FeedbackService {
 		Map<Integer, Long> ratings = new HashMap<Integer, Long>();
 
 		int filteredRating = Integer.MIN_VALUE;
-		if(filters.hasFilter(FilterType.RATING)) {
+		if (filters.hasFilter(FilterType.RATING)) {
 			filteredRating = ((RatingFilter) filters.getFilter(FilterType.RATING))
-									.getRating();
+					.getRating();
 		}
-		
+
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			
-			if(filteredRating != Integer.MIN_VALUE) {
-				
-				if(filteredRating == rating) {
+
+			if (filteredRating != Integer.MIN_VALUE) {
+
+				if (filteredRating == rating) {
 					ratings.put(rating, getCountByRating(filters));
 				} else {
 					ratings.put(rating, 0L);
 				}
-				
+
 			} else {
-				
+
 				Filters clone = filters.clone();
 				clone.addFilter(new RatingFilter(rating));
 				ratings.put(rating, getCountByRating(clone));
-				
+
 			}
 		}
-		
+
 		return ratings;
 	}
 
 	/**
 	 * Get the average numerical rating for the database.
-	 * 
-	 * @param filters the {@link Filters} to apply
+	 *
+	 * @param filters   the {@link Filters} to apply
 	 * @param formatted whether to neatly format the decimal
 	 * @return the average rating
 	 */
 	public double getAverageRating(Filters filters, boolean formatted) {
 		double total = 0;
 		int rowCount = 0;
-		for(Entry<Integer, Long> entry : getRatingCounts(filters).entrySet()) {
+		for (Entry<Integer, Long> entry : getRatingCounts(filters).entrySet()) {
 			rowCount += entry.getValue();
 			total += entry.getKey() * entry.getValue();
 		}
-		
+
 		// The unformatted average - it could have many trailing decimal values
 		double denominator = Math.max(1, rowCount);
 		double average = total / denominator;
@@ -281,42 +335,42 @@ public class FeedbackService {
 
 		return average;
 	}
-	
+
 	/**
 	 * Get the common phrases in the (Searchbox) database.
-	 * 
+	 *
 	 * @param filters the {@link Filter}s to apply
-	 * @param amount the maximum number of common phrases to retrieve
+	 * @param amount  the maximum number of common phrases to retrieve
 	 * @return the common phrases against their term vectors
 	 */
 	public Map<String, Collection<TermVector>> getCommonPhrases(Filters filters, int amount) {
 		// Add a filter based on the last month, however if they specify a date to find
 		// it by already, then we won't merge
 		filters = filters.clone().merge(FiltersBuilder
-									.newInstance()
-									.age(DateUtil.getLastMonth())
-									.build(),
-								false);
+						.newInstance()
+						.age(DateUtil.getLastMonth())
+						.build(),
+				false);
 
 		// Get the IDs of the Feedback we're going to send to Elasticsearch using queries
 		Query query = Queries.FEEDBACK_IDS.build(getFEntityManager(), filters);
 		List<String> ids = new ArrayList<String>();
-		for(Object obj : query.getResultList()) {
+		for (Object obj : query.getResultList()) {
 			ids.add((String) obj);
 		}
-		
+
 		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
 		List<TermVector> toReturn = new ArrayList<TermVector>();
 		map.put("result", toReturn);
-		
-		if(!ids.isEmpty()) {
+
+		if (!ids.isEmpty()) {
 			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-			if(phrases != null) {
+			if (phrases != null) {
 				LoggerUtil.log(Level.INFO, "Size before filtering : " + phrases.size());
 				// filter out single word phrases (by searching for a space in the term)
 				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
-				for(Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
-					if(phrase.getValue().getTerm().contains(" ")) { // Filter anything out any 1-grams
+				for (Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
+					if (phrase.getValue().getTerm().contains(" ")) { // Filter anything out any 1-grams
 						filteredPhrases.put(phrase.getKey(), phrase.getValue());
 					} else {
 						LoggerUtil.log(Level.INFO, "Filtering out 1-gram: " + phrase.getKey());
@@ -328,88 +382,87 @@ public class FeedbackService {
 				List<TermVector> sortedPhrases = new ArrayList<TermVector>(filteredPhrases.values());
 				Collections.sort(sortedPhrases);
 
-				for(int i = 0; i < Math.min(sortedPhrases.size(), amount); i ++) {
+				for (int i = 0; i < Math.min(sortedPhrases.size(), amount); i++) {
 					TermVector vec = sortedPhrases.get(i);
 					vec.getTerm().replace("  ", " "); // Remove any double spacing
 					toReturn.add(vec);
 				}
 			}
-			
+
 			// Sort the TermVectors so the highest frequency is first
-			toReturn.sort(new Comparator<TermVector>() 
-			{
+			toReturn.sort(new Comparator<TermVector>() {
 
 				@Override
 				public int compare(TermVector o1, TermVector o2) {
 					return -o1.getFrequency().compareTo(o2.getFrequency());
 				}
-				
+
 			});
 		}
 		return map;
 	}
-	
+
 	public HashMap<String, Object> getNegativePerDay(Filters filters) {
 		// Key: json key ("date", "volume")
 		// Value: json value (the date, the volume)
 		List<Map<String, Object>> days = new ArrayList<Map<String, Object>>();
-		
+
 		boolean shouldQuery = true;
-		if(filters.hasFilter(FilterType.SENTIMENT)) {
+		if (filters.hasFilter(FilterType.SENTIMENT)) {
 			SentimentFilter sf = (SentimentFilter) filters.getFilter(FilterType.SENTIMENT);
 			// There's no point in querying if the sentiment is negative
-			if(!sf.getSentiment().equals(Sentiment.NEGATIVE))
+			if (!sf.getSentiment().equals(Sentiment.NEGATIVE))
 				shouldQuery = false;
 		}
-		
-		if(shouldQuery) {
+
+		if (shouldQuery) {
 			// Ensure we only find NEGATIVE Feedback
 			filters = filters.merge(FiltersBuilder
-											.newInstance()
-											.sentiment(Sentiment.NEGATIVE)
-											.build(), 
-									true);
-			
+							.newInstance()
+							.sentiment(Sentiment.NEGATIVE)
+							.build(),
+					true);
+
 			// Query all the relevant Feedback and process it
 			Query query = Queries.FEEDBACK.build(getFEntityManager(), filters);
 			List<Feedback> result = query.getResultList();
-			
+
 			Map<Date, Integer> negativeDays = new HashMap<Date, Integer>();
-			for(Feedback feedback : result) {
+			for (Feedback feedback : result) {
 				Date date = DateUtil.getDayStart(feedback.getCreated());
-				if(negativeDays.containsKey(date)) {
+				if (negativeDays.containsKey(date)) {
 					negativeDays.put(date, negativeDays.get(date) + 1);
 				} else {
 					negativeDays.put(date, 1);
 				}
 			}
 
-			for(Entry<Date, Integer> negativeDay : negativeDays.entrySet()) {
+			for (Entry<Date, Integer> negativeDay : negativeDays.entrySet()) {
 				days.add(new HashMap<String, Object>() {{
 					put("date", negativeDay.getKey());
 					put("volume", negativeDay.getValue());
 				}});
 			}
 		}
-		
+
 		return new HashMap<String, Object>() {{
 			put("result", days);
 		}};
 	}
-	
+
 	/**
 	 * Get the {@link javax.persistence.EntityManager} for the {@link Feedback} entity.
-	 * 
+	 *
 	 * @return the {@link javax.persistence.EntityManager}
 	 */
 	private EntityManager getFEntityManager() {
 		return jpaContext.getEntityManagerByManagedType(Feedback.class);
 	}
-	
+
 	public WatsonGateway getWatsonGateway() {
 		return watsonGateway;
 	}
-	
+
 	public void setWatsonGateway(WatsonGateway gateway) {
 		this.watsonGateway = gateway;
 	}
