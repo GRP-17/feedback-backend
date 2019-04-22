@@ -71,9 +71,15 @@ public class LabelService {
 	public Resource<Label> updateLabel(String labelId, Label newLabel) throws CommonException {
 
 		Label updatedLabel = repository.findById(labelId).map(label -> {
-			label.setDashboardId(newLabel.getDashboardId());
-			label.setName(newLabel.getName());
-			label.setColor(newLabel.getColor());
+			if(newLabel.getDashboardId() != null) {
+				label.setDashboardId(newLabel.getDashboardId());
+			}
+			if(newLabel.getName() != null) {
+				label.setName(newLabel.getName());
+			}
+			if(newLabel.getColor() != null) {
+				label.setColor(newLabel.getColor());
+			}
 			return saveLabel(label);
 		}).orElseThrow(() -> new CommonException("Could not find label: " + labelId,
 												 HttpStatus.NOT_FOUND.value()));
