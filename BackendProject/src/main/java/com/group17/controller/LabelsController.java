@@ -42,7 +42,7 @@ public class LabelsController {
 	@GetMapping()
 	public Resources<Resource<Label>> findAll() throws CommonException {
 		List<Resource<Label>> resources = labelService.getAllLabels();
-		LoggerUtil.log(Level.INFO, "[Label/Retrieve] Retrieved: " 
+		LoggerUtil.log(Level.INFO, "[Label/Retrieve] Retrieved: "
 										+ resources.size() + " labels");
 		return new Resources<Resource<Label>>(
 				resources,
@@ -56,39 +56,20 @@ public class LabelsController {
 		LoggerUtil.log(Level.INFO, "[Label/Retrieve] Retrieved: label " + labelId);
 		return resource;
 	}
-	
+
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Label newLabel)
 				throws URISyntaxException, TransactionSystemException {
-		
+
 		Resource<Label> resource = labelService.createLabel(newLabel);
 		LoggerUtil.log(Level.INFO, "[Label/Create] Created: " + newLabel.getId());
 		return ResponseEntity.created(new URI(resource.getId().expand(newLabel.getId()).getHref())).body(resource);
 	}
-	
+
 	@PutMapping("/{labelId}")
-	public ResponseEntity<?> update(@PathVariable String labelId,
-									@RequestParam(value = "dashboardId", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String dashboardId,
-									@RequestParam(value = "name", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String name,
-									@RequestParam(value = "color", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String color)
+	public ResponseEntity<?> update(@PathVariable String labelId, @RequestBody Label newLabel)
 			throws URISyntaxException, TransactionSystemException {
 
-		Label newLabel = labelService.getLabelById(labelId).getContent();
-		if(dashboardId != null && !dashboardId.equals(Constants.PARAM_DEFAULT_STRING)) {
-			newLabel.setDashboardId(dashboardId);
-		}
-		if(name != null && !name.equals(Constants.PARAM_DEFAULT_STRING)) {
-			newLabel.setName(name);
-		}
-		if(color != null && !color.equals(Constants.PARAM_DEFAULT_STRING)) {
-			if(color.length() == 7) {
-				newLabel.setColor(color);
-			}
-		}
-		
 		Resource<Label> resource = labelService.updateLabel(labelId, newLabel);
 		LoggerUtil.log(Level.INFO, "[Label/Update] Updated: " + labelId
 										+ ". Object: " + newLabel.toString());
@@ -106,7 +87,7 @@ public class LabelsController {
 
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	/**
 	 * Handles any CommonExceptions thrown.
 	 *
