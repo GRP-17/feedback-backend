@@ -40,7 +40,14 @@ public class Configuration {
 	 */
 	@Bean
 	public SearchboxGateway searchboxGateway() {
-		return new SearchboxGateway();
+		String baseUrl = "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/";
+		String index = "master-test";
+				
+		String putUrl = baseUrl + index + "/doc/";
+		String postUrl = baseUrl + index + "/doc/_mtermvectors";
+		String deleteUrl = putUrl;
+		
+		return new SearchboxGateway(putUrl, postUrl, deleteUrl);
 	}
 
 }

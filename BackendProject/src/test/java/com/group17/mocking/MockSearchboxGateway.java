@@ -10,6 +10,10 @@ import com.group17.ngram.termvector.TermVector;
 
 public class MockSearchboxGateway extends SearchboxGateway {
 
+	public MockSearchboxGateway() {
+		super("", "", "");
+	}
+
 	@Override
 	public boolean put(String id, String text) {
 		return true;

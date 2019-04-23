@@ -27,14 +27,18 @@ public class SearchboxGateway {
 	/** The content type we're sending. */
 	private static final String CONTENT_TYPE = "application/json";
 
-	/** The base URL that all other request URLs derive from. */
-	private static final String BASE_URL = "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/";
 	/** The URL to do put requests to. */
-	private static final String PUT_URL = BASE_URL + "master-test/doc/";
+	private String putUrl;
 	/** The URL to do POST requests to. */
-	private static final String POST_URL  = BASE_URL + "master-test/doc/_mtermvectors";
+	private String postUrl;
 	/** The URL to do DELETE requests to. */
-	private static final String DELETE_URL = PUT_URL;
+	private String deleteUrl;
+	
+	public SearchboxGateway(String putUrl, String postUrl, String deleteUrl) {
+		this.putUrl = putUrl;
+		this.postUrl = postUrl;
+		this.deleteUrl = deleteUrl;
+	}
 	
 	/**
 	 * Insert a {@link Feedback} into the Searchbox database through a request.
@@ -50,7 +54,7 @@ public class SearchboxGateway {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
 			//post http request to the mtermvectors url
-			HttpPost req = new HttpPost(PUT_URL + id);
+			HttpPost req = new HttpPost(putUrl + id);
 
 			// build the data to send
 			JsonObject body = new JsonObject();
@@ -83,7 +87,7 @@ public class SearchboxGateway {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
 			//post http request to the mtermvectors url
-			HttpPost req = new HttpPost(DELETE_URL + id);
+			HttpPost req = new HttpPost(deleteUrl + id);
 			httpClient.execute(req);
 			
 			LoggerUtil.log(Level.INFO, "DELETED " + id + " from searchbox");
@@ -107,7 +111,7 @@ public class SearchboxGateway {
 			HttpClient httpClient = HttpClientBuilder.create().build();
 
 			//post http request to the mtermvectors url
-			HttpPost req = new HttpPost(POST_URL);
+			HttpPost req = new HttpPost(postUrl);
 
 			// build the data to send
 			// attach ids
