@@ -1,0 +1,14 @@
+com.group17
+com.group17.controller
+com.group17.dashboard
+com.group17.feedback
+com.group17.feedback.filter
+com.group17.feedback.filter.impl
+com.group17.feedback.filter.query
+com.group17.feedback.tone
+com.group17.label
+com.group17.mocking
+com.group17.ngram
+com.group17.ngram.termvector
+com.group17.util
+com.group17.util.exception
