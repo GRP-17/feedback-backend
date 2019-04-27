@@ -108,7 +108,12 @@ public class RootController {
 			// Add 'labels'
 			removeParameters(linkTo(methodOn(LabelsController.class)
 										.findAll())
-								.withRel("labels")));
+								.withRel("labels")),
+
+			// Add 'blacklisted_phrases'
+			removeParameters(linkTo(methodOn(BlacklistedPhrasesController.class)
+										.findAll())
+								.withRel("blacklisted_phrases")));
 		return rootResource;
 	}
 

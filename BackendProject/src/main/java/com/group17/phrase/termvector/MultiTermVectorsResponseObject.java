@@ -1,4 +1,4 @@
-package com.group17.ngram.termvector;
+package com.group17.phrase.termvector;
 
 import java.util.HashMap;
 import java.util.List;

@@ -11,8 +11,8 @@ import com.group17.feedback.tone.WatsonGateway;
 import com.group17.label.Label;
 import com.group17.label.LabelRepository;
 import com.group17.label.LabelService;
-import com.group17.ngram.NGramService;
-import com.group17.ngram.termvector.TermVector;
+import com.group17.phrase.PhraseService;
+import com.group17.phrase.termvector.TermVector;
 import com.group17.util.DateUtil;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
@@ -68,7 +68,7 @@ public class FeedbackService {
 	 * Stores the service for finding ngrams & common phrases.
 	 */
 	@Autowired
-	private NGramService phraseService;
+	private PhraseService phraseService;
 	/**
 	 * Stores the service for feedback labelling.
 	 */
@@ -344,61 +344,8 @@ public class FeedbackService {
 	 * @return the common phrases against their term vectors
 	 */
 	public Map<String, Collection<TermVector>> getCommonPhrases(Filters filters, int amount) {
-		// Add a filter based on the last month, however if they specify a date to find
-		// it by already, then we won't merge
-		filters = filters.clone().merge(FiltersBuilder
-						.newInstance()
-						.age(DateUtil.getLastMonth())
-						.build(),
-				false);
-
-		// Get the IDs of the Feedback we're going to send to Elasticsearch using queries
-		Query query = Queries.FEEDBACK_IDS.build(getFEntityManager(), filters);
-		List<String> ids = new ArrayList<String>();
-		for (Object obj : query.getResultList()) {
-			ids.add((String) obj);
-		}
-
 		Map<String, Collection<TermVector>> map = new HashMap<String, Collection<TermVector>>();
-		List<TermVector> toReturn = new ArrayList<TermVector>();
-		map.put("result", toReturn);
-
-		if (!ids.isEmpty()) {
-			Map<String, TermVector> phrases = phraseService.getCommonPhrases(ids);
-			if (phrases != null) {
-				LoggerUtil.log(Level.INFO, "Size before filtering : " + phrases.size());
-				// filter out single word phrases (by searching for a space in the term)
-				Map<String, TermVector> filteredPhrases = new HashMap<String, TermVector>();
-				for (Map.Entry<String, TermVector> phrase : phrases.entrySet()) {
-					if (phrase.getValue().getTerm().contains(" ")) { // Filter anything out any 1-grams
-						filteredPhrases.put(phrase.getKey(), phrase.getValue());
-					} else {
-						LoggerUtil.log(Level.INFO, "Filtering out 1-gram: " + phrase.getKey());
-					}
-				}
-				LoggerUtil.log(Level.INFO, "Size after filtering : " + filteredPhrases.size());
-
-				// sort based on score - get *amount* with highest score
-				List<TermVector> sortedPhrases = new ArrayList<TermVector>(filteredPhrases.values());
-				Collections.sort(sortedPhrases);
-
-				for (int i = 0; i < Math.min(sortedPhrases.size(), amount); i++) {
-					TermVector vec = sortedPhrases.get(i);
-					vec.getTerm().replace("  ", " "); // Remove any double spacing
-					toReturn.add(vec);
-				}
-			}
-
-			// Sort the TermVectors so the highest frequency is first
-			toReturn.sort(new Comparator<TermVector>() {
-
-				@Override
-				public int compare(TermVector o1, TermVector o2) {
-					return -o1.getFrequency().compareTo(o2.getFrequency());
-				}
-
-			});
-		}
+		map.put("result", phraseService.getCommonPhrases(filters, amount));
 		return map;
 	}
 

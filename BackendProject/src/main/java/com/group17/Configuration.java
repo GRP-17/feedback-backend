@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.group17.feedback.tone.WatsonGateway;
-import com.group17.ngram.SearchboxGateway;
+import com.group17.phrase.SearchboxGateway;
 
 /**
  * The {@link org.springframework.context.annotation.Configuration} 
@@ -34,7 +34,7 @@ public class Configuration {
 	}
 	
 	/**
-	 * Creates a new instance of the {@link com.group17.ngram.SearchboxGateway}.
+	 * Creates a new instance of the {@link com.group17.phrase.SearchboxGateway}.
 	 * 
 	 * @return the new com.group17.ngram.SearchboxGateway instance
 	 */

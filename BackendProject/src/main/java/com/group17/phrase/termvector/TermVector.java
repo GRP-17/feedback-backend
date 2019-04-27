@@ -1,4 +1,4 @@
-package com.group17.ngram.termvector;
+package com.group17.phrase.termvector;
 
 /**
  * A simple tuple object to store an n-gram term against
@@ -10,7 +10,12 @@ public class TermVector implements Comparable<TermVector> {
     private final double score;
 
     public TermVector(String term, int frequency, double score) {
-        this.term = term;
+    	if(term != null) {
+    		// Remove any double spacing
+    		this.term = term.replace("  ", " ");
+    	} else {
+        	this.term = term;
+    	}
         this.frequency = frequency;
         this.score = score * frequency;
     }

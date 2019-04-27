@@ -1,5 +1,5 @@
 
-package com.group17.ngram;
+package com.group17.phrase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.group17.ngram.termvector.MultiTermVectorsResponseObject;
-import com.group17.ngram.termvector.TermVector;
+import com.group17.phrase.termvector.MultiTermVectorsResponseObject;
+import com.group17.phrase.termvector.TermVector;
 import com.group17.util.LoggerUtil;
 
 @Component  // for spring bean autowiring (dependency injection)
