@@ -26,8 +26,9 @@ public class Queries {
 			if(filters.hasFilter(FilterType.LABEL)) {
 				// The resultant set would be empty if the FeedbackLabel
 				// table is empty otherwise. Proof: a x 0 = 0
-				strQuery = strQuery.concat(", FeedbackLabel l");
-				extraWhereClauses.add("l.id.feedbackId=f.feedbackId");
+				
+				strQuery = strQuery.concat(buildLabelJoins(filters, extraWhereClauses, 
+														   true));
 			}
 			strQuery = strQuery.concat(buildWhere(filters, extraWhereClauses))
 							   .concat(ORDER_BY);
@@ -49,8 +50,9 @@ public class Queries {
 			if(filters.hasFilter(FilterType.LABEL)) {
 				// The resultant set would be empty if the FeedbackLabel
 				// table is empty otherwise. Proof: a x 0 = 0
-				strQuery = strQuery.concat(", FeedbackLabel l");
-				extraWhereClauses.add("l.id.feedbackId=f.feedbackId");
+
+				strQuery = strQuery.concat(buildLabelJoins(filters, extraWhereClauses, 
+						   								   true));
 			}
 			strQuery = strQuery.concat(buildWhere(filters, extraWhereClauses))
 							   .concat(buildOrderByPinned());
@@ -72,8 +74,9 @@ public class Queries {
 			if(filters.hasFilter(FilterType.LABEL)) {
 				// The resultant set would be empty if the FeedbackLabel
 				// table is empty otherwise. Proof: a x 0 = 0
-				strQuery = strQuery.concat(", FeedbackLabel l");
-				extraWhereClauses.add("l.id.feedbackId=f.feedbackId");
+
+				strQuery = strQuery.concat(buildLabelJoins(filters, extraWhereClauses, 
+						   								   true));
 			}
 			strQuery = strQuery.concat(buildWhere(filters, extraWhereClauses))
 							   .concat(buildOrderByPinned());
@@ -98,8 +101,9 @@ public class Queries {
 			if(filters.hasFilter(FilterType.LABEL)) {
 				// The resultant set would be empty if the FeedbackLabel
 				// table is empty otherwise. Proof: a x 0 = 0
-				strQuery = strQuery.concat(", FeedbackLabel l");
-				extraWhereClauses.add("l.id.feedbackId=f.feedbackId");
+
+				strQuery = strQuery.concat(buildLabelJoins(filters, extraWhereClauses, 
+						   								   true));
 			}
 			strQuery = strQuery.concat(buildWhere(filters, extraWhereClauses))
 							   .concat(buildOrderByPinned())
@@ -125,8 +129,9 @@ public class Queries {
 			if(filters.hasFilter(FilterType.LABEL)) {
 				// The resultant set would be empty if the FeedbackLabel
 				// table is empty otherwise. Proof: a x 0 = 0
-				strQuery = strQuery.concat(", FeedbackLabel l");
-				extraWhereClauses.add("l.id.feedbackId=f.feedbackId");
+
+				strQuery = strQuery.concat(buildLabelJoins(filters, extraWhereClauses, 
+						   								   true));
 			}
 			strQuery = strQuery.concat(buildWhere(filters, extraWhereClauses))
 							   .concat(buildOrderByPinned())

@@ -2,6 +2,7 @@ package com.group17.feedback.filter.query;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -34,7 +35,7 @@ public abstract class DatabaseQuery {
 	 *  
 	 */
 	public static int PARAM_INDEX_LABEL     = 100;
-
+	
 	/**
 	 * Build a {@link javax.persistence.Query}, for this DatabaseQuery
 	 * based on Filters.
@@ -49,6 +50,33 @@ public abstract class DatabaseQuery {
 	
 	public String buildWhere(Filters filters, String... whereClauses) {
 		return buildWhere(filters, Arrays.asList(whereClauses));
+	}
+	
+	public String buildLabelJoins(Filters filters, List<String> whereClauses,
+								  boolean commaPrefix) {
+		StringBuilder sb = new StringBuilder();
+		LabelFilter lf = (LabelFilter) filters.getFilter(FilterType.LABEL);
+		List<String> labelIds = lf.getLabelIds();
+		
+		for(int i = 0; i < labelIds.size(); i ++) {
+			if(commaPrefix || i > 0) {
+				sb.append(", ");
+			}
+			sb.append(" FeedbackLabel l" + i);
+			whereClauses.add("l" + i + ".id.feedbackId=f.feedbackId");
+			
+			// Three label filters: [1, 2, 3]
+			// Ensure that:
+			// 1 <> 2
+			// 1 <> 2 <> 3
+			if(i > 0) {
+				for(int j = 0; j < i; j ++) {
+					whereClauses.add("l" + j + "<>l" + i);
+				}
+			}
+		}
+		
+		return sb.toString();
 	}
 	
 	/**

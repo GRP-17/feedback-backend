@@ -35,7 +35,7 @@ public abstract class FeedbackQuery extends DatabaseQuery {
 				LabelFilter lf = (LabelFilter) entry.getValue();
 				for(int offset = 0; offset < lf.getLabelIds().size(); offset ++) {
 					int index = PARAM_INDEX_LABEL + offset;
-					whereClauses.add("l.id.labelId=?" + index);
+					whereClauses.add("l" + offset + ".id.labelId=?" + index);
 				}
 				break;
 			}
