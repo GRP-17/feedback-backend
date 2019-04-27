@@ -8,6 +8,8 @@ public enum StatType {
 	DASHBOARD_NAME("dashboard_name"),
 	/** The set of all {@link Label}s for this dashboard */
 	DASHBOARD_LABELS("dashboard_labels"),
+	/** The set of all {@link BlacklistedPhrase}s for this dashboard */
+	DASHBOARD_BLACKLISTED_PHRASES("dashboard_blacklistedphrases"),
 	/** The paged {@link Feedback}. */
 	FEEDBACK("feedback"),
 	/** The {@link Feedback} count. */

@@ -247,6 +247,9 @@ public class FeedbackController {
 				case DASHBOARD_LABELS:
 					map.put(key, labelService.getLabelsByDashboardId(dashboardId));
 					break;
+				case DASHBOARD_BLACKLISTED_PHRASES:
+					map.put(key, phraseService.getBlacklistedPhrasesByDashboardId(dashboardId));
+					break;
 				case FEEDBACK:
 					map.put(key, feedbackService.getPagedFeedback(filters.clone(),
 							page, pageSize));
