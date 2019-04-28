@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.label.Label;
@@ -37,13 +38,14 @@ public class LabelsController {
 	@Autowired private LabelService labelService;
 
 	@GetMapping()
-	public Resources<Resource<Label>> findAll() throws CommonException {
-		List<Resource<Label>> resources = labelService.getAllLabels();
+	public Resources<Resource<Label>> findAll(@RequestParam(value = "dashboardId")
+													String dashboardId) throws CommonException {
+		List<Resource<Label>> resources = labelService.getLabelsByDashboardId(dashboardId);
 		LoggerUtil.log(Level.INFO, "[Label/Retrieve] Retrieved: "
 										+ resources.size() + " labels");
 		return new Resources<Resource<Label>>(
 				resources,
-				linkTo(methodOn(LabelsController.class).findAll())
+				linkTo(methodOn(LabelsController.class).findAll(dashboardId))
 					.withSelfRel());
 	}
 

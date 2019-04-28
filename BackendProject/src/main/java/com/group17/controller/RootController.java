@@ -107,7 +107,7 @@ public class RootController {
 
 			// Add 'labels'
 			removeParameters(linkTo(methodOn(LabelsController.class)
-										.findAll())
+										.findAll(DUMMY_ID))
 								.withRel("labels")));
 		return rootResource;
 	}
