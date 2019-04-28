@@ -21,17 +21,6 @@ public class LabelService {
 	/** Holds the instance of the factory which will make the resources. */
 	@Autowired private LabelResourceAssembler assembler;
 
-	/**
-	 * Get every {@link Label} in the repository.
-	 *
-	 * @return all of the entries
-	 */
-	public List<Resource<Label>> getAllLabels() {
-		return repository.findAll().stream()
-										.map(assembler::toResource)
-										.collect(Collectors.toList());
-	}
-	
 	public List<Resource<Label>> getLabelsByDashboardId(String dashboardId) {
 		return repository.findLabelsByDashboardId(dashboardId)
 										.stream()
