@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group17.phrase.PhraseService;
@@ -37,13 +38,17 @@ public class BlacklistedPhrasesController {
 	@Autowired private PhraseService phraseService;
 
 	@GetMapping()
-	public Resources<Resource<BlacklistedPhrase>> findAll() throws CommonException {
-		List<Resource<BlacklistedPhrase>> resources = phraseService.getAllBlacklistedPhrases();
+	public Resources<Resource<BlacklistedPhrase>> findAll(@RequestParam(value = "dashboardId")
+																String dashboardId) throws CommonException {
+		
+		List<Resource<BlacklistedPhrase>> resources = 
+					phraseService.getBlacklistedPhrasesByDashboardId(dashboardId);
 		LoggerUtil.log(Level.INFO, "[BlacklistedPhrase/Retrieve] Retrieved: "
 										+ resources.size() + " phrases");
+		
 		return new Resources<Resource<BlacklistedPhrase>>(
 				resources,
-				linkTo(methodOn(BlacklistedPhrasesController.class).findAll())
+				linkTo(methodOn(BlacklistedPhrasesController.class).findAll(dashboardId))
 					.withSelfRel());
 	}
 

@@ -112,7 +112,7 @@ public class RootController {
 
 			// Add 'blacklisted_phrases'
 			removeParameters(linkTo(methodOn(BlacklistedPhrasesController.class)
-										.findAll())
+										.findAll(DUMMY_ID))
 								.withRel("blacklisted_phrases")));
 		return rootResource;
 	}

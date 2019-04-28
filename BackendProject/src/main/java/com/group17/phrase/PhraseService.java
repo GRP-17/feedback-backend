@@ -161,12 +161,6 @@ public class PhraseService {
 		return result;
 	}
 
-	public List<Resource<BlacklistedPhrase>> getAllBlacklistedPhrases() {
-		return repository.findAll().stream()
-										.map(assembler::toResource)
-										.collect(Collectors.toList());
-	}
-	
 	public List<Resource<BlacklistedPhrase>> getBlacklistedPhrasesByDashboardId(String dashboardId) {
 		return repository.findByDashboardId(dashboardId)
 										.stream()
