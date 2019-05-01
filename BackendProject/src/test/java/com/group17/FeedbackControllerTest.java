@@ -43,7 +43,7 @@ public class FeedbackControllerTest extends BaseTest {
 		// database is empty then the list will not be returned
 
 		getMockMvc()
-				.perform(get("/feedback"))
+				.perform(get("/dashboards" + TEST_DASHBOARD_ID + "/feedback"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$._links").isMap());
 	}
