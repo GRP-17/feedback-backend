@@ -174,9 +174,8 @@ public class FeedbackControllerTest extends BaseTest {
 
 		expected.append('{');
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, Queries.class.toString(),
-					TEST_QUERY, Sentiment.values()[1].toString());
-			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters));
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null,0,null);
+			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters).get(rating));
 
 			if(rating < FEEDBACK_MAX_RATING){
 				expected.append(',');
@@ -185,7 +184,7 @@ public class FeedbackControllerTest extends BaseTest {
 		expected.append('}');
 
 		getMockMvc()
-				.perform(get("/feedback/rating/count"))
+				.perform(get("/feedback/rating/count?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(content().json(expected.toString()));
 
