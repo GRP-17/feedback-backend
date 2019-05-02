@@ -108,7 +108,7 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testKDeleteEndpoint() throws Exception {
 		for (String created : feedbacksCreated) {
-			getMockMvc().perform(delete("/feedback/" + created))
+			getMockMvc().perform(delete("/feedback?dashboardId=" + TEST_DASHBOARD_ID + "/" + created))
 					.andExpect(status().isNoContent());
 		}
 	}
