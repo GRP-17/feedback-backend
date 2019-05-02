@@ -30,7 +30,6 @@ public class FeedbackControllerTest extends BaseTest {
 	private static final String CREATE_FEEDBACK_TEXT = "This is a test.";
 	private static final int CREATE_FEEDBACK_RATING  = 1;
 	private static final String TEST_DASHBOARD_ID = "e99f1a5e-5666-4f35-a08b-190aeeb2d0db";
-	private static final Long TEST_QUERY = 1234_5678_9012_3456L;
 
 	/** Stores the last created feedbackId, so that the delete test
 	 *  can use the same one(s) */
@@ -145,12 +144,11 @@ public class FeedbackControllerTest extends BaseTest {
 		StringBuilder expecting = new StringBuilder();
 		expecting.append("{");
 		for (int i = 0; i < Sentiment.values().length; i ++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, Queries.class.toString(),
-					TEST_QUERY, Sentiment.values()[i].toString());
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
 
-			expecting.append('"').append(filters)
+			expecting.append('"').append(Sentiment.values()[i])
 					.append('"').append(":")
-					.append(getFeedbackService().getSentimentCounts(filters));
+					.append(getFeedbackService().getSentimentCounts(filters).get(Sentiment.values()[i]));
 			if(i == Sentiment.values().length - 1) {
 				expecting.append("}");
 			} else {
@@ -159,7 +157,7 @@ public class FeedbackControllerTest extends BaseTest {
 		}
 
 		getMockMvc()
-				.perform(get("/feedback/sentiments/count"))
+				.perform(get("/feedback/sentiments/count?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(content().json(expecting.toString()));
 	}
@@ -174,7 +172,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 		expected.append('{');
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null,0,null);
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
 			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters).get(rating));
 
 			if(rating < FEEDBACK_MAX_RATING){
