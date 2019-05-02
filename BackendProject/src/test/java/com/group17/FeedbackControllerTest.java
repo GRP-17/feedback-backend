@@ -42,7 +42,7 @@ public class FeedbackControllerTest extends BaseTest {
 		// database is empty then the list will not be returned
 
 		getMockMvc()
-				.perform(get("/dashboards" + TEST_DASHBOARD_ID + "/feedback"))
+				.perform(get("/dashboards/" + TEST_DASHBOARD_ID + "/feedback"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$._links").isMap());
 	}
@@ -190,10 +190,19 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testQAverageRatingsCount() throws Exception {
+	    // Build the JSON string we're expecting, for example:
+        // {"average":3.26}
+	    StringBuilder expected = new StringBuilder();
+	    expected.append("{\"average\":");
+
+        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+        expected.append(getFeedbackService().getAverageRating(filters, true));
+        expected.append('}');
+
 		getMockMvc()
-				.perform(get("/feedback/rating/average"))
+				.perform(get("/feedback/rating/average?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+				.andExpect(content().json(expected.toString()));
 
 	}
 
