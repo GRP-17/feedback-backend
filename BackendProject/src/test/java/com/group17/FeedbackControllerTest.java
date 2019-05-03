@@ -130,10 +130,13 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testNCountEndpoint() throws Exception {
-		long count = getRepository().count();
+
+		Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+		long count = getFeedbackService().getFeedbackCount(filters);
 
 		getMockMvc()
-				.perform(get("/feedback/count"))
+				.perform(get("/feedback/count?dashboardId=" + TEST_DASHBOARD_ID))
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.count").value(count));
 	}
 
@@ -190,20 +193,14 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testQAverageRatingsCount() throws Exception {
-	    // Build the JSON string we're expecting, for example:
-        // {"average":3.26}
-	    StringBuilder expected = new StringBuilder();
-	    expected.append("{\"average\":");
 
-        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
-        expected.append(getFeedbackService().getAverageRating(filters, true));
-        expected.append('}');
+		Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+		double avgRating = getFeedbackService().getAverageRating(filters, true);
 
 		getMockMvc()
 				.perform(get("/feedback/rating/average?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().json(expected.toString()));
-
+				.andExpect(jsonPath("$.average").value(avgRating));
 	}
 
 	@Test
