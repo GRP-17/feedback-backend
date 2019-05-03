@@ -9,14 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.group17.feedback.Feedback;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.query.Queries;
-import com.group17.ngram.termvector.TermVector;
 import com.jayway.jsonpath.Filter;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -98,7 +95,7 @@ public class FeedbackControllerTest extends BaseTest {
 								.contentType(MediaType.APPLICATION_JSON)
 								.content((new String("{\"rating\":" + CREATE_FEEDBACK_RATING
 										+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT
-										+ "\"}"))))
+										+ "\"}" ))))
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
@@ -118,7 +115,7 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testLStatsEndpoint() throws Exception{
 		getMockMvc()
-				.perform(get("/feedback/stats"))
+				.perform(get("/feedback/stats?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
@@ -126,46 +123,43 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testMPagedEndpoint() throws Exception{
 		getMockMvc()
-				.perform(get("feedback/paged"))
+				.perform(get("feedback/paged?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 
 	@Test
 	public void testNCountEndpoint() throws Exception {
+		long count = getRepository().count();
 
-        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
-        long count = getFeedbackService().getFeedbackCount(filters);
-
-        getMockMvc()
-                .perform(get("/feedback/count?dashboardId=" + TEST_DASHBOARD_ID))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.count").value(count));
-    }
+		getMockMvc()
+				.perform(get("/feedback/count"))
+				.andExpect(jsonPath("$.count").value(count));
+	}
 
 	@Test
 	public void testOSentimentsCount() throws Exception {
 		// Build the JSON string we're expecting, for example:
 		// {"POSITIVE":2,"NEUTRAL":8,"NEGATIVE":1}
-		StringBuilder expected = new StringBuilder();
-        expected.append("{");
+		StringBuilder expecting = new StringBuilder();
+		expecting.append("{");
 		for (int i = 0; i < Sentiment.values().length; i ++) {
 			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
 
-            expected.append('"').append(Sentiment.values()[i])
+			expecting.append('"').append(Sentiment.values()[i])
 					.append('"').append(":")
 					.append(getFeedbackService().getSentimentCounts(filters).get(Sentiment.values()[i]));
 			if(i == Sentiment.values().length - 1) {
-                expected.append("}");
+				expecting.append("}");
 			} else {
-                expected.append(",");
+				expecting.append(",");
 			}
 		}
 
 		getMockMvc()
 				.perform(get("/feedback/sentiments/count?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().json(expected.toString()));
+				.andExpect(content().json(expecting.toString()));
 	}
 
 
@@ -196,14 +190,20 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testQAverageRatingsCount() throws Exception {
+	    // Build the JSON string we're expecting, for example:
+        // {"average":3.26}
+	    StringBuilder expected = new StringBuilder();
+	    expected.append("{\"average\":");
 
         Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
-        double avgRating = getFeedbackService().getAverageRating(filters, true);
+        expected.append(getFeedbackService().getAverageRating(filters, true));
+        expected.append('}');
 
-        getMockMvc()
-                .perform(get("/feedback/rating/average?dashboardId=" + TEST_DASHBOARD_ID))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.average").value(avgRating));
+		getMockMvc()
+				.perform(get("/feedback/rating/average?dashboardId=" + TEST_DASHBOARD_ID))
+				.andExpect(status().isOk())
+				.andExpect(content().json(expected.toString()));
+
 	}
 
 	@Test
@@ -223,8 +223,4 @@ public class FeedbackControllerTest extends BaseTest {
 				.andExpect(jsonPath(".common_phrases").isMap());
 
 	}
-
-	//TODO: Add test(s) for labels
-
-    //TODO: Add test(s) for filtered results
 }
