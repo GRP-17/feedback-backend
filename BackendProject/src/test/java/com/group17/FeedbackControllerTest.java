@@ -209,7 +209,7 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testRNegativePerDay() throws Exception {
 		getMockMvc()
-				.perform(get("/feedback/rating/negativeperday"))
+				.perform(get("/feedback/rating/negativeperday?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
@@ -218,7 +218,7 @@ public class FeedbackControllerTest extends BaseTest {
 	@Test
 	public void testSCommonPhrases() throws Exception {
 		getMockMvc()
-				.perform(get("/feedback/commonphrases"))
+				.perform(get("/feedback/commonphrases?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath(".common_phrases").isMap());
 

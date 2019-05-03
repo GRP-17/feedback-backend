@@ -25,7 +25,7 @@ public class LabelsControllerTest extends BaseTest {
     @Test
     public void testTFindAllLabels() throws Exception{
         getMockMvc()
-                .perform(get("/labels?dashboardId" + TEST_DASHBOARD_ID))
+                .perform(get("/labels?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(".$labels").isArray());
     }
@@ -35,7 +35,7 @@ public class LabelsControllerTest extends BaseTest {
         Label label = new Label();
 
         getMockMvc()
-                .perform(get("/labels?dashboardId" + TEST_DASHBOARD_ID))
+                .perform(get("/labels?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect((ResultMatcher) jsonPath("$.id",is(label.getLabelId())));
@@ -46,7 +46,7 @@ public class LabelsControllerTest extends BaseTest {
         String result =
                 getMockMvc()
                         .perform(
-                                post("/labels?dashboardId" + TEST_DASHBOARD_ID)
+                                post("/labels?dashboardId=" + TEST_DASHBOARD_ID)
                                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
                         .andReturn()
@@ -60,7 +60,7 @@ public class LabelsControllerTest extends BaseTest {
     public void testWUpdateLabel() throws Exception{
         String result = getMockMvc()
                 .perform(
-                        put("/labels?dashboardId")
+                        put("/labels?dashboardId="  + TEST_DASHBOARD_ID)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 )
                 .andExpect(status().isOk())

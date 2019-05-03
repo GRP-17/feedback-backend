@@ -26,7 +26,7 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
     @Test
     public void testYFindAllBlacklisted() throws Exception{
         getMockMvc()
-                .perform(get("/blacklistedphrases?dashboardId" + TEST_DASHBOARD_ID))
+                .perform(get("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(".$labels").isArray());
     }
@@ -36,7 +36,7 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
         BlacklistedPhrase blacklistedPhrase = new BlacklistedPhrase();
 
         getMockMvc()
-                .perform(get("/blacklistedphrases?dashboardId" + TEST_DASHBOARD_ID))
+                .perform(get("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect((ResultMatcher) jsonPath("$.id",is(blacklistedPhrase.getId())));
@@ -47,7 +47,7 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
         String result =
                 getMockMvc()
                         .perform(
-                                post("/blacklistedphrases?dashboardId" + TEST_DASHBOARD_ID)
+                                post("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID)
                                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
                         .andReturn()
@@ -61,7 +61,7 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
     public void testWUpdateLabel() throws Exception{
         String result = getMockMvc()
                 .perform(
-                        put("/blacklistedphrases?dashboardId")
+                        put("/blacklistedphrases?dashboardId="  + TEST_DASHBOARD_ID)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
