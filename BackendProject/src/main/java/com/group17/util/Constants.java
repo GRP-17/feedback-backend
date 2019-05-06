@@ -28,15 +28,29 @@ public class Constants {
 	/** The default page size to show for paged feedback.  */
 	public static final int DASHBOARD_FEEDBACK_PAGE_SIZE = 20;
 
-	/** The value passed in for any optional String endpoint parameter.  */
-	public static final String PARAM_DEFAULT_STRING = ValueConstants.DEFAULT_NONE; // This will be read in as null
+	/** 
+	 * The value passed in for any optional String endpoint parameter.
+	 * <p>
+	 * This can be read in as null.  
+	 */
+	public static final String PARAM_DEFAULT_STRING = ValueConstants.DEFAULT_NONE;
 	/** The value passed in for any optional integer endpoint parameter.  */
 	public static final String PARAM_DEFAULT_INTEGER = "-100";
-	/** The numerical value of {@link PARAM_DEFAULT_INTEGER} for non-String comparisons.  */
+	/** 
+	 * The numerical value of {@value #PARAM_DEFAULT_INTEGER} for non-String comparisons. 
+	 * <p>
+	 * This is required to ensure the parsed value of {@link #PARAM_DEFAULT_INTEGER}
+	 * is correct.
+	 * */
 	public static final int PARAM_DEFAULT_INTEGER_VALUE = -100;
 	/** The value passed in for any optional long endpoint parameter.  */
 	public static final String PARAM_DEFAULT_LONG = "-100";
-	/** The numerical value of {@link PARAM_DEFAUL_LONG} for non-String comparisons.  */
+	/** 
+	 * The numerical value of {@value #PARAM_DEFAULT_LONG} for non-String comparisons. 
+	 * <p>
+	 * This is required to ensure the parsed value of {@link #PARAM_DEFAULT_LONG}
+	 * is correct.
+	 * */
 	public static final long PARAM_DEFAULT_LONG_VALUE = -100;
 	
 	private Constants() {}

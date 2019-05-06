@@ -3,8 +3,6 @@ package com.group17.controller;
 import static com.group17.util.Constants.COMMON_PHRASES_AMOUNT;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE;
 import static com.group17.util.Constants.DASHBOARD_FEEDBACK_PAGE_SIZE;
-import static com.group17.util.Constants.FEEDBACK_MAX_RATING;
-import static com.group17.util.Constants.FEEDBACK_MIN_RATING;
 import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER;
 import static com.group17.util.Constants.PARAM_DEFAULT_INTEGER_VALUE;
 import static com.group17.util.Constants.PARAM_DEFAULT_LONG;
@@ -50,12 +48,9 @@ import com.group17.feedback.FeedbackService;
 import com.group17.feedback.StatType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.tone.Sentiment;
-import com.group17.label.Label;
 import com.group17.label.LabelService;
-import com.group17.negativeperday.NegativePerDayService;
-import com.group17.ngram.NGramService;
-import com.group17.ngram.termvector.TermVector;
-import com.group17.util.Constants;
+import com.group17.phrase.PhraseService;
+import com.group17.phrase.termvector.TermVector;
 import com.group17.util.LoggerUtil;
 import com.group17.util.exception.CommonException;
 
@@ -69,12 +64,15 @@ public class FeedbackController {
 	/**
 	 * holds the instance of the FeedbackService
 	 */
-	@Autowired private FeedbackService feedbackService;
-	@Autowired private NegativePerDayService negativePerDayService;
-	@Autowired private DashboardService dashboardService;
-	@Autowired private LabelService labelService;
+	@Autowired
+	private FeedbackService feedbackService;
+	@Autowired
+	private DashboardService dashboardService;
+	@Autowired
+	private LabelService labelService;
 
-	@Autowired private NGramService ngramService;
+	@Autowired
+	private PhraseService phraseService;
 
 	/**
 	 * a sub-mapping for get requests
@@ -88,7 +86,7 @@ public class FeedbackController {
 	public Resource<Feedback> findOne(@PathVariable String id) throws CommonException {
 		Resource<Feedback> resource = feedbackService.getFeedbackById(id);
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + id
-										+ ". Object: " + resource.getContent().toString());
+				+ ". Object: " + resource.getContent().toString());
 		return resource;
 	}
 
@@ -103,22 +101,22 @@ public class FeedbackController {
 	@PostMapping(headers = "Accept=application/json")
 	public ResponseEntity<?> create(@RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
-		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
 
-		// N-Grams
-		ngramService.onFeedbackCreated(newFeedback);
-
-    	if (newFeedback.getSentimentEnum().equals(Sentiment.NEGATIVE)) {
-    		LoggerUtil.log(Level.INFO, "[Feedback/Analysis] A Negative review was left for id "
-    										+ newFeedback.getId());
-
-			// Increase negative rating this day
-			negativePerDayService.incrementNegativeByDate(newFeedback.getDashboardId(),
-														 newFeedback.getCreated());
+		// set default values
+		if (newFeedback.getText() == null) {
+			newFeedback.setText("");
+		}
+		if (newFeedback.isPinned() == null) {
+			newFeedback.setPinned(false);
 		}
 
+		Resource<Feedback> resource = feedbackService.createFeedback(newFeedback);
+
+		// n-grams
+		phraseService.onFeedbackCreated(newFeedback);
+
 		LoggerUtil.log(Level.INFO, "[Feedback/Create] Created: " + newFeedback.getId()
-										+ ". Object: " + newFeedback.toString());
+				+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
@@ -130,61 +128,13 @@ public class FeedbackController {
 	 * @throws TransactionSystemException will be thrown when the body of the request is not as expected (JSON format with a rating)
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@PathVariable String id,
-			 						@RequestParam(value = "dashboardId", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String dashboardId,
-			 						@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
-											int rating,
-			 						@RequestParam(value = "text", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String text,
-			 						@RequestParam(value = "pinned", required = false, defaultValue = PARAM_DEFAULT_STRING)
-											String pinned,
-									@RequestParam(value = "labelId", required = false)
-											List<String> labelId)
+	public ResponseEntity<?> update(@PathVariable String id, @RequestBody Feedback newFeedback)
 			throws URISyntaxException, TransactionSystemException {
 
-		Feedback newFeedback = feedbackService.getFeedbackById(id).getContent();
-		if(dashboardId != null && !dashboardId.equals(Constants.PARAM_DEFAULT_STRING)) {
-			newFeedback.setDashboardId(dashboardId);
-		}
-		if(rating != Constants.PARAM_DEFAULT_INTEGER_VALUE
-				&& rating >= FEEDBACK_MIN_RATING
-				&& rating <= FEEDBACK_MAX_RATING) {
-			newFeedback.setRating(rating);
-		}
-		if(text != null && !text.equals(Constants.PARAM_DEFAULT_STRING)) {
-			newFeedback.setText(text);
-			feedbackService.getWatsonGateway().deduceAndSetSentiment(newFeedback);
-		}
-		if(pinned != null && !pinned.equals(Constants.PARAM_DEFAULT_STRING)) {
-			boolean booleanValue = Boolean.valueOf(pinned);
-			newFeedback.setPinned(booleanValue);
-		}
-		if(labelId != null) {
-			// Check if the Feedback has any pre-existing Labels; removing them if they do
-			for(Label existingLabel : newFeedback.getLabels()) {
-				newFeedback.getLabels().remove(existingLabel);
-				labelService.saveLabel(existingLabel);
-
-				// Save the label otherwise this change won't be stored
-				labelService.saveLabel(existingLabel);
-			}
-
-			// Now, to add the existing labels
-			for(String newLabelId : labelId) {
-				// Labels can have duplicate names
-				Label newLabel = labelService.getLabelById(newLabelId).getContent();
-				newFeedback.getLabels().add(newLabel);
-				newLabel.getFeedback().add(newFeedback);
-
-				// Save the label otherwise this change won't be stored
-				labelService.saveLabel(newLabel);
-			}
-		}
-
 		Resource<Feedback> resource = feedbackService.updateFeedback(id, newFeedback);
+
 		LoggerUtil.log(Level.INFO, "[Feedback/Update] Updated: " + id
-										+ ". Object: " + newFeedback.toString());
+				+ ". Object: " + newFeedback.toString());
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
@@ -199,7 +149,7 @@ public class FeedbackController {
 
 		try {
 			feedbackService.deleteFeedbackById(id);
-			ngramService.onFeedbackRemoved(id);
+			phraseService.onFeedbackRemoved(id);
 			LoggerUtil.log(Level.INFO, "[Feedback/Delete] Deleted: " + id);
 		} catch (Exception e) {
 		}
@@ -217,99 +167,110 @@ public class FeedbackController {
 	 */
 	@GetMapping()
 	public Resources<Resource<Feedback>> findFeedback(
-				 @RequestParam(value = "dashboardId")
-						String dashboardId,
-				 @RequestParam(value = "page", required = false, defaultValue = "1")
-				 		int page,
-				 @RequestParam(value = "pageSize", required = false, defaultValue = "10")
-				 		int pageSize,
-				 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String query,
-				 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-						long since,
-				 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-						String sentiment) {
+			@RequestParam(value = "dashboardId")
+					String dashboardId,
+			@RequestParam(value = "page", required = false, defaultValue = "1")
+					int page,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "10")
+					int pageSize,
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String query,
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+					long since,
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		List<Resource<Feedback>> resources = feedbackService.getPagedFeedback(filters, page, pageSize);
 		LoggerUtil.log(Level.INFO, "[Feedback/Retrieve] Retrieved: " + resources.size()
 				+ " elements on page " + page);
 		return new Resources<Resource<Feedback>>(
 				resources,
-				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment))
-					.withSelfRel(),
-				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment))
-					.withRel("count"),
-				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment))
-					.withRel("sentiment_count"),
-				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment))
-					.withRel("rating_average"),
-				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId, query, since, sentiment))
-					.withRel("rating_count"),
-				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId, query, since, sentiment))
-					.withRel("rating_negative"),
-				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId, query, since, sentiment))
-					.withRel("common_phrases"));
+				linkTo(methodOn(FeedbackController.class).findFeedback(dashboardId, -1, -1, query, since, sentiment, rating, labelId))
+						.withSelfRel(),
+				linkTo(methodOn(FeedbackController.class).getCount(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("count"),
+				linkTo(methodOn(FeedbackController.class).getSentimentsCount(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("sentiment_count"),
+				linkTo(methodOn(FeedbackController.class).getAverageRating(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("rating_average"),
+				linkTo(methodOn(FeedbackController.class).getStarRatingCount(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("rating_count"),
+				linkTo(methodOn(FeedbackController.class).getNegativePerDay(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("rating_negative"),
+				linkTo(methodOn(FeedbackController.class).getCommonPhrases(dashboardId, query, since, sentiment, rating, labelId))
+						.withRel("common_phrases"));
 	}
 
 	@GetMapping("/stats")
 	public ResponseEntity<?> stats(
-			 @RequestParam(value = "dashboardId")
+			@RequestParam(value = "dashboardId")
 					String dashboardId,
-			 @RequestParam(value = "page", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+			@RequestParam(value = "page", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
 					int page,
-			 @RequestParam(value = "pageSize", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+			@RequestParam(value = "pageSize", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
 					int pageSize,
-			 @RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
-			 @RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
-			 @RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		if(page == PARAM_DEFAULT_INTEGER_VALUE) {
+		if (page == PARAM_DEFAULT_INTEGER_VALUE) {
 			page = DASHBOARD_FEEDBACK_PAGE;
 		}
-		if(pageSize == PARAM_DEFAULT_INTEGER_VALUE) {
+		if (pageSize == PARAM_DEFAULT_INTEGER_VALUE) {
 			pageSize = DASHBOARD_FEEDBACK_PAGE_SIZE;
 		}
 
-		for(StatType endpoint : StatType.values()) {
+		for (StatType endpoint : StatType.values()) {
 			String key = endpoint.getJsonKey();
 
-			switch(endpoint) {
-			case DASHBOARD_NAME:
-				map.put(key, dashboardService.getDashboardById(dashboardId).getContent().getName());
-				break;
-			case DASHBOARD_LABELS:
-				map.put(key, labelService.getLabelsByDashboardId(dashboardId));
-				break;
-			case FEEDBACK:
-				map.put(key, feedbackService.getPagedFeedback(filters.clone(),
-															  page, pageSize));
-				break;
-			case FEEDBACK_COUNT:
-				map.put(key, feedbackService.getFeedbackCount(filters.clone()));
-				break;
-			case FEEDBACK_SENTIMENT_COUNT:
-				map.put(key, feedbackService.getSentimentCounts(filters.clone()));
-				break;
-			case FEEDBACK_RATING_COUNT:
-				map.put(key, feedbackService.getRatingCounts(filters.clone()));
-				break;
-			case FEEDBACK_RATING_AVERAGE:
-				map.put(key, feedbackService.getAverageRating(filters.clone(), true));
-				break;
-			case FEEDBACK_RATING_NEGATIVE:
-				map.put(key, negativePerDayService.findNegativePerDay(filters.clone()));
-				break;
-			case FEEDBACK_COMMON_PHRASES:
-				map.put(key, feedbackService.getCommonPhrases(filters.clone(),
-															  COMMON_PHRASES_AMOUNT));
-				break;
+			switch (endpoint) {
+				case DASHBOARD_NAME:
+					map.put(key, dashboardService.getDashboardById(dashboardId).getContent().getName());
+					break;
+				case DASHBOARD_LABELS:
+					map.put(key, labelService.getLabelsByDashboardId(dashboardId));
+					break;
+				case DASHBOARD_BLACKLISTED_PHRASES:
+					map.put(key, phraseService.getBlacklistedPhrasesByDashboardId(dashboardId));
+					break;
+				case FEEDBACK:
+					map.put(key, feedbackService.getPagedFeedback(filters.clone(),
+							page, pageSize));
+					break;
+				case FEEDBACK_COUNT:
+					map.put(key, feedbackService.getFeedbackCount(filters.clone()));
+					break;
+				case FEEDBACK_SENTIMENT_COUNT:
+					map.put(key, feedbackService.getSentimentCounts(filters.clone()));
+					break;
+				case FEEDBACK_RATING_COUNT:
+					map.put(key, feedbackService.getRatingCounts(filters.clone()));
+					break;
+				case FEEDBACK_RATING_AVERAGE:
+					map.put(key, feedbackService.getAverageRating(filters.clone(), true));
+					break;
+				case FEEDBACK_RATING_NEGATIVE:
+					map.put(key, feedbackService.getNegativePerDay(filters.clone()));
+					break;
+				case FEEDBACK_COMMON_PHRASES:
+					map.put(key, feedbackService.getCommonPhrases(filters.clone(),
+							COMMON_PHRASES_AMOUNT));
+					break;
 			}
 		}
 
@@ -319,22 +280,26 @@ public class FeedbackController {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize endpoints",
-									  HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/count")
 	public ResponseEntity<?> getCount(
-			 	@RequestParam(value = "dashboardId")
-			 		String dashboardId,
-				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-			 		String query,
-				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-			 		long since,
-				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-			 		String sentiment) throws CommonException {
+			@RequestParam(value = "dashboardId")
+					String dashboardId,
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String query,
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+					long since,
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		long count = feedbackService.getFeedbackCount(filters);
 		Map<String, Long> res = new HashMap<String, Long>();
 		res.put("count", count);
@@ -345,75 +310,87 @@ public class FeedbackController {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(res));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize feedback count",
-									  HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/sentiments/count")
 	public ResponseEntity<?> getSentimentsCount(
-			 	@RequestParam(value = "dashboardId")
-		 			String dashboardId,
-		 		@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-		 			String query,
-		 		@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-		 			long since,
-		 		@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-		 			String sentiment) throws CommonException {
+			@RequestParam(value = "dashboardId")
+					String dashboardId,
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String query,
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+					long since,
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		Map<Sentiment, Long> counts = feedbackService.getSentimentCounts(filters);
 
 		try {
 			String countsAsString = new ObjectMapper().writeValueAsString(counts);
 			LoggerUtil.log(Level.INFO,
-						   "[Feedback/SentimentCount] Counted: " + countsAsString);
+					"[Feedback/SentimentCount] Counted: " + countsAsString);
 
 			return ResponseEntity.ok(countsAsString);
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize sentiment counts",
-									  HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/rating/count")
 	public ResponseEntity<?> getStarRatingCount(
-			 	@RequestParam(value = "dashboardId")
-	 				String dashboardId,
-	 			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
-	 				String query,
-	 			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
-	 				long since,
-	 			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-	 				String sentiment) throws CommonException {
+			@RequestParam(value = "dashboardId")
+					String dashboardId,
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String query,
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+					long since,
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		Map<Integer, Long> ratings = feedbackService.getRatingCounts(filters);
 
 		try {
 			String ratingsAsString = new ObjectMapper().writeValueAsString(ratings);
 			LoggerUtil.log(Level.INFO,
-						   "[Feedback/RatingCount] Counted: " + ratingsAsString);
+					"[Feedback/RatingCount] Counted: " + ratingsAsString);
 
 			return ResponseEntity.ok(ratingsAsString);
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize star rating counts",
-									  HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/rating/average")
 	public ResponseEntity<?> getAverageRating(
-			 	@RequestParam(value = "dashboardId")
+			@RequestParam(value = "dashboardId")
 					String dashboardId,
-				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
-				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
-				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
 		Map<String, Double> map = new HashMap<String, Double>();
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		map.put("average", feedbackService.getAverageRating(filters, true));
 
 		LoggerUtil.log(Level.INFO, "[Feedback/RatingAverage] Calculated Average");
@@ -422,57 +399,65 @@ public class FeedbackController {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize average rating",
-									  HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/rating/negativeperday")
 	public ResponseEntity<?> getNegativePerDay(
-			 	@RequestParam(value = "dashboardId")
+			@RequestParam(value = "dashboardId")
 					String dashboardId,
-				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
-				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
-				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
-		Map<String, Object> map = negativePerDayService.findNegativePerDay(filters);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
+		Map<String, Object> map = feedbackService.getNegativePerDay(filters);
 		LoggerUtil.log(Level.INFO, "[Feedback/RatingNegativePerDay] Returned "
-											+ map.size() + " days");
+				+ map.size() + " days");
 
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize negative rating counts",
-									HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	@GetMapping("/commonphrases")
 	public ResponseEntity<?> getCommonPhrases(
-			 	@RequestParam(value = "dashboardId")
+			@RequestParam(value = "dashboardId")
 					String dashboardId,
-				@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
+			@RequestParam(value = "query", required = false, defaultValue = PARAM_DEFAULT_STRING)
 					String query,
-				@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
+			@RequestParam(value = "since", required = false, defaultValue = PARAM_DEFAULT_LONG)
 					long since,
-				@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
-					String sentiment) throws CommonException {
+			@RequestParam(value = "sentiment", required = false, defaultValue = PARAM_DEFAULT_STRING)
+					String sentiment,
+			@RequestParam(value = "rating", required = false, defaultValue = PARAM_DEFAULT_INTEGER)
+					int rating,
+			@RequestParam(value = "labelId", required = false)
+					List<String> labelId) throws CommonException {
 
-		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment);
+		Filters filters = Filters.fromParameters(dashboardId, query, since, sentiment, rating, labelId);
 		Map<String, Collection<TermVector>> map
-						= feedbackService.getCommonPhrases(filters,
-														   COMMON_PHRASES_AMOUNT);
+				= feedbackService.getCommonPhrases(filters,
+				COMMON_PHRASES_AMOUNT);
 		LoggerUtil.log(Level.INFO,
-					   "[Feedback/CommonPhrases] Returned " + map.get("result").size() + " phrases");
+				"[Feedback/CommonPhrases] Returned " + map.get("result").size() + " phrases");
 
 		try {
 			return ResponseEntity.ok(new ObjectMapper().writeValueAsString(map));
 		} catch (JsonProcessingException e) {
 			throw new CommonException("Unable to serialize common phrases",
-									HttpStatus.NO_CONTENT.value());
+					HttpStatus.NO_CONTENT.value());
 		}
 	}
 
@@ -486,14 +471,14 @@ public class FeedbackController {
 	public ResponseEntity<String> exceptionHandlerCommon(CommonException ex) {
 		LoggerUtil.logException(ex);
 		return new ResponseEntity<String>(ex.getMessage(),
-										  HttpStatus.valueOf(ex.getErrorCode()));
+				HttpStatus.valueOf(ex.getErrorCode()));
 	}
 
 	@ExceptionHandler(JsonParseException.class)
 	public ResponseEntity<String> exceptionHandler(JsonParseException ex) {
 		LoggerUtil.logException(ex);
 		return new ResponseEntity<String>("Unable to parse Feedback object",
-										  HttpStatus.BAD_REQUEST);
+				HttpStatus.BAD_REQUEST);
 	}
 
 	/**

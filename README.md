@@ -7,13 +7,22 @@ The backend of the feedback analysis application.
 
 ### Development Build [![Build Status](https://travis-ci.com/GRP-17/feedback-backend.svg?branch=development)](https://travis-ci.com/GRP-17/feedback-backend)[![codecov](https://codecov.io/gh/GRP-17/feedback-backend/branch/development/graph/badge.svg)](https://codecov.io/gh/GRP-17/feedback-backend)
 
+## Documentation
+| Name | URL |
+| --- | --- |
+| Group Report | https://drive.google.com/open?id=1mbjr1n2SyjgtVKfPI2wD-miIsA2EuCMv |
+| Technical Document | https://drive.google.com/open?id=17yByxnY16siJlCuh0ghhaaALpeEsluFE |
+| User Manual | https://drive.google.com/open?id=1fTtcK_afQHLy4fY02K0Pn4C1mNZCCNJK |
+
 ## Useful Links
 
 | Name | URL |
 | --- | --- |
-| deployment app | https://feedback-analysis-grp-app.herokuapp.com/feedback |
-| development app | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
-| wiki | https://github.com/GRP-17/feedback-backend/wiki |
+| Trello Board | https://trello.com/segrp17 |
+| Document Repository | https://drive.google.com/drive/folders/1CePkA1cSuXFdGF-Pn8NyJPchsSWu4Yc2 |
+| Wiki | https://github.com/GRP-17/feedback-backend/wiki |
+| Deployment App | https://feedback-analysis-grp-app.herokuapp.com/feedback |
+| Development App | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.

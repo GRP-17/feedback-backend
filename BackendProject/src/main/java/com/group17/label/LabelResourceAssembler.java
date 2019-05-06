@@ -24,7 +24,7 @@ public class LabelResourceAssembler implements ResourceAssembler<Label, Resource
 		return new Resource<Label>(
 				label,
 				linkTo(methodOn(LabelsController.class)
-							.findOne(label.getId()))
+							.findOne(label.getLabelId()))
 					.withSelfRel());
 	}
 	

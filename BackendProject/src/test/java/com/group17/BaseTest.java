@@ -20,7 +20,7 @@ import com.group17.feedback.FeedbackService;
 import com.group17.feedback.tone.Sentiment;
 import com.group17.mocking.MockSearchboxGateway;
 import com.group17.mocking.MockWatsonGateway;
-import com.group17.ngram.NGramService;
+import com.group17.phrase.PhraseService;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class BaseTest implements ITest {
 	private static final List<String> DUMMY_IDS		  = new ArrayList<String>();
 	
 	@Autowired private FeedbackService feedbackService;
-	@Autowired private NGramService ngramService;
+	@Autowired private PhraseService ngramService;
 	
 	@Autowired private MockMvc mockMvc;
 	@Autowired private FeedbackRepository repository;
@@ -84,7 +84,7 @@ public class BaseTest implements ITest {
 	}
 
 	@Override
-	public NGramService getNGramService() {
+	public PhraseService getNGramService() {
 		// TODO Auto-generated method stub
 		return ngramService;
 	}

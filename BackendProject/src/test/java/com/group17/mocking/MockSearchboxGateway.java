@@ -3,12 +3,17 @@ package com.group17.mocking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
+import com.group17.phrase.SearchboxGateway;
+import com.group17.phrase.termvector.TermVector;
+
 import java.util.HashMap;
 
-import com.group17.ngram.SearchboxGateway;
-import com.group17.ngram.termvector.TermVector;
-
 public class MockSearchboxGateway extends SearchboxGateway {
+
+	public MockSearchboxGateway() {
+		super("", "", "");
+	}
 
 	@Override
 	public boolean put(String id, String text) {

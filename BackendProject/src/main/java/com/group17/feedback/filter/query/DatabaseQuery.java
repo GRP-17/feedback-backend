@@ -1,5 +1,8 @@
 package com.group17.feedback.filter.query;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -11,6 +14,7 @@ import com.group17.feedback.filter.FilterType;
 import com.group17.feedback.filter.Filters;
 import com.group17.feedback.filter.impl.AgeFilter;
 import com.group17.feedback.filter.impl.DashboardFilter;
+import com.group17.feedback.filter.impl.LabelFilter;
 import com.group17.feedback.filter.impl.RatingFilter;
 import com.group17.feedback.filter.impl.SentimentFilter;
 import com.group17.feedback.filter.impl.TextFilter;
@@ -26,7 +30,12 @@ public abstract class DatabaseQuery {
 	public static int PARAM_INDEX_SENTIMENT = 4;
 	/** The query parameter for {@link FilterType#RATING}. */
 	public static int PARAM_INDEX_RATING    = 5;
-
+	/** The query parameter for {@link FilterType#LABEL}. 
+	 *  <p>
+	 *  
+	 */
+	public static int PARAM_INDEX_LABEL     = 100;
+	
 	/**
 	 * Build a {@link javax.persistence.Query}, for this DatabaseQuery
 	 * based on Filters.
@@ -36,6 +45,39 @@ public abstract class DatabaseQuery {
 	 * @return the query to be executed
 	 */
 	public abstract Query build(EntityManager entityManager, Filters filters);
+	
+	public abstract String buildWhere(Filters filters, List<String> whereClauses);
+	
+	public String buildWhere(Filters filters, String... whereClauses) {
+		return buildWhere(filters, Arrays.asList(whereClauses));
+	}
+	
+	public String buildLabelJoins(Filters filters, List<String> whereClauses,
+								  boolean commaPrefix) {
+		StringBuilder sb = new StringBuilder();
+		LabelFilter lf = (LabelFilter) filters.getFilter(FilterType.LABEL);
+		List<String> labelIds = lf.getLabelIds();
+		
+		for(int i = 0; i < labelIds.size(); i ++) {
+			if(commaPrefix || i > 0) {
+				sb.append(", ");
+			}
+			sb.append(" FeedbackLabel l" + i);
+			whereClauses.add("l" + i + ".id.feedbackId=f.feedbackId");
+			
+			// Three label filters: [1, 2, 3]
+			// Ensure that:
+			// 1 <> 2
+			// 1 <> 2 <> 3
+			if(i > 0) {
+				for(int j = 0; j < i; j ++) {
+					whereClauses.add("l" + j + "<>l" + i);
+				}
+			}
+		}
+		
+		return sb.toString();
+	}
 	
 	/**
 	 * Set the {@link javax.persistence.Query} parameters based on filters.
@@ -73,10 +115,17 @@ public abstract class DatabaseQuery {
 				query = query.setParameter(PARAM_INDEX_RATING, 
 										   rf.getRating());
 				break;
+			case LABEL:
+				LabelFilter lf = (LabelFilter) entry.getValue();
+				int offset = 0;
+				for(String labelId : lf.getLabelIds()) {
+					int index = PARAM_INDEX_LABEL + offset++;
+					query = query.setParameter(index, labelId);
+				}
+				break;
 			}
 		}
 		return query;
 	}
-	
 	
 }

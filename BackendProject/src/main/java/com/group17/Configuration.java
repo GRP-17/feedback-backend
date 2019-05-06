@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.group17.feedback.tone.WatsonGateway;
-import com.group17.ngram.SearchboxGateway;
+import com.group17.phrase.SearchboxGateway;
 
 /**
  * The {@link org.springframework.context.annotation.Configuration} 
@@ -34,13 +34,20 @@ public class Configuration {
 	}
 	
 	/**
-	 * Creates a new instance of the {@link com.group17.ngram.SearchboxGateway}.
+	 * Creates a new instance of the {@link com.group17.phrase.SearchboxGateway}.
 	 * 
 	 * @return the new com.group17.ngram.SearchboxGateway instance
 	 */
 	@Bean
 	public SearchboxGateway searchboxGateway() {
-		return new SearchboxGateway();
+		String baseUrl = "http://paas:a3bae525150e419cfe82fe2f52b1a5f4@gloin-eu-west-1.searchly.com/";
+		String index = "master-test";
+				
+		String putUrl = baseUrl + index + "/doc/";
+		String postUrl = baseUrl + index + "/doc/_mtermvectors";
+		String deleteUrl = putUrl;
+		
+		return new SearchboxGateway(putUrl, postUrl, deleteUrl);
 	}
 
 }

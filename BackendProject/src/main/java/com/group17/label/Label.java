@@ -29,41 +29,44 @@ public class Label {
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	@Column(columnDefinition = "VARCHAR(36)")
+	private String labelId;
 	
 	/**
 	 * The {@link Dashboard} this Label belongs to.
 	 */
 	@NotNull(message = "Invalid dashboardId")
-	@Column(name = "dashboardId", columnDefinition = "VARCHAR(36)")
+	@Column(columnDefinition = "VARCHAR(36)")
 	private String dashboardId;
 	
 	/** The name of the label. */
 	@NotNull(message = "Bad Label Format")
-	@Column(name = "name", columnDefinition = "VARCHAR(36)")
+	@Column(columnDefinition = "VARCHAR(36)")
 	private String name;
 	
 	@NotNull(message = "Bad Label Color")
 	@Size(min=7, max=7)
-	@Column(name = "color", columnDefinition = "VARCHAR(7)")
+	@Column(columnDefinition = "VARCHAR(7)")
 	private String color = "#28AF61"; // Default value of #28AF61 (green)
 	
 	@JsonIgnore // This has to be ignored as there is a circular dependency inside Feedback
 	@ManyToMany(mappedBy = "labels")
     private Set<Feedback> feedback = new HashSet<Feedback>();
-	
-	public Label() {
-	}
-	
+
+	public Label() {}
+
 	public Label(String dashboardId, String name, String color) {
 		this.dashboardId = dashboardId;
 		this.name = name;
 		this.color = color;
 	}
-	
-	public String getId() {
-		return id;
+
+	public void setLabelId(String labelId) {
+		this.labelId = labelId;
+	}
+
+	public String getLabelId() {
+		return labelId;
 	}
 	
 	public String getDashboardId() {
