@@ -27,6 +27,7 @@ public class FeedbackControllerTest extends BaseTest {
 	private static final String CREATE_FEEDBACK_TEXT = "This is a test.";
 	private static final int CREATE_FEEDBACK_RATING  = 1;
 	private static final String TEST_DASHBOARD_ID = "e99f1a5e-5666-4f35-a08b-190aeeb2d0db";
+	private static final long TEST_SINCE = 0;
 
 	/** Stores the last created feedbackId, so that the delete test
 	 *  can use the same one(s) */
@@ -127,7 +128,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testNCountEndpoint() throws Exception {
-		Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+		Filters filters = (Filters) Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
 		long count = getFeedbackService().getFeedbackCount(filters);
 
 		getMockMvc()
@@ -143,7 +144,7 @@ public class FeedbackControllerTest extends BaseTest {
 		StringBuilder expecting = new StringBuilder();
 		expecting.append("{");
 		for (int i = 0; i < Sentiment.values().length; i ++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
 
 			expecting.append('"').append(Sentiment.values()[i])
 					.append('"').append(":")
@@ -171,7 +172,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 		expected.append('{');
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
 			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters).get(rating));
 
 			if(rating < FEEDBACK_MAX_RATING){
@@ -194,7 +195,7 @@ public class FeedbackControllerTest extends BaseTest {
 	    StringBuilder expected = new StringBuilder();
 	    expected.append("{\"average\":");
 
-        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, 0, null);
+        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
         expected.append(getFeedbackService().getAverageRating(filters, true));
         expected.append('}');
 
