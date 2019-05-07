@@ -52,8 +52,8 @@ public class BlacklistedPhrase {
 	/**
 	 * constructor for the general mapping of the JSON body onto the feedback object
 	 *
-	 * @param rating the rating of the feedback
-	 * @param text   the comment left with the feedback
+	 * @param dashboardId
+	 * @param phrase   the comment left with the feedback
 	 */
 	public BlacklistedPhrase(String dashboardId, String phrase) {
 		this.dashboardId = dashboardId;

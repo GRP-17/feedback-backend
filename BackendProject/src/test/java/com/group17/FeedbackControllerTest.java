@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,19 +16,26 @@ import com.group17.feedback.Feedback;
 import com.group17.feedback.filter.Filters;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.group17.feedback.tone.Sentiment;
 import com.jayway.jsonpath.JsonPath;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FeedbackControllerTest extends BaseTest {
 	private static final String CREATE_FEEDBACK_TEXT = "This is a test.";
 	private static final int CREATE_FEEDBACK_RATING  = 1;
 	private static final String TEST_DASHBOARD_ID = "e99f1a5e-5666-4f35-a08b-190aeeb2d0db";
 	private static final long TEST_SINCE = 0;
+	private MediaType contenttype = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
 
 	/** Stores the last created feedbackId, so that the delete test
 	 *  can use the same one(s) */
@@ -59,10 +67,9 @@ public class FeedbackControllerTest extends BaseTest {
 		Feedback feedback = new Feedback();
 
 		getMockMvc()
-				.perform(get("/feedback"))
+				.perform(get("/dashboards/" + TEST_DASHBOARD_ID +"/feedback"))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect((ResultMatcher) jsonPath("$.id",is(feedback.getId())));
+				.andExpect(content().contentType(contenttype));
 	}
 
 	@Test
@@ -70,8 +77,8 @@ public class FeedbackControllerTest extends BaseTest {
 		String result =
 				getMockMvc()
 						.perform(
-								post("/feedback")
-										.contentType(MediaType.APPLICATION_JSON)
+								post("/dashboards/" + TEST_DASHBOARD_ID +"/feedback")
+										.accept(MediaType.APPLICATION_JSON)
 										.content(new String("{\"rating\":" + CREATE_FEEDBACK_RATING
 												+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT
 												+ "\"}")))
@@ -89,8 +96,8 @@ public class FeedbackControllerTest extends BaseTest {
 	public void testJUpdateFeedbackEndpoint() throws Exception{
 		String result = getMockMvc()
 				.perform(
-						put("/feedback")
-								.contentType(MediaType.APPLICATION_JSON)
+						put("/dashboards/" + TEST_DASHBOARD_ID +"/feedback")
+								.accept(MediaType.APPLICATION_JSON)
 								.content((new String("{\"rating\":" + CREATE_FEEDBACK_RATING
 										+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT
 										+ "\"}" ))))
@@ -115,15 +122,7 @@ public class FeedbackControllerTest extends BaseTest {
 		getMockMvc()
 				.perform(get("/feedback/stats?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
-	}
-
-	@Test
-	public void testMPagedEndpoint() throws Exception{
-		getMockMvc()
-				.perform(get("/feedback/paged?dashboardId=" + TEST_DASHBOARD_ID))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+				.andExpect(content().contentType(contenttype));
 	}
 
 	@Test
@@ -211,8 +210,7 @@ public class FeedbackControllerTest extends BaseTest {
 		getMockMvc()
 				.perform(get("/feedback/rating/negativeperday?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
+				.andExpect(content().contentType(contenttype));
 	}
 
 	@Test
@@ -220,7 +218,6 @@ public class FeedbackControllerTest extends BaseTest {
 		getMockMvc()
 				.perform(get("/feedback/commonphrases?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath(".common_phrases").isMap());
-
+				.andExpect(content().contentType(contenttype));
 	}
 }

@@ -8,19 +8,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.group17.dashboard.Dashboard;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.*;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DashboardControllerTest extends BaseTest {
     private static final String CREATE_DASHBOARD_NAME = "dashboard's name";
+    private MediaType contenttype = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
 
     private static List<String> dashboardsCreated = new ArrayList<String>();
 
@@ -29,18 +38,19 @@ public class DashboardControllerTest extends BaseTest {
         getMockMvc()
                 .perform(get("/dashboards"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dashboard").isArray());
+                .andExpect(jsonPath("$._links").isMap());
     }
 
     @Test
     public void testBFindADashboard() throws Exception{
         Dashboard dashboard = new Dashboard();
+        JsonPathResultMatchers resultActions = jsonPath("$.id",is(dashboard.getId()));
 
         getMockMvc()
                 .perform(get("/dashboards"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect((ResultMatcher) jsonPath("$.id",is(dashboard.getId())));
+                .andExpect(content().contentType(contenttype))
+                .andExpect(resultActions.isArray());
     }
 
     @Test
