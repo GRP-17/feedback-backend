@@ -7,9 +7,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.group17.feedback.Feedback;
@@ -26,6 +28,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.web.bind.annotation.ValueConstants;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -127,7 +130,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testNCountEndpoint() throws Exception {
-		Filters filters = (Filters) Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
+		Filters filters = (Filters) Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
 		long count = getFeedbackService().getFeedbackCount(filters);
 
 		getMockMvc()
@@ -143,7 +146,7 @@ public class FeedbackControllerTest extends BaseTest {
 		StringBuilder expecting = new StringBuilder();
 		expecting.append("{");
 		for (int i = 0; i < Sentiment.values().length; i ++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
 
 			expecting.append('"').append(Sentiment.values()[i])
 					.append('"').append(":")
@@ -171,7 +174,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 		expected.append('{');
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
 			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters).get(rating));
 
 			if(rating < FEEDBACK_MAX_RATING){
@@ -194,7 +197,7 @@ public class FeedbackControllerTest extends BaseTest {
 	    StringBuilder expected = new StringBuilder();
 	    expected.append("{\"average\":");
 
-        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, null, TEST_SINCE, null, null, null);
+        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
         expected.append(getFeedbackService().getAverageRating(filters, true));
         expected.append('}');
 
