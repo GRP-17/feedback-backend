@@ -49,36 +49,6 @@ public class LabelsControllerTest extends BaseTest {
     }
 
     @Test
-    public void testVCreateLabel() throws Exception{
-        String result =
-                getMockMvc()
-                        .perform(
-                                post("/labels?dashboardId=" + TEST_DASHBOARD_ID)
-                                        .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isCreated())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
-
-        labelCreated.add(JsonPath.parse(result).read("$.id"));
-    }
-
-    @Test
-    public void testWUpdateLabel() throws Exception{
-        String result = getMockMvc()
-                .perform(
-                        put("/labels?dashboardId="  + TEST_DASHBOARD_ID)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                )
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        labelCreated.add(JsonPath.parse(result).read("$.id"));
-    }
-
-    @Test
     public void testXDeleteLabel() throws Exception{
         for (String created : labelCreated) {
             getMockMvc().perform(delete("/labels?dashboardId=" + TEST_DASHBOARD_ID + "/" + created))

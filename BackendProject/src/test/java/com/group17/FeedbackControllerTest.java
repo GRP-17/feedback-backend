@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -26,8 +25,6 @@ import org.springframework.http.MediaType;
 import com.group17.feedback.tone.Sentiment;
 import com.jayway.jsonpath.JsonPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.web.bind.annotation.ValueConstants;
 
@@ -75,43 +72,6 @@ public class FeedbackControllerTest extends BaseTest {
 				.perform(get("/feedback?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
                 .andExpect(resultActions.exists());
-	}
-
-	@Test
-	public void testICreateFeedbackEndpoint() throws Exception {
-		String result =
-				getMockMvc()
-						.perform(
-								post("/dashboards/" + TEST_DASHBOARD_ID +"/feedback")
-										.accept(MediaType.APPLICATION_JSON)
-										.content(new String("{\"rating\":" + CREATE_FEEDBACK_RATING
-												+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT
-												+ "\"}")))
-						.andExpect(status().isCreated())
-						.andExpect(jsonPath("$.rating").value(CREATE_FEEDBACK_RATING))
-						.andExpect(jsonPath("$.text").value(CREATE_FEEDBACK_TEXT))
-						.andReturn()
-						.getResponse()
-						.getContentAsString();
-
-		feedbacksCreated.add(JsonPath.parse(result).read("$.id"));
-	}
-
-	@Test
-	public void testJUpdateFeedbackEndpoint() throws Exception{
-		String result = getMockMvc()
-				.perform(
-						put("/dashboards/" + TEST_DASHBOARD_ID +"/feedback")
-								.accept(MediaType.APPLICATION_JSON)
-								.content((new String("{\"rating\":" + CREATE_FEEDBACK_RATING
-										+ ", \"text\": \"" + CREATE_FEEDBACK_TEXT
-										+ "\"}" ))))
-				.andExpect(status().isOk())
-				.andReturn()
-				.getResponse()
-				.getContentAsString();
-
-		feedbacksCreated.add(JsonPath.parse(result).read("$.id"));
 	}
 
 	@Test

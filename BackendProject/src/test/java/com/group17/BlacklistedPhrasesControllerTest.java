@@ -9,8 +9,6 @@ import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 
 
@@ -20,7 +18,6 @@ import java.util.List;
 
 import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,37 +50,7 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
     }
 
     @Test
-    public void testVCreateLabel() throws Exception{
-        String result =
-                getMockMvc()
-                        .perform(
-                                post("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID)
-                                        .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isCreated())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
-
-        phraseCreated.add(JsonPath.parse(result).read("$.id"));
-    }
-
-    @Test
-    public void testWUpdateLabel() throws Exception{
-        String result = getMockMvc()
-                .perform(
-                        put("/blacklistedphrases?dashboardId="  + TEST_DASHBOARD_ID)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        phraseCreated.add(JsonPath.parse(result).read("$.id"));
-    }
-
-    @Test
-    public void testXDeleteLabel() throws Exception{
+    public void testXDeleteBlacklistedPhrase() throws Exception{
         for (String created : phraseCreated) {
             getMockMvc().perform(delete("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID + "/" + created))
                     .andExpect(status().isNoContent());
