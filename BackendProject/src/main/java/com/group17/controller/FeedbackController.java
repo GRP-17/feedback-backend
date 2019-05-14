@@ -122,8 +122,6 @@ public class FeedbackController {
 
 	/**
 	 * a sub-mapping for put requests
-	 *
-	 * @param newFeedback the new feedback to save
 	 * @param id          the id of the feedback to update
 	 * @return a resource with the updated feedback
 	 * @throws URISyntaxException
