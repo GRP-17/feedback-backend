@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LabelsControllerTest extends BaseTest {
     private static List<String> labelCreated = new ArrayList<String>();
     private static final String TEST_DASHBOARD_ID = "e99f1a5e-5666-4f35-a08b-190aeeb2d0db";
-    private MediaType contenttype = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
 
     @Test
     public void testTFindAllLabels() throws Exception{

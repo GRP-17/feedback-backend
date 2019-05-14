@@ -28,8 +28,6 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DashboardControllerTest extends BaseTest {
     private static final String CREATE_DASHBOARD_NAME = "dashboard's name";
-    private MediaType contenttype = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
-
     private static List<String> dashboardsCreated = new ArrayList<String>();
 
     @Test
@@ -43,13 +41,12 @@ public class DashboardControllerTest extends BaseTest {
     @Test
     public void testBFindADashboard() throws Exception{
         Dashboard dashboard = new Dashboard();
-        JsonPathResultMatchers resultActions = jsonPath("$.id",is(dashboard.getId()));
+        JsonPathResultMatchers resultActions = jsonPath(".id",is(dashboard.getId()));
 
         getMockMvc()
                 .perform(get("/dashboards"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contenttype))
-                .andExpect(resultActions.isArray());
+                .andExpect(resultActions.exists());
     }
 
     @Test
