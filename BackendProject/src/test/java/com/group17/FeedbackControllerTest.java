@@ -194,17 +194,14 @@ public class FeedbackControllerTest extends BaseTest {
 	public void testQAverageRatingsCount() throws Exception {
 	    // Build the JSON string we're expecting, for example:
         // {"average":3.26}
-	    StringBuilder expected = new StringBuilder();
-	    expected.append("{\"average\":");
-
-        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
-        expected.append(getFeedbackService().getAverageRating(filters, true));
-        expected.append('}');
+	    
+        Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.emptyList());
+        double avgRating = getFeedbackService().getAverageRating(filters, true);
 
 		getMockMvc()
 				.perform(get("/feedback/rating/average?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().json(expected.toString()));
+                .andExpect(jsonPath("$.average").value(avgRating));
 
 	}
 
