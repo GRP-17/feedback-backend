@@ -42,15 +42,14 @@ public class BlacklistedPhrasesControllerTest extends BaseTest{
     }
 
     @Test
-    public void testUFindOneLabel() throws Exception{
+    public void testZFindNewBlacklistedPhrase() throws Exception{
         BlacklistedPhrase blacklistedPhrase = new BlacklistedPhrase();
-        JsonPathResultMatchers resultActions = jsonPath("$.id",is(blacklistedPhrase.getId()));
+        JsonPathResultMatchers resultActions = jsonPath(".id",is(blacklistedPhrase.getId()));
 
         getMockMvc()
                 .perform(get("/blacklistedphrases?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contenttype))
-                .andExpect(resultActions.isArray());
+                .andExpect(resultActions.exists());
     }
 
     @Test

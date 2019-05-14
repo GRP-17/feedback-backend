@@ -38,7 +38,7 @@ public class LabelsControllerTest extends BaseTest {
     }
 
     @Test
-    public void testUFindOneLabel() throws Exception{
+    public void testUFindNewLabel() throws Exception{
         Label label = new Label();
         JsonPathResultMatchers resultActions = jsonPath(".labelId",is(label.getLabelId()));
 

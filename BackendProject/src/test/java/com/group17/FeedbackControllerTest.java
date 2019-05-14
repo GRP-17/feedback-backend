@@ -67,7 +67,7 @@ public class FeedbackControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testHFindOneFeedback() throws Exception{
+	public void testHFindNewFeedback() throws Exception{
 		Feedback feedback = new Feedback();
         JsonPathResultMatchers resultActions = jsonPath(".id",is(feedback.getId()));
 

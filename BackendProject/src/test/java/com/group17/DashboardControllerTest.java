@@ -39,7 +39,7 @@ public class DashboardControllerTest extends BaseTest {
     }
 
     @Test
-    public void testBFindADashboard() throws Exception{
+    public void testBFindNewDashboard() throws Exception{
         Dashboard dashboard = new Dashboard();
         JsonPathResultMatchers resultActions = jsonPath(".id",is(dashboard.getId()));
 
