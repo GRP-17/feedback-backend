@@ -174,7 +174,7 @@ public class FeedbackControllerTest extends BaseTest {
 
 		expected.append('{');
 		for (int rating = FEEDBACK_MIN_RATING; rating <= FEEDBACK_MAX_RATING; rating++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.emptyList());
 			expected.append('"').append(rating).append("\":").append(getFeedbackService().getRatingCounts(filters).get(rating));
 
 			if(rating < FEEDBACK_MAX_RATING){
