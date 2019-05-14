@@ -130,13 +130,13 @@ public class FeedbackControllerTest extends BaseTest {
 
 	@Test
 	public void testNCountEndpoint() throws Exception {
-		Filters filters = (Filters) Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
+		Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.emptyList());
 		long count = getFeedbackService().getFeedbackCount(filters);
 
 		getMockMvc()
 				.perform(get("/feedback/count?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().json(String.valueOf(count)));
+		        .andExpect(jsonPath("$.count").value(count));
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class FeedbackControllerTest extends BaseTest {
 		StringBuilder expecting = new StringBuilder();
 		expecting.append("{");
 		for (int i = 0; i < Sentiment.values().length; i ++) {
-			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.singletonList(ValueConstants.DEFAULT_NONE));
+			Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.emptyList());
 
 			expecting.append('"').append(Sentiment.values()[i])
 					.append('"').append(":")
