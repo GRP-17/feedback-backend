@@ -41,13 +41,12 @@ public class LabelsControllerTest extends BaseTest {
     @Test
     public void testUFindOneLabel() throws Exception{
         Label label = new Label();
-        JsonPathResultMatchers resultActions = jsonPath("$.id",is(label.getLabelId()));
+        JsonPathResultMatchers resultActions = jsonPath(".labelId",is(label.getLabelId()));
 
         getMockMvc()
                 .perform(get("/labels?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contenttype))
-                .andExpect(resultActions.isArray());
+                .andExpect(resultActions.exists());
     }
 
     @Test
