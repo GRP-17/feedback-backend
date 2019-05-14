@@ -35,7 +35,7 @@ public class LabelsControllerTest extends BaseTest {
         getMockMvc()
                 .perform(get("/labels?dashboardId=" + TEST_DASHBOARD_ID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(".$labels").isArray());
+                .andExpect(jsonPath("._links").isArray());
     }
 
     @Test

@@ -194,7 +194,7 @@ public class FeedbackControllerTest extends BaseTest {
 	public void testQAverageRatingsCount() throws Exception {
 	    // Build the JSON string we're expecting, for example:
         // {"average":3.26}
-	    
+
         Filters filters = Filters.fromParameters(TEST_DASHBOARD_ID, ValueConstants.DEFAULT_NONE, TEST_SINCE, ValueConstants.DEFAULT_NONE, -100, Collections.emptyList());
         double avgRating = getFeedbackService().getAverageRating(filters, true);
 
