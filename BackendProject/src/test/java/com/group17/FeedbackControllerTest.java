@@ -28,6 +28,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.web.bind.annotation.ValueConstants;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,13 +67,14 @@ public class FeedbackControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testHFindOneEndpoint() throws Exception{
+	public void testHFindOneFeedback() throws Exception{
 		Feedback feedback = new Feedback();
+        JsonPathResultMatchers resultActions = jsonPath(".id",is(feedback.getId()));
 
-		getMockMvc()
-				.perform(get("/dashboards/" + TEST_DASHBOARD_ID +"/feedback"))
+        getMockMvc()
+				.perform(get("/feedback?dashboardId=" + TEST_DASHBOARD_ID))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(contenttype));
+                .andExpect(resultActions.exists());
 	}
 
 	@Test
