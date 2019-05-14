@@ -21,8 +21,8 @@ The backend of the feedback analysis application.
 | Trello Board | https://trello.com/segrp17 |
 | Document Repository | https://drive.google.com/drive/folders/1CePkA1cSuXFdGF-Pn8NyJPchsSWu4Yc2 |
 | Wiki | https://github.com/GRP-17/feedback-backend/wiki |
-| Deployment App | https://feedback-analysis-grp-app.herokuapp.com/feedback |
-| Development App | https://feedback-analysis-grp-app-dev.herokuapp.com/feedback |
+| Deployment App | https://feedback-analysis-grp-app.herokuapp.com/ |
+| Development App | https://feedback-analysis-grp-app-dev.herokuapp.com/ |
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
